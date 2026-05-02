@@ -202,6 +202,12 @@ def call_llm(prompt, max_tokens=4000, temperature=0.3, timeout=120):
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             resp = json.loads(r.read())
+            # 提取 token 用量并打印（供 run_combined_briefing.py 解析）
+            usage = resp.get('usage', {})
+            if usage:
+                inp = usage.get('prompt_tokens', 0)
+                out = usage.get('completion_tokens', 0)
+                print(f'[LLM] input_tokens={inp} output_tokens={out}')
             # 兼容不同 API 响应格式
             if 'choices' in resp:
                 return True, resp['choices'][0]['message']['content']
