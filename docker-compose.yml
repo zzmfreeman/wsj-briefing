@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  wsj-briefing:
+    build: .
+    container_name: wsj-briefing
+    volumes:
+      - ./cn_wsj_cookies.txt:/data/cookies/cn_wsj_cookies.txt:ro
+      - ./archive:/data/archive
+      - ./seen:/data/seen
+      - /Users/zzm/.openclaw/workspace/openclaw_macmini_ICnews/docs:/data/web
+      - /Users/zzm/.openclaw/openclaw.json:/app/openclaw.json:ro
+    environment:
+      - COOKIE_FILE=/data/cookies/cn_wsj_cookies.txt
+      - ARCHIVE_DIR=/data/archive
+      - WEB_DIR=/data/web
+      - OPENCLAW_CONFIG=/app/openclaw.json
+    restart: "no"  # cron 触发，不需要常驻
+
+  # Watchdog: 检查 wsj-briefing 容器最近是否成功运行
+  wsj-watchdog:
+    image: python:3.12-slim
+    container_name: wsj-watchdog
+    volumes:
+      - ./archive:/data/archive:ro
+    entrypoint: ["python3", "-c"]
+    command:
+      - |
+        import json, os, sys
+        from datetime import datetime, timedelta
+        from pathlib import Path
+        archive = Path("/data/archive")
+        today = datetime.now().strftime("%Y-%m-%d")
+        cn_file = archive / f"{today}_cn_home.md"
+        if not cn_file.exists():
+            print(f"⚠️ WSJ briefing not found for {today}")
+            # Notify via openclaw (if available)
+            sys.exit(1)
+        print(f"✅ WSJ briefing exists for {today}")
+    restart: "no"

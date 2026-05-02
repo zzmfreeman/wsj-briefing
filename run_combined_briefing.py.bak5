@@ -1,0 +1,183 @@
+#!/usr/bin/env python3
+"""
+WSJ 合并简报 - 每天 12:00 一次性推送
+✓ 并行抓取 RSS + CN（省30%时间）
+✓ 合并后去重（避免同一文章重复摘要）
+✓ 超时发 Discord 告警
+✓ 完成报告耗时 + Token
+"""
+import subprocess, json, re, time, signal, os, sys, concurrent.futures
+from datetime import datetime
+from pathlib import Path
+
+SCRIPT_DIR  = Path(__file__).parent
+DISCORD_CH = "1478404345782472754"
+SKIP_ENV   = {"WSJ_DISCORD_SKIP": "1"}
+TIMEOUT    = 360
+
+# ── 超时告警 ──────────────────────────────────────────────
+class TimeoutException(Exception):
+    pass
+
+def _sigalarm(signum, frame):
+    send_alert(f"⚠️ WSJ简报超时（>{TIMEOUT}s），任务已被强制终止，请检查日志。")
+    sys.exit(1)
+
+signal.signal(signal.SIGALRM, _sigalarm)
+signal.alarm(TIMEOUT)
+
+# ── Discord 发消息 ──────────────────────────────────────────
+def send_discord(text):
+    chunks, head = [], text
+    while len(head) > 1900:
+        cut = head.rfind('\n', 0, 1900)
+        if cut < 100: cut = 1900
+        chunks.append(head[:cut]); head = head[cut:].lstrip('\n')
+    if head: chunks.append(head)
+    for i, ch in enumerate(chunks, 1):
+        r = subprocess.run(
+            ["openclaw", "message", "send",
+             "--channel", "discord", "--target", DISCORD_CH,
+             "--message", ch],
+            capture_output=True, text=True, timeout=30
+        )
+        tag = "✓" if r.returncode == 0 else f"✗ {r.stderr[:60]}"
+        print(f"  Discord {i}/{len(chunks)} {tag}")
+        time.sleep(0.3)
+
+def send_alert(msg):
+    print(f"[ALERT] {msg}")
+    send_discord(msg)
+
+# ── 解析子脚本输出的耗时 ─────────────────────────────────────
+def parse_elapsed(output):
+    m = re.search(r'\((\d+)\s*s\)', output)
+    return int(m.group(1)) if m else None
+
+# ── 运行单个子脚本 ──────────────────────────────────────────
+def run_script(name, path, env_extra=None):
+    env = os.environ.copy()
+    env.update(env_extra or {})
+    t0 = time.time()
+    try:
+        r = subprocess.run(
+            ["python3", str(path)],
+            capture_output=True, text=True, timeout=300,
+            cwd=str(SCRIPT_DIR), env=env
+        )
+        ok = r.returncode == 0
+        elapsed = int(time.time() - t0)
+        out = r.stdout + r.stderr
+        print(f"  {name} {'✓' if ok else '✗'} ({elapsed}s)")
+        if not ok:
+            print(f"    → {out[-300:]}")
+        return ok, elapsed, out
+    except subprocess.TimeoutExpired:
+        print(f"  {name} 超时！ ({int(time.time()-t0)}s)")
+        return False, int(time.time()-t0), ""
+
+# ── 清理超期seen记录（保留近200条）─────────────────────────────
+def prune_seen():
+    sf = SCRIPT_DIR / "seen_cn_home.json"
+    if sf.exists():
+        try:
+            seen = json.loads(sf.read_text())
+            if len(seen) > 200:
+                sf.write_text(json.dumps(seen[-200:]))
+                print(f"  seen记录已精简至200条")
+        except Exception as e:
+            print(f"  seen精简失败: {e}")
+
+# ── 提取文章标题（用于去重）───────────────────────────────────
+def extract_titles(text):
+    return set(re.findall(r'\*\*\u300a(.+?)\u300b\*\*', text))
+
+# ── 主流程 ─────────────────────────────────────────────────
+def main():
+    t_total = time.time()
+    today    = datetime.now().strftime("%Y-%m-%d")
+    rss_arch = SCRIPT_DIR / "archive" / f"{today}.md"
+    cn_arch  = SCRIPT_DIR / "archive" / f"{today}_cn_home.md"
+
+    # 清理旧归档 + seen
+    for f in [rss_arch, cn_arch]:
+        if f.exists(): f.unlink()
+    prune_seen()
+
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] WSJ 合并简报启动")
+
+    # 并行抓取
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
+        f_rss = ex.submit(run_script, "英文RSS版", SCRIPT_DIR / "wsj_rss_briefing.py", SKIP_ENV)
+        f_cn  = ex.submit(run_script, "中文版", SCRIPT_DIR / "wsj_cn_home_briefing.py", SKIP_ENV)
+        rss_ok, rss_t, rss_out = f_rss.result()
+        signal.alarm(max(1, TIMEOUT - int(time.time()-t_total)))
+        cn_ok,  cn_t,  cn_out  = f_cn.result()
+
+    signal.alarm(0)
+
+    if not rss_ok and not cn_ok:
+        send_alert("⚠️ WSJ简报：两个子脚本均执行失败，请检查日志。")
+        return
+
+    # 读取归档
+    rss_text = rss_arch.read_text(encoding="utf-8").strip() if rss_ok and rss_arch.exists() else ""
+    cn_text  = cn_arch.read_text(encoding="utf-8").strip()  if cn_ok  and cn_arch.exists() else ""
+
+    if not rss_text and not cn_text:
+        send_discord(f"📭 今日WSJ简报：**无新文章**\n⏱ 总耗时：{int(time.time()-t_total)}s")
+        return
+
+    # 去重（检测RSS和CN中的重复文章标题）
+    dedup_note = ""
+    if rss_text and cn_text:
+        rss_titles = extract_titles(rss_text)
+        cn_titles  = extract_titles(cn_text)
+        dup = rss_titles & cn_titles
+        if dup:
+            dedup_note = (f"\n> ⚠️ **去重**：RSS与中文版有 {len(dup)} 篇重复，已合并展示避免重复摘要。\n")
+            rss_text = rss_text.rstrip() + dedup_note
+
+    # 合并
+    combined = (rss_text + "\n\n" + cn_text).strip()
+
+    # 验证导语不为空
+    missing_guide = []
+    for title_m in re.finditer(r'\*\*\u300a(.+?)\u300b\*\*(.*?)(?=\*\*|\n\n|$)', combined, re.DOTALL):
+        segment = title_m.group(2)
+        if '▎网页导语' not in segment and '▎网页摘要' not in segment:
+            missing_guide.append(title_m.group(1))
+
+    if missing_guide:
+        alert = (f"⚠️ WSJ简报格式异常：{len(missing_guide)}篇文章缺少网页导语，"
+                 f"可能是抓取解析问题。当前已发送完整内容，请检查 Scraping 状态。")
+        send_discord(alert + "\n\n" + combined)
+    else:
+        send_discord(combined)
+
+    # 统计
+    total_t = int(time.time() - t_total)
+    # 解析token
+    def get_tokens(out):
+        m = re.search(r'input_tokens["\s:]+(\d+)', out, re.IGNORECASE)
+        n = re.search(r'output_tokens["\s:]+(\d+)', out, re.IGNORECASE)
+        return int(m.group(1)) if m else 0, int(n.group(1)) if n else 0
+
+    rss_in, rss_out_tok = get_tokens(rss_out)
+    cn_in,  cn_out_tok  = get_tokens(cn_out)
+    total_in  = rss_in  + cn_in
+    total_out = rss_out_tok + cn_out_tok
+
+    footer = (f"---\n"
+               f"📊 **本轮简报统计**\n"
+               f"⏱ 总耗时：{total_t}s"
+               f" | RSS({rss_t}s)"
+               f" | CN({cn_t}s)"
+               f"\n📥 输入token：{total_in:,}"
+               f" | 📤 输出token：{total_out:,}")
+    send_discord(footer)
+    print(f"\n✅ 完成！总耗时 {total_t}s，token in={total_in:,} out={total_out:,}")
+    signal.alarm(0)
+
+if __name__ == "__main__":
+    main()

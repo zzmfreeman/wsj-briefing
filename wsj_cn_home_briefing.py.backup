@@ -1,0 +1,435 @@
+#!/usr/bin/env python3
+"""
+WSJ 简报 - 方案1：cn.wsj.com 首页标题+导言版
+抓 cn.wsj.com 首页渲染后的文章列表（标题+导言段）→ Claude 生成中文简报
+无需订阅认证，首页公开可访问
+"""
+
+import json, re, time, random, hashlib, asyncio, urllib.request
+import xml.etree.ElementTree as ET
+from datetime import datetime
+from pathlib import Path
+
+SCRIPT_DIR   = Path(__file__).parent
+COOKIE_FILE  = SCRIPT_DIR / "cn_wsj_cookies.txt"
+SEEN_FILE    = SCRIPT_DIR / "seen_cn_home.json"
+ARCHIVE_DIR  = SCRIPT_DIR / "archive"
+ARCHIVE_DIR.mkdir(exist_ok=True)
+
+ARTICLES_PER_RUN = 20
+DISCORD_CHANNEL  = "1478404345782472754"
+
+CLAUDE_BASE_URL = "https://www.sophnet.com/api/open-apis/anthropic/v1"
+CLAUDE_API_KEY  = "8TPc5q00vXTLX9fqTeogRg6apSsuxQ5UXxrS_pZquyGNV2VfqVNVgiHy_MO7w_sExIGWXMY3jte3zAvEP7fgmg"
+CLAUDE_MODEL    = "claude-sonnet-4-6"
+
+# ── 工具 ──────────────────────────────────────────────
+def load_seen():
+    if SEEN_FILE.exists():
+        try: return set(json.loads(SEEN_FILE.read_text()))
+        except: return set()
+    return set()
+
+def save_seen(s):
+    SEEN_FILE.write_text(json.dumps(list(s)[-500:]))
+
+def art_id(url):
+    return hashlib.md5(url.encode()).hexdigest()
+
+def parse_cookies(path):
+    cookies = []
+    if not Path(path).exists():
+        return cookies
+    for line in Path(path).read_text().splitlines():
+        line = line.strip()
+        if not line: continue
+        if line.startswith('#HttpOnly_'):
+            line = line[len('#HttpOnly_'):]
+        elif line.startswith('#'):
+            continue
+        parts = line.split('\t')
+        if len(parts) < 7: continue
+        domain, _, path_, secure, expires, name, value = parts[:7]
+        c = {'name': name, 'value': value, 'domain': domain.lstrip('.'),
+             'path': path_, 'secure': secure.upper() == 'TRUE', 'sameSite': 'None'}
+        try:
+            exp = int(expires)
+            if exp > 0: c['expires'] = exp
+        except: pass
+        cookies.append(c)
+    return cookies
+
+# ── Playwright 抓首页 ─────────────────────────────────
+async def scrape_cn_homepage(limit=20):
+    from playwright.async_api import async_playwright
+    from playwright_stealth import Stealth
+
+    cookies = parse_cookies(COOKIE_FILE)
+    seen = load_seen()
+
+    async with Stealth().use_async(async_playwright()) as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=['--no-sandbox', '--disable-blink-features=AutomationControlled']
+        )
+        context = await browser.new_context(
+            user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+            viewport={'width': 1280, 'height': 900},
+            locale='zh-CN',
+            timezone_id='Asia/Shanghai',
+        )
+        if cookies:
+            await context.add_cookies(cookies)
+
+        page = await context.new_page()
+
+        print('  访问 cn.wsj.com 首页...')
+        await page.goto('https://cn.wsj.com/', wait_until='domcontentloaded', timeout=30000)
+        await asyncio.sleep(4)
+
+        html = await page.content()
+
+        # ── 提取文章链接（去重）──────────────────────
+        raw_links = re.findall(r'https://cn\.wsj\.com/articles/[^\"\?\s]+', html)
+        seen_urls = set()
+        article_urls = []
+        for url in raw_links:
+            base = url.split('?')[0]
+            if base not in seen_urls:
+                seen_urls.add(base)
+                article_urls.append(base)
+
+        print(f'  首页文章: {len(article_urls)} 篇')
+
+        # ── 提取每篇文章的标题和导言 ─────────────────
+        # 方法1：从 HTML 中提取结构化数据
+        articles = []
+
+        # 找所有文章卡片
+        cards = await page.eval_on_selector_all(
+            'article, [data-type="article"], .style--article, [class*="WSJTheme--story"]',
+            '''els => els.map(el => ({
+                title: (el.querySelector("h2,h3,[class*=\'headline\']") || {}).innerText || "",
+                summary: (el.querySelector("p,[class*=\'summary\'],[class*=\'desc\']") || {}).innerText || "",
+                link: (el.querySelector("a[href*=\'/articles/\']") || {}).href || "",
+            })).filter(a => a.link && a.title.length > 5)'''
+        )
+
+        # 用 JS 直接提取所有文章链接、标题、摘要、发布时间
+        js_articles = await page.evaluate('''
+            () => {
+                const cards = [];
+                const seen = new Set();
+                document.querySelectorAll("a[href*='/articles/']").forEach(a => {
+                    const url = a.href.split("?")[0];
+                    if (seen.has(url)) return;
+                    const text = a.innerText.trim();
+                    if (text.length < 5) return;
+                    let summary = "";
+                    let pubtime = "";
+                    const parent = a.closest("li,article,div") || a.parentElement;
+                    if (parent) {
+                        for (const p of parent.querySelectorAll("p")) {
+                            const t = p.innerText.trim();
+                            if (t.length > 20 && t !== text) { summary = t; break; }
+                        }
+                        // 找时间标签
+                        const timeEl = parent.querySelector("time,[datetime],[data-timestamp]");
+                        if (timeEl) {
+                            pubtime = timeEl.getAttribute("datetime") ||
+                                      timeEl.getAttribute("data-timestamp") ||
+                                      timeEl.innerText || "";
+                        }
+                    }
+                    seen.add(url);
+                    cards.push({url, title: text, summary: summary.slice(0, 250), pubtime});
+                });
+                return cards;
+            }
+        ''')
+        print(f'  JS 提取: {len(js_articles)} 篇')
+        from datetime import timezone as tz_utc
+        now_ts = __import__('time').time()
+        cutoff_ts = now_ts - 36 * 3600  # 36 小时内（容忍时区偏差）
+
+        for card in js_articles:
+            url = card['url']
+            if art_id(url) in seen or url in [a['url'] for a in articles]:
+                continue
+            # 解析发布时间
+            pubtime_raw = card.get('pubtime', '')
+            pub_ts = None
+            pub_label = ''
+            if pubtime_raw:
+                try:
+                    import dateutil.parser
+                    dt = dateutil.parser.parse(pubtime_raw)
+                    if dt.tzinfo is None:
+                        import datetime as _dt
+                        dt = dt.replace(tzinfo=_dt.timezone.utc)
+                    pub_ts = dt.timestamp()
+                    # 转为上海时间显示
+                    import datetime as _dt
+                    sh_tz = _dt.timezone(_dt.timedelta(hours=8))
+                    dt_sh = dt.astimezone(sh_tz)
+                    pub_label = dt_sh.strftime('%m-%d %H:%M')
+                except Exception:
+                    pub_label = pubtime_raw[:16]
+
+            # 过滤旧文章（如果能解析时间且超过36h则跳过）
+            if pub_ts and pub_ts < cutoff_ts:
+                continue
+
+            articles.append({
+                'url': url,
+                'title': card['title'].strip(),
+                'summary': card['summary'].strip(),
+                'pub_label': pub_label,
+            })
+
+        # 过滤掉已见，限制数量
+        new_articles = [a for a in articles if art_id(a['url']) not in seen][:limit]
+        print(f'  新文章: {len(new_articles)} 篇')
+
+        # ── 对没有摘要的文章，抓导言段 ───────────────
+        need_summary = [a for a in new_articles if not a.get('summary')]
+        if need_summary:
+            print(f'  补充 {len(need_summary)} 篇导言...')
+            for art in need_summary[:10]:  # 最多补10篇
+                try:
+                    resp = await page.goto(art['url'], wait_until='domcontentloaded', timeout=20000)
+                    if resp.status == 200:
+                        await asyncio.sleep(2)
+                        # 取可见的第一段正文（导言，不受订阅墙限制）
+                        try:
+                            intro = await page.eval_on_selector(
+                                'p[data-type="body"], .article-content p, article p',
+                                'el => el.innerText',
+                            )
+                            if intro and len(intro) > 30:
+                                art['summary'] = intro[:300]
+                        except:
+                            # 用 title 标签
+                            title_tag = await page.title()
+                            art['title'] = title_tag.replace(' - WSJ', '').replace(' - 华尔街日报', '').strip()
+                    await asyncio.sleep(random.uniform(1.5, 2.5))
+                except Exception as e:
+                    print(f'    [跳过] {e}')
+
+        # 更新已见记录
+        for a in new_articles:
+            seen.add(art_id(a['url']))
+        save_seen(seen)
+
+        await browser.close()
+
+    return new_articles
+
+# ── WSJ Tech RSS 兜底 ───────────────────────────────
+WSJ_TECH_RSS = "https://feeds.a.dj.com/rss/RSSWSJD.xml"
+
+def fetch_wsj_tech_rss(limit=6):
+    """当首页无科技文章时，从 WSJ Tech RSS 补充"""
+    try:
+        req = urllib.request.Request(WSJ_TECH_RSS, headers={
+            "User-Agent": "Mozilla/5.0 (compatible; RSS/2.0)"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            raw = r.read()
+        root = ET.fromstring(raw)
+        items = []
+        for item in root.findall(".//item")[:limit]:
+            def t(tag):
+                el = item.find(tag)
+                return el.text.strip() if el is not None and el.text else ""
+            desc = re.sub(r"<[^>]+>", "", t("description"))
+            items.append({
+                'url': t('link').split('?')[0],
+                'title': t('title'),
+                'summary': desc[:300],
+                'pub_label': t('pubDate')[:16],
+                'is_tech': True,
+                'source': 'WSJ Tech RSS'
+            })
+        print(f"  [兜底] WSJ Tech RSS 补充 {len(items)} 篇")
+        return items
+    except Exception as e:
+        print(f"  [兜底] RSS 获取失败: {e}")
+        return []
+
+# ── Claude ───────────────────────────────────────────
+def call_claude(articles):
+    today = datetime.now().strftime('%Y年%m月%d日')
+    lines = []
+    for i, a in enumerate(articles, 1):
+        body = a.get('summary') or '（仅标题）'
+        time_tag = f" 🕐{a['pub_label']}" if a.get('pub_label') else ""
+        lines.append(
+            f"[{i}]{time_tag} 标题：{a['title']}\n"
+            f"导言：{body[:300]}\n"
+            f"链接：{a['url']}"
+        )
+
+    # 标记科技类文章
+    tech_keywords = ['科技', 'AI', '人工智能', '芯片', '半导体', '科技股', '互联网',
+                     '苹果', '谷歌', '微软', '英伟达', '特斯拉', 'Meta', 'OpenAI',
+                     '字节', '阿里', '腾讯', '华为', '小米', '大模型', '机器人',
+                     'DeepSeek', '量子', '自动驾驶', '数据中心']
+    for a in articles:
+        title = a.get('title', '') + a.get('summary', '')
+        a['is_tech'] = any(kw in title for kw in tech_keywords)
+
+    tech_arts = [a for a in articles if a.get('is_tech')]
+    other_arts = [a for a in articles if not a.get('is_tech')]
+
+    # 预构建文章文本块（避免 f-string 内含 \n 的 Python 3.9 限制）
+    nl = '\n'
+    def fmt_art(a, is_tech):
+        tag = '[科技]' if is_tech else '[其他]'
+        t = f"{tag} 时间：{a.get('pub_label','未知')} 标题：{a['title']}"
+        t += nl + f"导言：{a.get('summary','')[:250]}"
+        t += nl + f"链接：{a['url']}"
+        return t
+    _fmt_tech  = nl.join(fmt_art(a, True)  for a in tech_arts)
+    _fmt_other = nl.join(fmt_art(a, False) for a in other_arts)
+
+    prompt = f"""你是一名专业财经分析师，以下是今日《华尔街日报》中文版（cn.wsj.com）首页 {len(articles)} 篇文章（已标注是否科技类）。
+
+请生成一份专业中文简报（用于 Discord），格式如下：
+
+📰 **WSJ中文版 · {today}**
+> 来源：cn.wsj.com 首页
+
+**💻 科技资讯 — 重点板块**
+（所有标注为科技类的文章必须全部列出，每篇格式：）
+**[标题]**
+• 要点1：核心内容（含具体公司/产品/数字）
+• 要点2：背景或影响
+• 要点3：行业意义（如有导言则从导言提炼，否则根据标题推断）
+原文：<链接>
+
+**🔥 今日头条（非科技）**
+（选出3-4篇最重要的非科技文章，每篇格式：）
+**[标题]**
+• 要点1
+• 要点2
+原文：<链接>
+
+**📋 其他资讯**
+（其余文章每篇一行）
+• **标题** — 一句话摘要 <链接>
+
+---
+**💡 今日洞察**
+> 1. [科技/AI/芯片相关洞察，含具体公司和影响]
+> 2. [中国/亚洲市场动态]
+> 3. [跨领域综合研判]
+
+要求：
+- **科技类文章全部列出，每篇3个要点，包含具体公司/产品/数字**
+- 科技板块放最前
+- 每篇标题后标注发布时间，格式：**[标题]** `MM-DD HH:MM`
+- 链接用 <> 包裹
+- 总长度 2500 字以内
+
+科技类文章（{len(tech_arts)} 篇）：
+{_fmt_tech}
+
+其他文章（{len(other_arts)} 篇）：
+{_fmt_other}
+"""
+
+    payload = json.dumps({
+        'model': CLAUDE_MODEL,
+        'max_tokens': 2500,
+        'messages': [{'role': 'user', 'content': prompt}]
+    }).encode('utf-8')
+
+    req = urllib.request.Request(
+        f'{CLAUDE_BASE_URL}/messages',
+        data=payload,
+        headers={
+            'x-api-key': CLAUDE_API_KEY,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json',
+        }
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=90) as r:
+            return json.loads(r.read())['content'][0]['text']
+    except Exception as e:
+        print(f'[Claude] {e}')
+        return None
+
+# ── Discord ───────────────────────────────────────────
+def send_discord(text):
+    import subprocess
+    MAX = 1900
+    chunks = []
+    while len(text) > MAX:
+        cut = text.rfind('\n', 0, MAX)
+        if cut == -1: cut = MAX
+        chunks.append(text[:cut])
+        text = text[cut:].lstrip('\n')
+    if text: chunks.append(text)
+
+    for i, chunk in enumerate(chunks):
+        try:
+            r = subprocess.run(
+                ['openclaw', 'message', 'send',
+                 '--channel', 'discord', '--target', DISCORD_CHANNEL,
+                 '--message', chunk],
+                capture_output=True, text=True, timeout=30
+            )
+            print(f'  Discord {i+1}/{len(chunks)} {"✓" if r.returncode==0 else "✗ "+r.stderr[:60]}')
+        except Exception as e:
+            print(f'  [Discord] {e}')
+        if len(chunks) > 1:
+            time.sleep(1)
+
+# ── 主流程 ────────────────────────────────────────────
+def run():
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 方案1·cn.wsj.com首页简报启动")
+
+    articles = asyncio.run(scrape_cn_homepage(ARTICLES_PER_RUN))
+
+    if not articles:
+        print('  无新文章')
+        return None
+
+    # 检查科技类文章数量，不足则从 RSS 兜底补充
+    tech_keywords = ['科技', 'AI', '人工智能', '芯片', '半导体', '科技股', '互联网',
+                     '苹果', '谷歌', '微软', '英伟达', '特斯拉', 'Meta', 'OpenAI',
+                     '字节', '阿里', '腾讯', '华为', '小米', '大模型', '机器人',
+                     'DeepSeek', '量子', '自动驾驶', '数据中心']
+    tech_count = sum(1 for a in articles
+                     if any(kw in (a.get('title','') + a.get('summary','')) for kw in tech_keywords))
+    print(f'  科技类文章: {tech_count} 篇')
+    if tech_count < 2:
+        rss_tech = fetch_wsj_tech_rss(limit=6)
+        # 去重（避免与首页文章重复）
+        existing_urls = {a['url'] for a in articles}
+        rss_tech = [a for a in rss_tech if a['url'] not in existing_urls]
+        articles = rss_tech + articles  # 科技文章放前面
+        print(f'  补充后共 {len(articles)} 篇')
+
+    print(f'  共 {len(articles)} 篇，调用 Claude...')
+    briefing = call_claude(articles)
+
+    if not briefing:
+        today = datetime.now().strftime('%Y年%m月%d日')
+        lines = [f'📰 **WSJ中文版 · {today}**\n']
+        for a in articles[:15]:
+            lines.append(f"• **{a['title']}** <{a['url']}>")
+        briefing = '\n'.join(lines)
+
+    today_str = datetime.now().strftime('%Y-%m-%d')
+    archive_path = ARCHIVE_DIR / f'{today_str}_cn_home.md'
+    archive_path.write_text(briefing, encoding='utf-8')
+    print(f'  归档: {archive_path}')
+
+    send_discord(briefing)
+    print('  ✅ 完成！')
+    return briefing
+
+if __name__ == '__main__':
+    run()
