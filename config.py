@@ -15,7 +15,7 @@ ARCHIVE_DIR    = Path(os.environ.get("ARCHIVE_DIR", str(SCRIPT_DIR / "archive"))
 ARCHIVE_DIR.mkdir(exist_ok=True)
 
 # Discord 频道
-DISCORD_CHANNEL = "1478404345782472754"  # WSJ 简报频道
+DISCORD_CHANNEL = "1495744491586584647"  # 📰WSJ Cron thread
 DISCORD_IT_CH   = "1478264573776892047"  # IT 频道（故障通知）
 
 # ── 模型配置（R5：从 openclaw.json 读取）─────────────────
