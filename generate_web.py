@@ -98,6 +98,13 @@ def parse_archive_md(md_text):
     for m in pattern_full.finditer(md_text):
         guide_text = m.group(3).strip().lstrip('>▎网页导语：').strip()
         articles.append({'title': m.group(1), 'date': m.group(2), 'guide': guide_text, 'summary': m.group(4).strip(), 'url': m.group(5), 'has_full': True})
+    # Fallback: bullet list format (• **标题** <url>)
+    pattern_bullet_simple = re.compile(r'•\s*\*\*(.+?)\*\*\s*<([^>]+)>')
+    for m in pattern_bullet_simple.finditer(md_text):
+        title = m.group(1).strip()
+        if any(a['title'] == title for a in articles): continue
+        articles.append({'title': title, 'guide': '', 'summary': '', 'url': m.group(2).strip(), 'has_full': False})
+
     pattern_bullet = re.compile(r'•\s*\*\*【(.+?)】\*\*\s*—\s*\[([^\]]*)\s*([^]]*)\]\s*<([^>]+)>')
     for m in pattern_bullet.finditer(md_text):
         title = m.group(1)
@@ -403,6 +410,7 @@ def main():
     cache = load_image_cache()
     urls_to_fetch = [a['url'] for a in articles if a.get('url') and a['url'] not in cache]
     images = dict(cache)
+    new_images = {}
     if urls_to_fetch:
         print(f"  用 Playwright+Stealth 获取 {len(urls_to_fetch)} 张配图...")
         new_images = asyncio.run(fetch_images_playwright(urls_to_fetch))
