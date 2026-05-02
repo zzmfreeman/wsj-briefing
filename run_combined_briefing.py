@@ -116,28 +116,37 @@ def check_services():
 
 # ── Token/费用统计 ──────────────────────────────────────
 def estimate_cost(output_text):
-    """从子脚本输出中提取 token 用量，估算费用"""
-    # 尝试从输出中提取 token 信息
-    input_tokens = 0
-    output_tokens = 0
+    """从子脚本输出中提取 token 用量，按模型分别估算费用"""
+    # 解析 [LLM] model=xxx input_tokens=N output_tokens=M 行
+    model_usage = {}  # model -> {input: int, output: int}
+    for m in re.finditer(r'\[LLM\] model=(\S+) input_tokens=(\d+) output_tokens=(\d+)', output_text):
+        model = m.group(1)
+        inp = int(m.group(2))
+        out = int(m.group(3))
+        if model not in model_usage:
+            model_usage[model] = {"input": 0, "output": 0}
+        model_usage[model]["input"] += inp
+        model_usage[model]["output"] += out
 
-    for m in re.finditer(r'input_tokens["\s:]+(\d+)', output_text, re.IGNORECASE):
-        input_tokens += int(m.group(1))
-    for m in re.finditer(r'output_tokens["\s:]+(\d+)', output_text, re.IGNORECASE):
-        output_tokens += int(m.group(1))
+    # 模型定价 (per million tokens)
+    PRICING = {
+        "GLM-5.1": {"input": 0.5, "output": 1.5},      # sophnet 代理
+        "MiniMax-M2.7": {"input": 0.1, "output": 0.2},  # MiniMax 官方
+    }
 
-    # 如果没找到 token 信息，根据耗时粗略估算
-    # GLM-5.1 大约: input ~$0.5/M, output ~$1.5/M (sophnet 代理价)
-    input_price = 0.5 / 1_000_000
-    output_price = 1.5 / 1_000_000
-    cost = input_tokens * input_price + output_tokens * output_price
+    total_cost = 0
+    lines = ["💰 Token 费用统计"]
+    for model, usage in model_usage.items():
+        pricing = PRICING.get(model, {"input": 0.5, "output": 1.5})
+        cost = usage["input"] * pricing["input"] / 1_000_000 + usage["output"] * pricing["output"] / 1_000_000
+        total_cost += cost
+        lines.append(f"  {model}: in={usage['input']:,} out={usage['output']:,} → ${cost:.4f}")
 
-    lines = [f"💰 Token 使用统计"]
-    lines.append(f"  Input tokens:  {input_tokens:,}")
-    lines.append(f"  Output tokens: {output_tokens:,}")
-    lines.append(f"  估算费用:      ${cost:.4f}")
-    lines.append(f"  (按 GLM-5.1 sophnet 代理价: input $0.5/M, output $1.5/M)")
-    return "\n".join(lines)
+    if not model_usage:
+        lines.append("  (未捕获 token 数据)")
+
+    lines.append(f"  合计: ${total_cost:.4f}")
+    return "\n".join(lines), total_cost
 
 # ── 主流程 ─────────────────────────────────────────────────
 def main():
@@ -198,7 +207,7 @@ def main():
 
     # Token/费用统计
     combined_output = rss_out + cn_out
-    cost_report = estimate_cost(combined_output)
+    cost_report, total_cost = estimate_cost(combined_output)
 
     # R8: Discord 推送版本号（不发链接）
     ver = get_git_version()
@@ -212,7 +221,7 @@ def main():
     send_discord_links_only(health_report)
     send_discord_links_only(cost_report)
 
-    print(f"\n✅ 完成！总耗时 {total_t}s")
+    print(f"\n✅ 完成！总耗时 {total_t}s，费用 ${total_cost:.4f}")
     print(cost_report)
     signal.alarm(0)
 
