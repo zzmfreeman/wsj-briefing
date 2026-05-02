@@ -18,6 +18,7 @@ from pathlib import Path
 from config import (
     SCRIPT_DIR, ARCHIVE_DIR, DISCORD_CHANNEL, DISCORD_IT_CH,
     check_cookie_health, notify_failure, send_discord_links_only,
+    get_git_version,
 )
 
 SKIP_ENV = {"WSJ_DISCORD_SKIP": "1"}
@@ -199,11 +200,12 @@ def main():
     combined_output = rss_out + cn_out
     cost_report = estimate_cost(combined_output)
 
-    # R8: Discord 推送到 WSJ 频道
-    parts = [f"📊 WSJ简报 | ⏱ {total_t}s | RSS({rss_t}s){'✓' if rss_ok else '✗'} CN({cn_t}s){'✓' if cn_ok else '✗'}"]
-    parts.append(f"🕐 生成时间：{generated_at}")
-    if wsj_url:   parts.append(f"🌐 今日: <{wsj_url}>")
-    if wsj_index: parts.append(f"📋 索引: <{wsj_index}>")
+    # R8: Discord 推送版本号（不发链接）
+    ver = get_git_version()
+    parts = [f"📊 WSJ简报 v{ver} | ⏱ {total_t}s | RSS({rss_t}s){'✓' if rss_ok else '✗'} CN({cn_t}s){'✓' if cn_ok else '✗'}"]
+    parts.append(f"🕐 {generated_at}")
+    if wsj_url:   parts.append(f"🌐 <{wsj_url}>")
+    if wsj_index: parts.append(f"📋 <{wsj_index}>")
     send_discord_links_only("\n".join(parts))
 
     # 发送服务状态 + 费用统计到 WSJ 频道

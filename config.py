@@ -95,6 +95,47 @@ def get_model_config():
     notify_failure(f"⚠️ WSJ Briefing：provider {pid} 缺少 baseUrl 或 apiKey")
     return None
 
+
+
+def get_fallback_config():
+    """
+    从 openclaw.json 读取 fallback 模型（MiniMax）配置。
+    返回 (base_url, api_key, model_name, api_format) 或 None
+    MiniMax 实际支持 OpenAI 兼容格式（/v1/chat/completions）。
+    """
+    try:
+        cfg = json.loads(OPENCLAW_CONFIG.read_text())
+    except:
+        return None
+
+    providers = cfg.get("models", {}).get("providers", {})
+    if not providers:
+        providers = cfg.get("providers", {})
+
+    for pid, pconf in providers.items():
+        if "minimax" in pid.lower():
+            api_key = pconf.get("apiKey", "")
+            models = pconf.get("models", [])
+            model_name = models[0]["id"] if models else "MiniMax-M2.7"
+            # MiniMax OpenAI 兼容端点
+            base_url = "https://api.minimaxi.com/v1/chat/completions"
+            if api_key:
+                return base_url, api_key, model_name, "openai"
+    return None
+
+def get_git_version():
+    """获取当前 git 版本号"""
+    try:
+        r = subprocess.run(
+            ['git', 'rev-parse', '--short', 'HEAD'],
+            capture_output=True, text=True, timeout=5,
+            cwd=str(SCRIPT_DIR))
+        if r.returncode == 0:
+            return r.stdout.strip()
+    except:
+        pass
+    return "unknown"
+
 # ── Cookie 检测（R9）────────────────────────────────────
 def check_cookie_health():
     """
@@ -171,19 +212,115 @@ def send_discord_links_only(stats_text, links_text=""):
     except:
         pass
 
-# ── 模型调用封装（含失败通知 R6）────────────────────────
-def call_llm(prompt, max_tokens=4000, temperature=0.3, timeout=120):
-    """
-    调用 LLM 生成摘要。
-    从 openclaw.json 读取配置（R5）。
-    失败时通知用户（R6）。
-    返回 (success: bool, result: str|None)
-    """
+# ── 模型调用封装（含 fallback + 失败通知 R6）────────────────
+def _call_openai(base_url, api_key, model, prompt, max_tokens, temperature, timeout):
+    """OpenAI chat/completions 格式调用"""
     import urllib.request, urllib.error
 
+    url = base_url
+    if not url.endswith("/chat/completions"):
+        url = url.rstrip("/") + "/chat/completions"
+
+    payload = json.dumps({
+        'model': model,
+        'max_tokens': max_tokens,
+        'temperature': temperature,
+        'messages': [{'role': 'user', 'content': prompt}]
+    }).encode('utf-8')
+
+    req = urllib.request.Request(
+        url, data=payload,
+        headers={'Authorization': f'Bearer {api_key}', 'content-type': 'application/json'}
+    )
+
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        resp = json.loads(r.read())
+        usage = resp.get('usage', {})
+        if usage:
+            inp = usage.get('prompt_tokens', 0)
+            out = usage.get('completion_tokens', 0)
+            print(f'[LLM] model={model} input_tokens={inp} output_tokens={out}')
+        if 'choices' in resp:
+            return resp['choices'][0]['message']['content']
+        elif 'content' in resp:
+            return resp['content'][0]['text']
+        else:
+            raise ValueError(f"响应格式异常：{list(resp.keys())}")
+
+def _call_anthropic(base_url, api_key, model, prompt, max_tokens, temperature, timeout):
+    """Anthropic Messages 格式调用"""
+    import urllib.request, urllib.error
+
+    url = base_url
+    if not url.endswith("/messages"):
+        url = url.rstrip("/") + "/messages"
+
+    payload = json.dumps({
+        'model': model,
+        'max_tokens': max_tokens,
+        'messages': [{'role': 'user', 'content': prompt}]
+    }).encode('utf-8')
+
+    req = urllib.request.Request(
+        url, data=payload,
+        headers={'x-api-key': api_key, 'content-type': 'application/json',
+                 'anthropic-version': '2023-06-01'}
+    )
+
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        resp = json.loads(r.read())
+        usage = resp.get('usage', {})
+        if usage:
+            inp = usage.get('input_tokens', 0)
+            out = usage.get('output_tokens', 0)
+            print(f'[LLM] model={model} input_tokens={inp} output_tokens={out}')
+        if 'content' in resp and resp['content']:
+            return resp['content'][0]['text']
+        else:
+            raise ValueError(f"响应格式异常：{list(resp.keys())}")
+
+def call_llm(prompt, max_tokens=4000, temperature=0.3, timeout=120):
+    """
+    调用 LLM 生成摘要（含 fallback）。
+    1. 先尝试 primary 模型（GLM-5.1）
+    2. 失败则 fallback 到 MiniMax-M2.7
+    返回 (success: bool, result: str|None)
+    """
+    import urllib.error
+
+    # ── Primary ──
     config = get_model_config()
-    if not config:
-        return False, None
+    if config:
+        base_url, api_key, model = config
+        try:
+            result = _call_openai(base_url, api_key, model, prompt, max_tokens, temperature, timeout)
+            return True, result
+        except urllib.error.HTTPError as e:
+            body = e.read().decode('utf-8', errors='replace')[:200]
+            print(f"[LLM] Primary {model} failed: HTTP {e.code}")
+        except Exception as e:
+            print(f"[LLM] Primary {model} failed: {e}")
+
+    # ── Fallback ──
+    fb = get_fallback_config()
+    if fb:
+        base_url, api_key, model, api_fmt = fb
+        print(f"[LLM] Fallback to {model} ({api_fmt})")
+        try:
+            if api_fmt == "anthropic-messages":
+                result = _call_anthropic(base_url, api_key, model, prompt, max_tokens, temperature, timeout)
+            else:
+                result = _call_openai(base_url, api_key, model, prompt, max_tokens, temperature, timeout)
+            return True, result
+        except urllib.error.HTTPError as e:
+            body = e.read().decode('utf-8', errors='replace')[:200]
+            notify_failure(f"⚠️ WSJ Briefing：Fallback {model} 也失败 HTTP {e.code}：{body}")
+        except Exception as e:
+            notify_failure(f"⚠️ WSJ Briefing：Fallback {model} 也失败：{e}")
+    else:
+        notify_failure("⚠️ WSJ Briefing：Primary 失败且无 fallback 可用")
+
+    return False, None
 
     base_url, api_key, model = config
 

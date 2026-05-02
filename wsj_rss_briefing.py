@@ -15,7 +15,7 @@ from itertools import groupby
 from config import (
     SCRIPT_DIR, ARCHIVE_DIR,
     DISCORD_CHANNEL, notify_failure,
-    call_llm, send_discord_links_only,
+    call_llm, send_discord_links_only, get_git_version,
 )
 
 SEEN_FILE = SCRIPT_DIR / "seen_articles.json"
@@ -188,7 +188,8 @@ def run():
 
     # R8: Discord 只发链接+统计
     web_url = f"https://zzmfreeman.github.io/openclaw_macmini_ICnews/wsj-{today_str}.html"
-    stats = f"📰 WSJ RSS | {len(all_articles)} 篇 | 🌐 <{web_url}>"
+    ver = get_git_version()
+    stats = f"📰 WSJ RSS v{ver} | {len(all_articles)} 篇 | 🌐 <{web_url}>"
     send_discord_links_only(stats)
 
     print("  ✅ 完成！")
