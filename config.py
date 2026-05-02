@@ -16,6 +16,47 @@ ARCHIVE_DIR.mkdir(exist_ok=True)
 
 # Discord 频道
 DISCORD_CHANNEL = "1495744491586584647"  # 📰WSJ Cron thread
+DISCORD_BOT_TOKEN = None  # 从 openclaw.json 读取
+
+def _get_discord_bot_token():
+    """从 openclaw.json 读取 Discord bot token"""
+    global DISCORD_BOT_TOKEN
+    if DISCORD_BOT_TOKEN is not None:
+        return DISCORD_BOT_TOKEN
+    try:
+        cfg = json.loads(OPENCLAW_CONFIG.read_text())
+        # Navigate to discord token
+        for key in ['channels', 'discord']:
+            if key in cfg:
+                cfg = cfg[key]
+        DISCORD_BOT_TOKEN = cfg.get('token', '')
+    except:
+        pass
+    return DISCORD_BOT_TOKEN
+
+def _discord_api_send(channel_id, message):
+    """通过 Discord Bot API 直连发送消息（用 curl 绕过 TLS 指纹问题）"""
+    token = _get_discord_bot_token()
+    if not token:
+        print("  [Discord] 无 bot token，跳过发送")
+        return False
+    payload = json.dumps({"content": message})
+    try:
+        r = subprocess.run(
+            ['curl', '-s', '-m', '15', '-X', 'POST',
+             '-H', f'Authorization: Bot {token}',
+             '-H', 'Content-Type: application/json',
+             '-d', payload,
+             f'https://discord.com/api/v10/channels/{channel_id}/messages'],
+            capture_output=True, text=True, timeout=20
+        )
+        if r.returncode == 0 and '"id"' in r.stdout:
+            return True
+        print(f"  [Discord] curl 失败: {r.stderr[:100] or r.stdout[:100]}")
+        return False
+    except Exception as e:
+        print(f"  [Discord] 发送异常: {e}")
+        return False
 DISCORD_IT_CH   = "1478264573776892047"  # IT 频道（故障通知）
 
 # ── 模型配置（R5：从 openclaw.json 读取）─────────────────
@@ -187,30 +228,31 @@ def check_cookie_health():
 def notify_failure(msg, channel=None):
     """故障通知：发到 IT 频道（确保能看到）"""
     ch = channel or DISCORD_IT_CH
-    try:
-        subprocess.run(
-            ['openclaw', 'message', 'send', '--channel', 'discord',
-             '--target', ch, '--message', msg],
-            capture_output=True, text=True, timeout=15
-        )
-    except:
-        pass
+    _discord_api_send(ch, msg)
 
 def send_discord_links_only(stats_text, links_text=""):
     """
     R8：Discord 推送精简版（只发链接+统计，不发摘要全文）
+    通过 Discord Bot API 直连发送。
     """
     msg = stats_text
     if links_text:
         msg += "\n" + links_text
-    try:
-        subprocess.run(
-            ['openclaw', 'message', 'send', '--channel', 'discord',
-             '--target', DISCORD_CHANNEL, '--message', msg],
-            capture_output=True, text=True, timeout=30
-        )
-    except:
-        pass
+    ok = _discord_api_send(DISCORD_CHANNEL, msg)
+    if ok:
+        print(f"  [Discord] ✅ 已发送")
+    else:
+        # Fallback: 写入待发送文件
+        _PENDING_FILE = SCRIPT_DIR / "_pending_discord.json"
+        try:
+            pending = []
+            if _PENDING_FILE.exists():
+                pending = json.loads(_PENDING_FILE.read_text())
+            pending.append({"channel": DISCORD_CHANNEL, "message": msg})
+            _PENDING_FILE.write_text(json.dumps(pending, ensure_ascii=False))
+            print(f"  [Discord] ⚠️ API失败，已写入待发送队列")
+        except Exception as e:
+            print(f"  [Discord] 写入待发送失败: {e}")
 
 # ── 模型调用封装（含 fallback + 失败通知 R6）────────────────
 def _call_openai(base_url, api_key, model, prompt, max_tokens, temperature, timeout):
