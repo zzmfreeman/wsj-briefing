@@ -18,7 +18,7 @@ from pathlib import Path
 from config import (
     SCRIPT_DIR, ARCHIVE_DIR, DISCORD_CHANNEL, DISCORD_IT_CH,
     check_cookie_health, notify_failure, send_discord_links_only,
-    get_git_version,
+    get_git_version, is_cookie_degraded,
 )
 
 SKIP_ENV = {"WSJ_DISCORD_SKIP": "1"}
@@ -173,13 +173,17 @@ def main():
 
     print(f"[{datetime.now().strftime('%H:%M:%S')}] WSJ 合并简报启动 (v3)")
 
-    # 并行抓取
+    # 并行抓取（P0: Cookie 失效时跳过中文版）
+    cn_ok, cn_t, cn_out = True, 0, ""
+    if is_cookie_degraded():
+        print("  ⚠️ Cookie 失效，跳过中文版（纯 RSS 模式）")
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
         f_rss = ex.submit(run_script, "英文RSS版", SCRIPT_DIR / "wsj_rss_briefing.py", SKIP_ENV)
-        f_cn  = ex.submit(run_script, "中文版", SCRIPT_DIR / "wsj_cn_home_briefing.py", SKIP_ENV)
+        f_cn  = ex.submit(run_script, "中文版", SCRIPT_DIR / "wsj_cn_home_briefing.py", SKIP_ENV) if not is_cookie_degraded() else None
         rss_ok, rss_t, rss_out = f_rss.result()
         signal.alarm(max(1, TIMEOUT - int(time.time()-t_total)))
-        cn_ok,  cn_t,  cn_out  = f_cn.result()
+        if f_cn:
+            cn_ok, cn_t, cn_out = f_cn.result()
 
     signal.alarm(0)
 

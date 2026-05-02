@@ -241,27 +241,15 @@ def fetch_wsj_tech_rss(limit=6, max_age_days=7):
 def generate_briefing(articles):
     today = datetime.now().strftime('%Y年%m月%d日')
 
-    tech_keywords = ['科技', 'AI', '人工智能', '芯片', '半导体', '科技股', '互联网',
-                     '苹果', '谷歌', '微软', '英伟达', '特斯拉', 'Meta', 'OpenAI',
-                     '字节', '阿里', '腾讯', '华为', '小米', '大模型', '机器人',
-                     'DeepSeek', '量子', '自动驾驶', '数据中心']
-    for a in articles:
-        title = a.get('title', '') + a.get('summary', '')
-        a['is_tech'] = any(kw in title for kw in tech_keywords)
-
-    tech_arts = [a for a in articles if a.get('is_tech')]
-    other_arts = [a for a in articles if not a.get('is_tech')]
-
+    # 不做科技/非科技分类，全部文章同等对待
     nl = '\n'
-    def fmt_art(a, is_tech):
-        tag = '[科技]' if is_tech else '[其他]'
+    def fmt_art(a):
         summary_status = "✅有导言" if a.get('summary') else "❌缺导言"
-        t = f"{tag} {summary_status} 时间：{a.get('pub_label','未知')} 标题：{a['title']}"
+        t = f"{summary_status} 时间：{a.get('pub_label','未知')} 标题：{a['title']}"
         t += nl + f"导言：{a.get('summary','')[:250]}"
         t += nl + f"链接：{a['url']}"
         return t
-    _fmt_tech  = nl.join(fmt_art(a, True)  for a in tech_arts)
-    _fmt_other = nl.join(fmt_art(a, False) for a in other_arts)
+    _fmt_all = nl.join(fmt_art(a) for a in articles)
 
     prompt = f"""你是一名专业财经分析师，以下是今日《华尔街日报》中文版（cn.wsj.com）首页 {len(articles)} 篇文章。
 
@@ -275,32 +263,19 @@ def generate_briefing(articles):
 📰 **WSJ中文版 · {today}**
 > 来源：cn.wsj.com 首页
 
-**💻 科技资讯 — 重点板块**
-（所有标注为科技类的文章必须全部列出，每篇格式：）
+**📋 今日资讯**
+（所有文章按重要性排序，每篇格式：）
 **【标题】** `MM-DD`
 >▎网页导语：（原文导语，一字不改抄录）
-**▎AI摘要：**（150-250字连贯段落）
-原文：<链接>
-
-**🔥 今日头条（非科技）**
-（选出最多5篇最重要的非科技文章，格式同上）
-
-**📋 其他资讯**
-（其余文章每篇也要有导语和摘要，格式同科技/头条）
-**【标题】** `MM-DD`
->▎网页导语：（推断导语或原文导语）
-**▎AI摘要：**（50-100字）
+**▎AI摘要：**（100-200字连贯段落）
 原文：<链接>
 
 要求：
 - 链接用 <链接> 格式
-- 总长度不超过 2500 字
+- 总长度不超过 3000 字
 
-科技类文章（{len(tech_arts)} 篇）：
-{_fmt_tech}
-
-其他文章（{len(other_arts)} 篇）：
-{_fmt_other}
+全部文章（{len(articles)} 篇）：
+{_fmt_all}
 """
 
     ok, result = call_llm(prompt, max_tokens=4000, temperature=0.3, timeout=450)
@@ -324,14 +299,7 @@ def run():
         notify_failure('⚠️ WSJ中文版简报：首页无新文章。')
         return None
 
-    tech_count = sum(1 for a in articles if a.get('is_tech'))
-    print(f'  科技类: {tech_count} 篇')
-    if tech_count < 2:
-        rss_tech = fetch_wsj_tech_rss(limit=6)
-        existing_urls = {a['url'] for a in articles}
-        rss_tech = [a for a in rss_tech if a['url'] not in existing_urls]
-        articles = rss_tech + articles
-        print(f'  补充后共 {len(articles)} 篇')
+    print(f'  共 {len(articles)} 篇（全部输出，无分类过滤）')
 
     print(f'  共 {len(articles)} 篇，调用 LLM 生成摘要...')
     briefing = generate_briefing(articles)
