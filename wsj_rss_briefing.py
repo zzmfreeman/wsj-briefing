@@ -134,6 +134,7 @@ def generate_briefing(articles):
 # ── 主流程 ────────────────────────────────────────────
 def run():
     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] WSJ RSS 简报启动 (v2)")
+    t0 = datetime.now()
 
     seen = load_seen()
     all_articles = []
@@ -153,6 +154,10 @@ def run():
                 new_count += 1
         print(f"    → {new_count} 篇新文章")
 
+    t1 = datetime.now()
+    rss_delta = (t1 - t0).total_seconds()
+    print(f"  RSS抓取耗时: {rss_delta:.1f}s")
+
     all_articles = all_articles[:ARTICLES_PER_RUN]
 
     if not all_articles:
@@ -166,6 +171,10 @@ def run():
 
     print(f"  共 {len(all_articles)} 篇，调用 LLM 生成简报...")
     briefing = generate_briefing(all_articles)
+
+    t2 = datetime.now()
+    llm_delta = (t2 - t1).total_seconds()
+    print(f"  LLM调用耗时: {llm_delta:.1f}s")
 
     if not briefing:
         # Fallback
@@ -191,6 +200,10 @@ def run():
     ver = get_git_version()
     stats = f"📰 WSJ RSS v{ver} | {len(all_articles)} 篇 | 🌐 <{web_url}>"
     send_discord_links_only(stats)
+
+    t3 = datetime.now()
+    total_delta = (t3 - t0).total_seconds()
+    print(f"  总耗时: {total_delta:.1f}s")
 
     print("  ✅ 完成！")
     return briefing
