@@ -1200,6 +1200,18 @@ def collect_all():
     # 5. 所有文章配图
     all_articles = cn_articles + rss_articles
 
+    # ── URL 去重：同一 URL 只保留第一篇（跨 RSS feed 重复） ──
+    seen_in_batch = set()
+    deduped = []
+    for a in all_articles:
+        url = a.get('url') or a.get('link', '')
+        if url and url not in seen_in_batch:
+            seen_in_batch.add(url)
+            deduped.append(a)
+    if len(deduped) < len(all_articles):
+        print(f"  URL去重: {len(all_articles)} → {len(deduped)}（移除 {len(all_articles) - len(deduped)} 篇跨 feed 重复）")
+    all_articles = deduped
+
     # ── 日期过滤：只保留 MAX_ARTICLE_AGE_DAYS 天内的文章 ──
     from email.utils import parsedate_to_datetime
     now = datetime.now(SH_TZ)
