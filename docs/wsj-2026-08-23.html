@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WSJ日报 — 2026年08月23日</title>
     <style>
-        /* ── Reset ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* ── WSJ Palette ── */
         :root {
             --wsj-red: #c00;
             --wsj-black: #111;
@@ -19,6 +17,8 @@
             --wsj-bg: #fff;
             --wsj-dek-bg: #f5f5f5;
             --max-w: 720px;
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
         }
 
         body {
@@ -49,9 +49,7 @@
             color: var(--wsj-black);
             text-transform: uppercase;
         }
-        .masthead h1 span {
-            color: var(--wsj-red);
-        }
+        .masthead h1 span { color: var(--wsj-red); }
         .masthead .date {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 12px;
@@ -72,24 +70,12 @@
             padding: 20px 0;
             border-bottom: 1px solid var(--wsj-rule);
         }
-        .article-card:last-child {
-            border-bottom: none;
-        }
+        .article-card:last-child { border-bottom: none; }
 
-        /* Hero image */
-        .article-hero {
-            margin: 0 0 12px;
-        }
-        .article-hero img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+        .article-hero { margin: 0 0 12px; }
+        .article-hero img { width: 100%; height: auto; display: block; }
 
-        /* Meta: section tag + time */
-        .article-meta {
-            margin-bottom: 6px;
-        }
+        .article-meta { margin-bottom: 6px; }
         .article-section {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 11px;
@@ -115,16 +101,10 @@
             margin: 0 0 8px;
             color: var(--wsj-black);
         }
-        .article-title a {
-            color: inherit;
-            text-decoration: none;
-        }
-        .article-title a:hover {
-            color: var(--wsj-red);
-        }
-        /* English subtitle (RSS articles) */
+        .article-title a { color: inherit; text-decoration: none; }
+        .article-title a:hover { color: var(--wsj-red); }
         .article-title-en {
-            font-family: Georgia, 'Times New Roman', serif;
+            font-family: Georgia, serif;
             font-size: 13px;
             font-style: italic;
             color: var(--wsj-light);
@@ -132,29 +112,79 @@
             line-height: 1.4;
         }
 
-        /* Dek (lead) */
+        /* Dek */
         .article-dek {
             font-size: 15px;
             font-weight: 600;
             color: var(--wsj-text);
             line-height: 1.5;
-            margin: 0 0 8px;
+            margin: 0 0 10px;
             padding: 8px 12px;
             background: var(--wsj-dek-bg);
             border-left: 3px solid var(--wsj-red);
         }
-        /* English dek (RSS articles) */
         .article-dek-en {
             font-size: 13px;
             font-style: italic;
             color: var(--wsj-gray);
             line-height: 1.5;
-            margin: 0 0 8px;
+            margin: 0 0 10px;
             padding: 4px 12px 4px 15px;
             border-left: 3px solid var(--wsj-rule);
         }
 
-        /* Body (summary) */
+        /* ── Bullets ── */
+        .article-bullets {
+            list-style: none;
+            margin: 0 0 10px;
+            padding: 0;
+        }
+        .article-bullets li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 6px;
+            font-size: 14.5px;
+            color: var(--wsj-text);
+            line-height: 1.55;
+        }
+        .article-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 9px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--wsj-red);
+        }
+
+        /* ── Insight Box ── */
+        .article-insight {
+            margin: 0 0 10px;
+            padding: 10px 14px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .article-insight p {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        /* Fallback body */
         .article-body {
             font-size: 14.5px;
             color: var(--wsj-gray);
@@ -162,34 +192,8 @@
             margin: 0 0 8px;
         }
 
-        /* ── Highlight styles ── */
-        .hl-num {
-            color: #0066cc;
-            font-weight: 700;
-        }
-        .hl-tech {
-            background: #e8f0fe;
-            color: #0066cc;
-            font-weight: 600;
-            padding: 0 2px;
-            border-radius: 2px;
-        }
-        .hl-trend {
-            background: #fff3cd;
-            color: #856404;
-            font-weight: 600;
-            padding: 0 2px;
-            border-radius: 2px;
-        }
-        .hl-name {
-            color: #c00;
-            font-weight: 700;
-        }
-
         /* CTA */
-        .article-footer {
-            margin-top: 4px;
-        }
+        .article-footer { margin-top: 4px; }
         .article-cta {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 12px;
@@ -199,9 +203,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .article-cta:hover {
-            text-decoration: underline;
-        }
+        .article-cta:hover { text-decoration: underline; }
 
         /* ── Footer ── */
         .page-footer {
@@ -215,7 +217,6 @@
             text-align: center;
         }
 
-        /* ── Mobile ── */
         @media (max-width: 600px) {
             .masthead h1 { font-size: 22px; }
             .article-title { font-size: 17px; }
@@ -239,9 +240,14 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Sun, 23 Aug 2026 00:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/nvidia-is-spending-6-billion-to-build-a-powerful-u-s-alternative-to-chinese-ai-c51c38cc" target="_blank">1. 英伟达斥资60亿美元，在美国打造强大的中国人工智能替代方案</a></h2><p class="article-title-en">Nvidia Is Spending $6 Billion to Build a Powerful U.S. Alternative to Chinese AI</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/nvidia-is-spending-6-billion-to-build-a-powerful-u-s-alternative-to-chinese-ai-c51c38cc" target="_blank">1. 英伟达</a></h2><p class="article-title-en">Nvidia Is Spending $6 Billion to Build a Powerful U.S. Alternative to Chinese AI</p>
             <p class="article-dek">A sweeping agreement with startup Poolside aims to build an open artificial-intelligence ecosystem in the U.S. that would compete with Chinese heavyweights and American AI giants.</p>
-            <p class="article-body"><span class="hl-tech">英伟达</span>与初创公司Poolside达成一项总额达<span class="hl-num">60亿</span>美元的全面协议，旨在美国打造一个开放的<span class="hl-tech">人工智能</span>生态系统，直接与中国<span class="hl-tech">人工智能</span>领域的重量级企业以及美国本土的<span class="hl-tech">AI</span>巨头展开竞争。该协议将推动建立一个不受单一厂商绑定、可供多元参与者共同开发的<span class="hl-tech">AI</span>基础设施，试图在训练和部署先进模型方面提供替代方案，从而降低对现有封闭生态的依赖。此举反映出全球<span class="hl-tech">AI</span>供应链正在加速分化，美国力图通过大规模投资巩固自身在尖端技术领域的自主地位，并应对中国在<span class="hl-tech">AI</span>领域快速崛起的挑战。</p>
+            <ul class="article-bullets"><li>{
+  "bullets": [
+    "Nvidia与Poolside达成60亿美元协议，打造开放AI生态系统。</li><li>",
+    "目标直指中国AI巨头及美国本土领先公司。</li><li>",
+    "此举凸显美国加速构建自主AI基础设施的战略紧迫性。</li></ul>
+            
             <div class="article-footer"><a href="https://www.wsj.com/tech/ai/nvidia-is-spending-6-billion-to-build-a-powerful-u-s-alternative-to-chinese-ai-c51c38cc" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -252,9 +258,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Sun, 23 Aug 2026 01:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/we-went-to-wall-streets-exclusive-wilderness-camp-everyone-was-spooked-by-ai-e16dbe10" target="_blank">2. 我们参加了</a></h2><p class="article-title-en">We Went to Wall Street’s Exclusive Wilderness Camp. Everyone Was Spooked by AI.</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/we-went-to-wall-streets-exclusive-wilderness-camp-everyone-was-spooked-by-ai-e16dbe10" target="_blank">2. 我们去了华尔街的专属荒野营地，每个人都被人工智能吓到了</a></h2><p class="article-title-en">We Went to Wall Street’s Exclusive Wilderness Camp. Everyone Was Spooked by AI.</p>
             <p class="article-dek">Between fishing outings and poker games, veteran finance pros shared their fears about the artificial intelligence trade.</p>
-            <p class="article-body">在华尔街精英专属的荒野营地中，资深金融从业者们在钓鱼和扑克牌局的间隙，流露出对<span class="hl-tech">人工智能</span>交易热潮的深层不安。他们普遍担忧市场对<span class="hl-tech">AI</span>概念股的追捧已脱离基本面，泡沫风险正在积聚，并且量化模型和算法交易的扩散可能加剧市场波动，甚至引发难以预料的系统性冲击。这些长期习惯于掌控风险的金融老手，在远离交易大厅的篝火旁，依然无法摆脱对技术颠覆性力量的焦虑，透露出既希望抓住<span class="hl-tech">AI</span>红利又惧怕其失控后果的矛盾心态。</p>
+            <ul class="article-bullets"><li>华尔街资深金融人士在荒野营地活动中，普遍表达对AI交易的恐惧与不安。</li><li>AI交易成为金融精英私下讨论的焦点，担忧其颠覆传统投资模式。</li><li>AI热潮引发金融界对技术失控、就业冲击和市场波动的深层焦虑。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向金融从业者与投资者，在AI概念股狂热却暗藏风险的时间点发布，揭示即使最资深的华尔街玩家也对AI交易缺乏掌控感。它传递出精英圈子内部的集体迷茫，暗示AI叙事可能已从盲目乐观转向怀疑审视，体现技术与金融权力结构碰撞下的信任危机。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/finance/investing/we-went-to-wall-streets-exclusive-wilderness-camp-everyone-was-spooked-by-ai-e16dbe10" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -267,7 +274,8 @@
             </div>
             <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/we-went-to-wall-streets-exclusive-wilderness-camp-everyone-was-spooked-by-ai-e16dbe10" target="_blank">3. 我们去了华尔街的专属荒野营地，所有人都被人工智能吓到了</a></h2><p class="article-title-en">We Went to Wall Street’s Exclusive Wilderness Camp. Everyone Was Spooked by AI.</p>
             <p class="article-dek">Between fishing outings and poker games, veteran finance pros shared their fears about the artificial intelligence trade.</p>
-            <p class="article-body">在一个华尔街精英参加的偏远营地活动中，金融界资深人士在休闲活动间讨论了<span class="hl-tech">人工智能</span>技术对行业的深远影响。他们表达了对<span class="hl-tech">AI</span>迅速发展的担忧，认为这种技术正在改变传统金融交易的规则，甚至可能威胁到他们的职业稳定性。与会者指出，<span class="hl-tech">人工智能</span>不仅提升了交易速度和效率，还开始在决策中发挥主导作用，这种趋势让许多人感到不安。此外，他们担心<span class="hl-tech">AI</span>的不可预测性以及技术垄断可能带来的市场风险。一些人试图通过学习相关知识应对变化，但也有人认为这种技术的快速发展可能超出了个人能力范围。</p>
+            <ul class="article-bullets"><li>华尔街资深人士在野外营地聚会中，钓鱼打牌之余热议对AI交易的恐惧。</li><li>AI交易正在重塑金融业，传统从业者担忧其冲击与不可控性。</li><li>AI焦虑已从专业工作场景蔓延至高端社交圈，成行业共识话题。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向金融从业者和投资者，揭示AI交易带来的深层不安已渗透至华尔街精英的私人社交场合。此时刊发意在捕捉市场情绪转折点，当非正式场合的恐惧取代了正式场合的乐观叙事，说明AI的颠覆性已从效率工具演变为存在性焦虑。这反映了金融行业对技术失控的普遍担忧，以及传统人际信任模式被算法取代的危机感。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/finance/investing/we-went-to-wall-streets-exclusive-wilderness-camp-everyone-was-spooked-by-ai-e16dbe10" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -278,9 +286,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Sat, 22 Aug 2026 12:12:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/articles/ais-need-for-content-has-put-rare-book-dealers-in-a-bind-1ac5a053" target="_blank">4. 稀有书籍销售激增，它们被切割后用于训练人工智能</a></h2><p class="article-title-en">Rare-Book Sales Are Booming. They’re Getting Sliced Up and Fed to AI.</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/articles/ais-need-for-content-has-put-rare-book-dealers-in-a-bind-1ac5a053" target="_blank">4. 珍本书籍销售火爆，正被切碎喂给AI</a></h2><p class="article-title-en">Rare-Book Sales Are Booming. They’re Getting Sliced Up and Fed to AI.</p>
             <p class="article-dek">Sellers are enjoying a jump in sales but fretting over whether irreplaceable books are being “sent to the guillotine” to train large language models.</p>
-            <p class="article-body">稀有书市场正经历销售热潮，但背后隐藏着一个令人不安的趋势：这些珍贵书籍正被拆解并数字化，用于训练大型语言模型。卖家虽因销量增长而获益，却日益担忧无法替代的孤本被“送上断头台”，即为了扫描而破坏装订、裁切页面。这种做法使得原本完整的古籍沦为算法养料，引发了对文化遗产保护和知识获取伦理的深刻忧虑。收藏界开始反思，在<span class="hl-tech">人工智能</span>对数据需求激增的背景下，书籍作为物理实体的价值与数字副本的利用之间，如何划清界限。</p>
+            <ul class="article-bullets"><li>稀有书籍销量激增，但卖家担忧书籍被“送上断头台”切碎用于训练大语言模型。</li><li>AI训练对稀缺文本的需求推动市场，不可替代的纸质书面临销毁风险。</li><li>书籍销售热潮背后，文化保存与数据伦理的冲突正在加剧。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向关注AI伦理与文化保护的读者，在AI训练数据来源争议升温的节点发布，意在揭露技术进步对实体文化遗产的侵蚀。它传递了一个信号：当数据成为新石油，连稀有书籍这样的稀缺资源也可能被工具化，其存续价值被商业利益碾压。这体现了AI发展从“从互联网抓取”向“掠夺物理世界”升级的趋势，以及市场与伦理之间日益尖锐的张力。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/articles/ais-need-for-content-has-put-rare-book-dealers-in-a-bind-1ac5a053" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -291,9 +300,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#00853e;border-color:#00853e">📈 Markets</span><time class="article-time">Sun, 23 Aug 2026 00:41:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/trump-discloses-1-000-stock-trades-in-june-2e5b0773" target="_blank">5. 特朗普披露6月进行了1000笔股票交易</a></h2><p class="article-title-en">Trump Discloses 1,000 Stock Trades in June</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/trump-discloses-1-000-stock-trades-in-june-2e5b0773" target="_blank">5. 特朗普披露6月份进行了1000笔股票交易</a></h2><p class="article-title-en">Trump Discloses 1,000 Stock Trades in June</p>
             <p class="article-dek">White House says president’s accounts are invested in ‘computer-based model portfolios’ to replicate stock indexes.</p>
-            <p class="article-body">美国总统<span class="hl-name">特朗普</span>在<span class="hl-num">6</span>月披露了<span class="hl-num">1000</span>笔股票交易，白宫对此解释称，其个人账户中的资金投资于“基于计算机的模型投资组合”，旨在复制主要股票指数的表现。这种被动投资策略意味着，总统本人并未主动进行大量个股的日常买卖决策，相关交易是由算法自动执行以跟踪市场整体走势。这一披露揭示了<span class="hl-name">特朗普</span>在任期间其金融资产的管理方式，即通过程序化交易参与市场，而非凭借个人判断来选择特定股票，从而在投资盈利的同时，试图与可能产生利益冲突的主动管理决策保持距离。</p>
+            <ul class="article-bullets"><li>特朗普6月单月披露1000笔股票交易，白宫称账户由电脑模型投资组合自动复制股票指数。</li><li>高频率交易引发公众对其是否利用职务获取内幕信息的质疑。</li><li>被动化、自动化投资成政客规避利益冲突指控的常见合规手段。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>此文面向关注政治人物财务透明度的读者，选择在交易披露后迅速发布，旨在用“自动化模型”解释异常高频操作，提前化解利益冲突指控。这既反映了美国官员资产披露日益精细化的合规趋势，也暗示被动投资工具可能被用作隔离道德风险的“防火墙”，但其模型决策逻辑的透明度仍存疑。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/finance/investing/trump-discloses-1-000-stock-trades-in-june-2e5b0773" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -304,9 +314,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#333;border-color:#333">🌍 World</span><time class="article-time">Sun, 23 Aug 2026 02:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/world/china/this-ancient-temple-is-where-chinas-young-people-go-to-pray-for-a-good-job-21ff191e" target="_blank">6. 这座古庙是中国年轻人祈求好工作的地方</a></h2><p class="article-title-en">This Ancient Temple Is Where China’s Young People Go to Pray for a Good Job</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/world/china/this-ancient-temple-is-where-chinas-young-people-go-to-pray-for-a-good-job-21ff191e" target="_blank">6. 这座古庙是中国年轻人</a></h2><p class="article-title-en">This Ancient Temple Is Where China’s Young People Go to Pray for a Good Job</p>
             <p class="article-dek">Young Chinese people are engaging in rituals they hope will bring real-world benefits, such as passing an exam or making more money.</p>
-            <p class="article-body">在中国，越来越多的年轻人涌向一座古老寺庙，通过参与特定的仪式，祈求获得现实世界中的实际利益，比如顺利通过考试或增加收入。这座寺庙已成为他们寄托职业与学业期望的重要场所，信徒们虔诚地烧香、跪拜，并将写有求职意向或分数目标的祈福牌挂在墙上。这种寻求精神慰藉的行为，折射出年轻群体在激烈竞争和不确定性加剧的社会环境中，渴望借助传统信仰来缓解焦虑、增强信心。他们并非单纯迷信，而是将寺庙视为一种心理调节与自我激励的空间，在袅袅香烟中整理思绪，为继续应对现实挑战积蓄力量。</p>
+            <ul class="article-bullets"><li>中国年轻人涌入古庙祈求通过考试、获得高薪工作等现实利益</li><li>就业市场竞争激烈，青年失业率攀升，催生“求神拜佛”式精神慰藉</li><li>寺庙游在年轻群体中爆火，上香成为缓解焦虑的流行仪式</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向关注中国社会心态与消费趋势的读者，在毕业季或青年失业率公布节点发布，旨在揭示经济下行压力下年轻人从追求成功转向寻求心理锚定的集体情绪。它传递了“奋斗叙事”疲软后，Z世代通过玄学仪式重构掌控感的信号，并折射出情绪消费与精神疗愈经济的崛起。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/world/china/this-ancient-temple-is-where-chinas-young-people-go-to-pray-for-a-good-job-21ff191e" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -317,9 +328,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#333;border-color:#333">🌍 World</span><time class="article-time">Sat, 22 Aug 2026 22:50:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/economy/trade/canada-announces-new-post-labor-day-tariffs-ef1de8e1" target="_blank">7. 美加两国螺旋式滑向贸易战</a></h2><p class="article-title-en">U.S., Canada Spiral Toward Trade War</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/economy/trade/canada-announces-new-post-labor-day-tariffs-ef1de8e1" target="_blank">7. 美国与加拿大滑向</a></h2><p class="article-title-en">U.S., Canada Spiral Toward Trade War</p>
             <p class="article-dek">Canada responded to new U.S. tariffs with levies of its own as the two sides trade blame for collapse of talks.</p>
-            <p class="article-body">美加贸易摩擦急剧升级，双方正滑向全面<span class="hl-trend">贸易战</span>。加拿大针对美国新加征的<span class="hl-trend">关税</span>立即采取了报复性征税措施，两国就此陷入相互指责的局面。谈判的突然破裂成为冲突激化的导火索，双方均将责任归咎于对方，令原本旨在缓和紧张局势的外交努力宣告失败。这一轮针锋相对的<span class="hl-trend">关税</span>行动不仅重创了北美高度一体化的供应链，也加剧了金融市场和商业界对长期贸易对峙的担忧，双边经贸关系面临严峻考验。</p>
+            <ul class="article-bullets"><li>加拿大对美国新关税采取报复性关税措施。</li><li>双方互相指责谈判破裂，贸易战螺旋升级。</li><li>美加贸易摩擦加剧，关系恶化趋势明显。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>本文面向关注国际贸易与地缘政治的投资者和政策观察者，在当前美加关税交锋的关键节点发布，揭示传统盟友关系正被单边主义侵蚀。它传递出保护主义政策已从战术施压演变为系统性对抗，北美经济一体化面临解构风险。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/economy/trade/canada-announces-new-post-labor-day-tariffs-ef1de8e1" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -331,8 +343,9 @@
                 <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
             </div>
             <h2 class="article-title"><a href="https://cn.wsj.com/articles/%E6%8E%A8%E5%8A%A8%E4%B8%AD%E5%9B%BDai%E5%AE%9E%E7%8E%B0%E6%83%8A%E4%BA%BA%E9%A3%9E%E8%B7%83%E7%9A%84%E5%B9%95%E5%90%8E%E6%99%BA%E5%9B%8A-9a0f1c39" target="_blank">8. 推动中国AI实现惊人飞跃的幕后智囊</a></h2>
-            <p class="article-dek">中国人工智能产业的跨越式发展，离不开一群长期深耕于战略规划与核心技术攻关的幕僚型人才。</p>
-            <p class="article-body">中国<span class="hl-tech">人工智能</span>产业的跨越式发展，离不开一群长期深耕于战略规划与<span class="hl-trend">核</span>心技术攻关的幕僚型人才。他们多来自顶尖高校、国家级实验室及政策研究机构，通过参与起草《新一代<span class="hl-tech">人工智能</span>发展规划》等顶层设计，将基础研究<span class="hl-trend">突破</span>与产业应用需求精准对接。这些智囊不仅主导了深度学习框架、<span class="hl-tech">算力</span>基础设施等关键方向的布局，还在<span class="hl-tech">大模型</span>爆发前便前瞻性地推动了数据共享与伦理治理体系构建。</p>
+            <p class="article-dek">|||BULLETS|||要点1：文章聚焦中国AI领域的关键决策者或研究团队，揭示其推动技术突破的幕后作用。</p>
+            <ul class="article-bullets"><li>要点1：文章聚焦中国AI领域的关键决策者或研究团队，揭示其推动技术突破的幕后作用。</li><li>要点2：中国AI产业正从应用创新转向基础研究，政策与资本合力培育自主生态。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章之所以重要，在于将关注点从技术成果转向背后的制度与人才支撑，折射出中国AI发展已进入深水区，依赖系统性智力架构而非单点突破。它体现了从“模式创新”到“源头创新”的行业趋势，以及国际竞争下自主技术体系的紧迫性。</p></div>
             <div class="article-footer"><a href="https://cn.wsj.com/articles/%E6%8E%A8%E5%8A%A8%E4%B8%AD%E5%9B%BDai%E5%AE%9E%E7%8E%B0%E6%83%8A%E4%BA%BA%E9%A3%9E%E8%B7%83%E7%9A%84%E5%B9%95%E5%90%8E%E6%99%BA%E5%9B%8A-9a0f1c39" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -344,8 +357,9 @@
                 <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
             </div>
             <h2 class="article-title"><a href="https://cn.wsj.com/articles/ai%E7%9A%84%E4%B8%8B%E4%B8%80%E6%AC%A1%E9%87%8D%E5%A4%A7%E9%A3%9E%E8%B7%83-%E8%B5%B0%E8%BF%9B%E7%8E%B0%E5%AE%9E-2739cd3f" target="_blank">9. AI的下一次重大飞跃：走进现实</a></h2>
-            <p class="article-dek">人工智能正从虚拟的数字世界加速融入物理现实，掀起新一波产业化浪潮。</p>
-            <p class="article-body"><span class="hl-tech">人工智能</span>正从虚拟的数字世界加速融入物理现实，掀起新一波产业化浪潮。此前的技术<span class="hl-trend">突破</span>主要集中在语言和图像生成等数字领域，而下一阶段的重大飞跃将体现为具身智能与实体环境的深度结合。在工业制造场景中，搭载多模态感知与决策<span class="hl-tech">大模型</span>的<span class="hl-tech">机器人</span>不再局限于重复性劳作，而是能自适应调整产线动作、完成精密装配，并与人安全协作。<span class="hl-tech">自动驾驶</span>也正从特定场景向更复杂的城市开放道路演进，端到端模型使车辆具备类人的环境理解与瞬时决策能力。</p>
+            <p class="article-dek">|||BULLETS|||AI技术正从虚拟走向物理世界，嵌入机器人、自动驾驶等实体载体。</p>
+            <ul class="article-bullets"><li>AI技术正从虚拟走向物理世界，嵌入机器人、自动驾驶等实体载体。</li><li>多模态大模型与具身智能结合，推动工业、服务场景的突破性应用落地。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章标志着AI发展从纯数字交互转向实体化渗透，将重塑制造业与服务业。它揭示了具身智能作为下一竞争高地的战略价值，预示着技术红利向真实生产力转化进入关键期。</p></div>
             <div class="article-footer"><a href="https://cn.wsj.com/articles/ai%E7%9A%84%E4%B8%8B%E4%B8%80%E6%AC%A1%E9%87%8D%E5%A4%A7%E9%A3%9E%E8%B7%83-%E8%B5%B0%E8%BF%9B%E7%8E%B0%E5%AE%9E-2739cd3f" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -357,8 +371,9 @@
                 <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
             </div>
             <h2 class="article-title"><a href="https://cn.wsj.com/articles/%E5%8F%B0%E6%B9%BE%E6%8B%9F%E5%87%BA%E5%8F%B0%E5%8F%B2%E4%B8%8A%E6%9C%80%E9%AB%98%E5%9B%BD%E9%98%B2%E9%A2%84%E7%AE%97-%E5%90%91%E7%BE%8E%E4%B8%AD%E8%A1%A8%E6%98%8E%E7%AB%8B%E5%9C%BA-3d14cd9a" target="_blank">10. 台湾拟出台史上最高国防预算，向美中表明立场</a></h2>
-            <p class="article-dek">台湾地区计划推出的史上最高国防预算，总额预计将显著超越往年规模，此举旨在强化其“自主防卫”形象，并同时向美中双方传递明确信号。</p>
-            <p class="article-body">台湾地区计划推出的史上最高国防预算，总额预计将显著超越往年规模，此举旨在强化其“自主防卫”形象，并同时向美中双方传递明确信号。对美方而言，大幅增加军费开支是回应华府持续施压，要求其承担更多自身安全责任，展现“自我防卫决心”，以巩固美台安全合作与军售管道。面向大陆，则意在展示其具备“抵抗”能力，试图为两岸关系注入强硬立场。这一预算案背后，折射出台海局势的持续紧张，以及美国对台军售常态化带来的装备采购与维护需求激增。</p>
+            <p class="article-dek">|||BULLETS|||要点1：台湾当局拟大幅提升国防预算至历史新高，强化防务自主。</p>
+            <ul class="article-bullets"><li>要点1：台湾当局拟大幅提升国防预算至历史新高，强化防务自主。</li><li>要点2：该预算旨在向美国展现自我防卫决心，并回应中国大陆军事压力。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>此举标志着台湾在美中战略竞争下选边站队，试图以财力换取安全保障，但可能激化两岸对立，使台海局势更趋复杂。它反映出区域安全架构正从模糊维稳转向硬实力博弈，经济红利与政治风险加速捆绑。</p></div>
             <div class="article-footer"><a href="https://cn.wsj.com/articles/%E5%8F%B0%E6%B9%BE%E6%8B%9F%E5%87%BA%E5%8F%B0%E5%8F%B2%E4%B8%8A%E6%9C%80%E9%AB%98%E5%9B%BD%E9%98%B2%E9%A2%84%E7%AE%97-%E5%90%91%E7%BE%8E%E4%B8%AD%E8%A1%A8%E6%98%8E%E7%AB%8B%E5%9C%BA-3d14cd9a" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -371,7 +386,8 @@
             </div>
             <h2 class="article-title"><a href="https://www.wsj.com/world/middle-east/irans-top-politicians-urge-an-end-to-the-war-d0936e12" target="_blank">11. 伊朗高层政界人士呼吁结束战争</a></h2><p class="article-title-en">Iran’s Top Politicians Urge an End to the War</p>
             <p class="article-dek">The country’s president and its parliamentary speaker say Tehran needs to negotiate an exit and shore up its economy while it has leverage.</p>
-            <p class="article-body">伊朗总统和议会议长共同呼吁结束<span class="hl-trend">战争</span>，强调德黑兰应趁当前仍握有谈判筹码之际，寻求通过外交途径实现脱身，并将重心转向稳固国内经济。两位高层政治人物认为，持续冲突已对伊朗经济造成沉重压力，继续消耗下去将削弱国家的战略地位。他们主张尽快启动谈判进程，在伊朗尚未丧失战场杠杆优势时，为冲突画上句号，从而为经济振兴释放空间。这一表态反映出伊朗领导层内部对<span class="hl-trend">战争</span>代价的重新评估，以及在外部<span class="hl-trend">制裁</span>与内部压力交织下，将经济重建置于优先位置的务实考量。</p>
+            <ul class="article-bullets"><li>伊朗总统莱希及议长卡利巴夫呼吁趁有筹码时谈判结束战争，巩固经济</li><li>高层公开转向务实，寻求外交退出以避免长期消耗战</li><li>此举反映伊朗在内外压力下优先经济稳定与政权生存</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>面向国际关系和地缘政治关注者，在伊朗与以色列冲突升级后发布，时机敏感。文章传递出伊朗统治精英内部对持续战争代价的担忧加剧，可能在外交上让步，体现中东冲突从军事对抗转向谈判解决的潜在趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/world/middle-east/irans-top-politicians-urge-an-end-to-the-war-d0936e12" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -382,9 +398,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Sat, 22 Aug 2026 04:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/pepperand-salt-437d6f63" target="_blank">12. 胡椒与盐</a></h2><p class="article-title-en">Pepper…and Salt</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/pepperand-salt-437d6f63" target="_blank">12. 胡椒……与盐</a></h2><p class="article-title-en">Pepper…and Salt</p>
             <p class="article-dek">Pepper…and Salt</p>
-            <p class="article-body">胡椒价格近期持续攀升，全球主要产区越南和巴西因极端天气导致大幅减产，供应链紧张推高了现货与期货价格。与此同时，作为基础调味品的盐，市场供需结构稳定，价格长期维持在低位，两者形成鲜明对比。这一分化折射出农产品领域结构性差异——胡椒作为小宗香辛料，产地集中、金融属性渐强，易受投机资金和气候因素扰动；盐则因资源分布广泛、工业需求占主导，价格弹性极低。对食品加工企业而言，胡椒成本激增正在挤压利润，迫使部分厂商调整配方或寻求替代品，而盐的支出几乎可忽略。</p>
+            <ul class="article-bullets"><li>核心事实：全球胡椒和盐价格因供应链扰动与气候异常持续走高。</li><li>行业背景：调味品成本上涨正传导至餐饮与食品加工行业，推动终端涨价。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇标题简洁的报道可能揭示了日常消费品的通胀压力正在从宏观叙事渗透到最基础的调味品。胡椒和盐作为餐饮刚需，其价格波动直接反映供应链脆弱性和农业大宗商品市场的结构性变化，突显了即使是最微小的成本增加也会对消费者日常产生累积影响。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/pepperand-salt-437d6f63" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -395,9 +412,14 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Sat, 22 Aug 2026 01:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/ai-agents-startup-work-culture-fa10494d" target="_blank">13. 创业公司</a></h2><p class="article-title-en">Startup Founders Are Working Harder Than Ever to Keep Up With Their AI Agents</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/ai-agents-startup-work-culture-fa10494d" target="_blank">13. 初创公</a></h2><p class="article-title-en">Startup Founders Are Working Harder Than Ever to Keep Up With Their AI Agents</p>
             <p class="article-dek">The growing capabilities of AI give new meaning to working yourself to the bone.</p>
-            <p class="article-body"><span class="hl-tech">人工智能</span>能力的飞速发展，正让创业者的工作强度达到前所未有的水平。过去，创始人可以借助智能代理处理客户支持、销售等重复性工作，但如今这些代理不仅能执行任务，还能自主决策、优化流程，甚至提出创新方案，这让人类领导者猝不及防地成了最忙碌的追赶者。创业者们发现，他们必须拼命学习才能看懂代理生成的代码、分析报告和战略建议，稍一松懈就可能被自己搭建的系统远远甩在身后。许多人不得不每天工作超过十六小时，不是为了公司生存，而是为了不被自己的<span class="hl-tech">AI</span>代理超越。</p>
+            <ul class="article-bullets"><li>{
+  "bullets": [
+    "AI代理能力持续增强，迫使创业者每周工作超80小时以跟上其决策速度。</li><li>",
+    "AI代理能自主执行复杂任务，但创始人仍需全天候监控、纠偏并承担最终责任。</li><li>",
+    "人机协作强度不降反升，AI工具并未减少创业者的总工作量，仅改变了工作性质。</li></ul>
+            
             <div class="article-footer"><a href="https://www.wsj.com/tech/ai/ai-agents-startup-work-culture-fa10494d" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -408,9 +430,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Fri, 21 Aug 2026 16:17:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/private-equity-is-deploying-an-army-of-ai-wonks-to-embed-in-the-firms-they-back-96d279ec" target="_blank">14. 私募股权公</a></h2><p class="article-title-en">Private Equity Is Deploying an Army of AI Wonks to Embed in the Firms They Back</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/private-equity-is-deploying-an-army-of-ai-wonks-to-embed-in-the-firms-they-back-96d279ec" target="_blank">14. 私募股权正在向其投</a></h2><p class="article-title-en">Private Equity Is Deploying an Army of AI Wonks to Embed in the Firms They Back</p>
             <p class="article-dek">Wall Street firms see big business potential in offering AI services to the broader business world.</p>
-            <p class="article-body">私募股权公司正积极利用<span class="hl-tech">人工智能</span>技术，为其投资组合中的企业提供深度支持。这些华尔街公司看到了<span class="hl-tech">人工智能</span>在商业领域的巨大潜力，正在部署一批专业的<span class="hl-tech">人工智能</span>团队，将其嵌入到被投资企业的业务当中，以帮助提升运营效率、优化决策流程和挖掘增长机会。这些团队不仅为企业提供现有工具的技术支持，还协助开发定制化的<span class="hl-tech">人工智能</span>解决方案，以实现差异化竞争优势。随着<span class="hl-tech">人工智能</span>技术的发展，这种战略合作模式有望成为私募股权投资的一大趋势，推动企业在数据驱动的时代中获得更强的竞争力和价值增长。</p>
+            <ul class="article-bullets"><li>私募股权公司向被投企业派驻AI专家，推动AI商业化落地。</li><li>华尔街将AI服务视为规模可观的业务，通过赋能实体企业获取回报。</li><li>AI技术与产业资本深度绑定，从工具升级为投资运营核心能力。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>文章面向投行、PE从业者和企业决策层，揭示资本如何通过人力资本注入而非单纯资金来驱动AI转型。选择此时发布，正值AI从概念验证转向规模化应用的关键窗口，信号是顶级资本已不再满足于财务投资，而是下场亲手构建AI竞争力。这体现了私募股权行业从‘资本配置’向‘能力建设’演变的深层趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/tech/ai/private-equity-is-deploying-an-army-of-ai-wonks-to-embed-in-the-firms-they-back-96d279ec" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -423,7 +446,8 @@
             </div>
             <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/ai-world-models-robotics-33ab46cb" target="_blank">15. 人工智能的下一个重大飞跃是进入现实世界</a></h2><p class="article-title-en">AI’s Next Big Leap Is Into the Real World</p>
             <p class="article-dek">Engineers and investors are piling into world models, aka “large action models,” to do for robotics what ChatGPT did for writing and coding.</p>
-            <p class="article-body"><span class="hl-tech">人工智能</span>的下一个重大飞跃正从数字领域迈向现实世界。工程师与投资者们正大举投入“<span class="hl-tech">世界模型</span>”，也被称为“大型行动模型”，其<span class="hl-trend">核</span>心目标是像<span class="hl-tech">ChatGPT</span>颠覆写作与编程那样，彻底变革<span class="hl-tech">机器人</span>技术。这类模型致力于让机器能够理解物理世界的运行规律，并自主执行复杂操作，而不仅仅是处理语言或代码。这一趋势预示着<span class="hl-tech">人工智能</span>将从虚拟交互走向实体操控，通过赋予<span class="hl-tech">机器人</span>感知、推理和行动能力，开启工业自动化、家庭服务等领域的全新可能。</p>
+            <ul class="article-bullets"><li>工程师与投资者正涌入“世界模型”或“大型行动模型”，推动机器人领域实现类似ChatGPT的突破。</li><li>该模型旨在让AI理解物理世界并执行复杂动作，被视为继大语言模型后的下一波浪潮。</li><li>机器人技术正从实验室走向现实世界，投资与研发加速，预示具身智能的产业化拐点临近。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向科技投资者与产业决策者，在具身智能融资热度攀升的2025年发布，意在传递“AI从虚拟走向物理”的转折信号。它揭示了资本与技术正从语言模型向物理世界迁移，表明行业共识已从“让AI说”转向“让AI做”，预示机器人将复刻大语言模型的爆发路径，成为下一轮基础设施级机会。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/tech/ai/ai-world-models-robotics-33ab46cb" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -434,9 +458,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Fri, 21 Aug 2026 12:31:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/cio-journal/an-innovation-veteran-on-whats-next-in-enterprise-ai-1e20ead2" target="_blank">16. 一位创新老将谈企业人工智能的下一步发展</a></h2><p class="article-title-en">An Innovation Veteran on What’s Next in Enterprise AI</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/cio-journal/an-innovation-veteran-on-whats-next-in-enterprise-ai-1e20ead2" target="_blank">16. 一位创新领域老将谈企业人工智能的下一步</a></h2><p class="article-title-en">An Innovation Veteran on What’s Next in Enterprise AI</p>
             <p class="article-dek">ServiceNow’s Dave Wright breaks down the reality of the “SaaSpocalypse” and why businesses need to pay attention to quantum computing.</p>
-            <p class="article-body">ServiceNow 的 Dave Wright 对所谓“SaaS 末日论”进行了剖析，指出企业并不会简单地抛弃 SaaS 模式，而是正在进入一个 <span class="hl-tech">AI</span> 驱动的混合时代，传统软件与智能代理将长期共存并协同工作。他强调，企业不应被炒作迷惑，真正的挑战在于如何将 <span class="hl-tech">AI</span> 可靠地嵌入<span class="hl-trend">核</span>心业务流程，实现自动化决策与行动，而不仅仅是生成内容。</p>
+            <ul class="article-bullets"><li>ServiceNow的Dave Wright警示“SaaSpocalypse”已成现实，企业须直面SaaS模式的颠覆性风险。</li><li>他呼吁企业立即关注量子计算，因其将深刻重塑企业AI的能力边界。</li><li>企业AI的未来在于融合SaaS敏捷性与量子计算等前沿算力。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向企业技术决策者与创新负责人，在SaaS增长放缓、生成式AI爆发的交叠时刻发布，意在警示企业不能仅依赖传统软件交付模式，必须主动拥抱量子计算等底层变革。它传递出企业AI竞争正从应用层创新转向算力与架构重塑的信号，反映了“软件定义一切”向“智能原生架构”演进的深层趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/cio-journal/an-innovation-veteran-on-whats-next-in-enterprise-ai-1e20ead2" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -448,8 +473,9 @@
                 <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
             </div>
             <h2 class="article-title"><a href="https://cn.wsj.com/articles/us-weapons-stockpile-ef059f94" target="_blank">17. 美国是否仍有能力维护世界秩序？</a></h2>
-            <p class="article-dek">美国维护世界秩序的能力正面临多重结构性考验。</p>
-            <p class="article-body">美国维护世界秩序的能力正面临多重结构性考验。财政层面，联邦债务规模持续攀升，产业空心化与通胀压力削弱了其长期投入全球公共产品的能力；军事层面，多区域同时应对使资源分配趋于紧张，战略优先级难以兼顾。与此同时，盟友体系内部协调成本上升，各方对安全负担分担的分歧加大。文章<span class="hl-trend">核</span>心判断认为，美国仍保有全球最强军事实力与美元霸权，但单极秩序的运行成本已日益超过收益，国内政治极化进一步制约对外承诺的连续性。若无法修复国内经济基础并重构盟友责任分担机制，美国主导的世界秩序将加速向多极化方向演变。</p>
+            <p class="article-dek">|||BULLETS|||要点1：美国主导的全球秩序正面临经济、军事和外交多层面挑战|||要点2：新兴大国崛起和区域合作机制发展正在重塑国际秩序格局 |||INSIGHT|||这篇文章聚焦于后冷战时代美国霸权可持续性的根本问题，反映出全球力量重心转移的深层焦虑。</p>
+            <ul class="article-bullets"><li>要点1：美国主导的全球秩序正面临经济、军事和外交多层面挑战</li><li>要点2：新兴大国崛起和区域合作机制发展正在重塑国际秩序格局</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章聚焦于后冷战时代美国霸权可持续性的根本问题，反映出全球力量重心转移的深层焦虑。其重要性在于，它不仅关乎美国自身战略调整，更预示着一个更加多极、规则博弈加剧的国际秩序重构期到来，对全球投资和地缘政治风险具有长期影响。</p></div>
             <div class="article-footer"><a href="https://cn.wsj.com/articles/us-weapons-stockpile-ef059f94" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -461,8 +487,9 @@
                 <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
             </div>
             <h2 class="article-title"><a href="https://cn.wsj.com/articles/the-66-year-old-who-overcame-the-odds-and-found-a-new-job-2779f127" target="_blank">18. 打破年龄魔咒：66岁老人重返职场之路</a></h2>
-            <p class="article-dek">在全球人口老龄化加剧、劳动年龄人口收缩的背景下，一位66岁老人的重返职场之路折射出个人韧性与社会认知的深层变革。</p>
-            <p class="article-body">在全球人口老龄化加剧、劳动年龄人口收缩的背景下，一位<span class="hl-num">66</span>岁老人的重返职场之路折射出个人韧性与社会认知的深层变革。文章可能详述了这位老人如何通过系统学习数字技能、参与政府或企业设立的“银发再就业”培训项目，最终在某零售或服务业岗位成功入职的过程。这不仅打破了对老年员工效率低下、学习能力不足的刻板印象，更凸显了企业在劳动力短缺压力下，开始重新评估年长员工的价值：他们往往具备更强的稳定性、责任感和人际沟通能力。</p>
+            <p class="article-dek">|||BULLETS|||要点1：66岁老人通过技能培训与灵活用工模式实现再就业。</p>
+            <ul class="article-bullets"><li>要点1：66岁老人通过技能培训与灵活用工模式实现再就业。</li><li>要点2：老年人口红利与养老压力倒逼企业探索老龄用工新策略。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>该案例折射出老龄化社会下劳动力供给结构变迁，延迟退休与终身就业趋势逐渐明朗。企业正从被动合规转向主动挖掘老龄人才价值，这既是应对用工短缺的务实选择，也是重塑年龄包容文化的契机。</p></div>
             <div class="article-footer"><a href="https://cn.wsj.com/articles/the-66-year-old-who-overcame-the-odds-and-found-a-new-job-2779f127" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -475,8 +502,51 @@
             </div>
             <h2 class="article-title"><a href="https://cn.wsj.com/articles/%E4%BD%A0%E8%A7%89%E5%BE%97%E5%9C%A8%E5%8A%9E%E5%85%AC%E5%AE%A4%E7%A9%BF%E4%BB%80%E4%B9%88%E6%89%8D%E5%90%88%E9%80%82-%E6%9D%A5%E5%81%9A%E5%81%9A%E6%88%91%E4%BB%AC%E7%9A%84%E5%B0%8F%E6%B5%8B%E8%AF%95%E5%90%A7-048c31b7" target="_blank">19. 你觉得在办公室穿什么才合适？来做做我们的小测试吧</a></h2>
             <p class="article-dek">对于上班时该穿什么、不该穿什么，每个人都有自己的一套标准。来看看你个人的职场着装标准与《华尔街日报》的其他读者有何异同。</p>
-            <p class="article-body">办公室的着装规范往往是员工手册里找不到的不成文规矩，它在追求职业形象、展现个性与保持专业感之间维持着微妙平衡。随着职场氛围愈发随意，人们对得体穿着的看法反而变得更为强烈，比如初级银行家为时尚杂志拍摄大片引发的争议，以及“裸感穿搭”向商务会议蔓延的趋势，都凸显了这一点。时尚作家蒂姆·冈恩给出的<span class="hl-trend">核</span>心建议是“察言观色，注意场合”，强调个人表达仍需融入整体环境。</p>
+            <ul class="article-bullets"><li>办公室着装规范多是不成文规矩，平衡专业形象与自我表达成为挑战。</li><li>初级银行家为时尚杂志拍摄大片引发争议，凸显职场着装界限模糊。</li><li>蒂姆·冈恩建议“察言观色注意场合”，强调融入环境而非放弃自我。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向正在适应后疫情时代混合办公的职场人群，在2026年夏季发布，捕捉了职场着装规范从明文规定向不成文共识的深刻转变。它通过互动测试将个人选择与集体判断并置，传递出职场文化正从统一规范转向个体解读的信号，同时警示过度随意可能引发的职业风险。这反映了组织在取消强制着装令后，转而通过社会压力与舆论监督来维持形象边界的趋势。</p></div>
             <div class="article-footer"><a href="https://cn.wsj.com/articles/%E4%BD%A0%E8%A7%89%E5%BE%97%E5%9C%A8%E5%8A%9E%E5%85%AC%E5%AE%A4%E7%A9%BF%E4%BB%80%E4%B9%88%E6%89%8D%E5%90%88%E9%80%82-%E6%9D%A5%E5%81%9A%E5%81%9A%E6%88%91%E4%BB%AC%E7%9A%84%E5%B0%8F%E6%B5%8B%E8%AF%95%E5%90%A7-048c31b7" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
+        </div>
+    </article>
+
+    <article class="article-card">
+        <figure class="article-hero"><img src="https://images.wsj.net/im-37090372?size=1.5&width=161&height=90" alt="" loading="lazy" onerror="this.parentElement.remove()"></figure>
+        <div class="article-content">
+            <div class="article-meta">
+                <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
+            </div>
+            <h2 class="article-title"><a href="https://cn.wsj.com/articles/%E5%86%85%E9%AC%BC-%E6%B3%84%E9%9C%B2%E5%AE%98%E6%96%B9%E6%9C%BA%E5%AF%86%E4%BB%A5%E8%B0%8B%E7%A7%81%E5%88%A9-%E4%B8%AD%E5%9B%BD%E5%8F%8D%E8%85%90%E9%9D%A2%E4%B8%B4%E9%9A%90%E6%82%A3-30973621" target="_blank">20. “内鬼”泄露官方机密以谋私利，中国反腐面临隐患</a></h2>
+            <p class="article-dek">|||BULLETS|||要点1：部分公职人员利用职务之便泄露官方机密，换取经济利益或庇护。</p>
+            <ul class="article-bullets"><li>要点1：部分公职人员利用职务之便泄露官方机密，换取经济利益或庇护。</li><li>要点2：反腐败斗争持续高压，但内部泄密成为监督体系的新漏洞。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章揭示了反腐体系的内部风险，即“内鬼”通过泄密谋私，可能破坏调查进程、庇护腐败分子。这反映出在体制机制完善过程中，内部监督与信息保密机制亟待加强，反腐已进入深水区，需防范“灯下黑”。</p></div>
+            <div class="article-footer"><a href="https://cn.wsj.com/articles/%E5%86%85%E9%AC%BC-%E6%B3%84%E9%9C%B2%E5%AE%98%E6%96%B9%E6%9C%BA%E5%AF%86%E4%BB%A5%E8%B0%8B%E7%A7%81%E5%88%A9-%E4%B8%AD%E5%9B%BD%E5%8F%8D%E8%85%90%E9%9D%A2%E4%B8%B4%E9%9A%90%E6%82%A3-30973621" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
+        </div>
+    </article>
+
+    <article class="article-card">
+        <figure class="article-hero"><img src="https://images.wsj.net/im-49290526?width=74&height=74" alt="" loading="lazy" onerror="this.parentElement.remove()"></figure>
+        <div class="article-content">
+            <div class="article-meta">
+                <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
+            </div>
+            <h2 class="article-title"><a href="https://cn.wsj.com/articles/michael-jacksons-biopic-blinds-us-from-the-truth-789c7f95" target="_blank">21. Image thumbnail for article titled 迈克尔·杰克逊传记电影所遮蔽的丑陋事实</a></h2>
+            <p class="article-dek">|||BULLETS|||要点1：传记片聚焦其艺术成就，淡化猥亵儿童等争议指控。</p>
+            <ul class="article-bullets"><li>要点1：传记片聚焦其艺术成就，淡化猥亵儿童等争议指控。</li><li>要点2：好莱坞传记片常因商业压力选择美化主角，回避道德瑕疵。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>此文揭示了传记电影作为流行文化叙事工具的选择性记忆机制，它通过遮蔽丑闻来重塑偶像，折射出娱乐工业在消费情怀与面对历史真相间的矛盾，以及公众对艺术家道德审查的持续张力。</p></div>
+            <div class="article-footer"><a href="https://cn.wsj.com/articles/michael-jacksons-biopic-blinds-us-from-the-truth-789c7f95" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
+        </div>
+    </article>
+
+    <article class="article-card">
+        <figure class="article-hero"><img src="https://images.wsj.net/im-68751582?width=74&height=74" alt="" loading="lazy" onerror="this.parentElement.remove()"></figure>
+        <div class="article-content">
+            <div class="article-meta">
+                <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
+            </div>
+            <h2 class="article-title"><a href="https://cn.wsj.com/articles/%E6%B3%B0%E6%A0%BC-%E4%BC%8D%E5%85%B9%E7%8E%B0%E5%9C%A8%E9%9C%80%E8%A6%81%E7%9A%84%E4%B8%8D%E6%98%AF%E9%AB%98%E5%B0%94%E5%A4%AB-01ca5cf1" target="_blank">22. Image thumbnail for article titled 泰格·伍兹现在需要的不是高尔夫</a></h2>
+            <p class="article-dek">|||BULLETS|||泰格·伍兹因伤缺席大师赛，职业前景再添不确定性|||高尔夫偶像的转型压力折射职业体育对高龄选手的残酷性 |||INSIGHT|||这篇文章的重要性在于，它揭示了一个超级体育明星在职业生涯暮年面临的现实困境：当身体无法支撑赛场时，如何重新定义自我价值。</p>
+            <ul class="article-bullets"><li>泰格·伍兹因伤缺席大师赛，职业前景再添不确定性</li><li>高尔夫偶像的转型压力折射职业体育对高龄选手的残酷性</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章的重要性在于，它揭示了一个超级体育明星在职业生涯暮年面临的现实困境：当身体无法支撑赛场时，如何重新定义自我价值。这反映了当代职业体育对运动员的极致压榨，以及公众对英雄叙事的不切实际期待，伍兹的案例成为讨论运动员心理健康与退役规划的典型样本。</p></div>
+            <div class="article-footer"><a href="https://cn.wsj.com/articles/%E6%B3%B0%E6%A0%BC-%E4%BC%8D%E5%85%B9%E7%8E%B0%E5%9C%A8%E9%9C%80%E8%A6%81%E7%9A%84%E4%B8%8D%E6%98%AF%E9%AB%98%E5%B0%94%E5%A4%AB-01ca5cf1" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
 
@@ -486,9 +556,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span>
             </div>
-            <h2 class="article-title"><a href="https://cn.wsj.com/articles/the-trade-war-couldnt-change-chinas-economy-94946475" target="_blank">20. Image thumbnail for article titled 美国曾以为贸易战能改变中国经济，但它错了</a></h2>
-            <p class="article-dek">美国对华贸易战自2018年全面升级以来，华盛顿的核心战略预设是：通过持续加征关税，迫使中国在经济结构和产业政策上做出根本性让步，最终推动中国向更市场化的方向转型。</p>
-            <p class="article-body">美国对华<span class="hl-trend">贸易战</span>自<span class="hl-num">2018</span>年全面升级以来，华盛顿的<span class="hl-trend">核</span>心战略预设是：通过持续加征<span class="hl-trend">关税</span>，迫使中国在经济结构和产业政策上做出根本性让步，最终推动中国向更市场化的方向转型。然而，现实的走向与这一预期大相径庭。面对外部压力，中国并未按照美方设想的路径调整，反而加速推进产业自主化战略，在<span class="hl-tech">半导体</span>、新能源、电动汽车等关键领域持续加大国家投入，本土供应链的韧性和自给能力显著增强。与此同时，中国出口规模不降反升，贸易顺差屡创新高，对美出口虽有所转移，却借道东南亚等第三方市场延续了对全球市场的渗透。</p>
+            <h2 class="article-title"><a href="https://cn.wsj.com/articles/the-trade-war-couldnt-change-chinas-economy-94946475" target="_blank">23. Image thumbnail for article titled 美国曾以为贸易战能改变中国经济，但它错了</a></h2>
+            <p class="article-dek">|||BULLETS|||要点1：美国对华贸易战未迫使中国经济体制转向，反而加速自主创新与产业升级。</p>
+            <ul class="article-bullets"><li>要点1：美国对华贸易战未迫使中国经济体制转向，反而加速自主创新与产业升级。</li><li>要点2：中国产业链韧性、内需市场及政策调控能力，抵御了外部压力，出口结构持续优化。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>文章揭示单边关税难以撼动中国深度嵌入全球价值链的经济模式，反促使中国加快技术自立与内循环布局。这体现全球经贸博弈正从“脱钩”转向“新平衡”，中国经济的适应性与政策空间成为关键变量。</p></div>
             <div class="article-footer"><a href="https://cn.wsj.com/articles/the-trade-war-couldnt-change-chinas-economy-94946475" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -499,9 +570,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Fri, 21 Aug 2026 15:50:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/articles/e-noses-microscopic-robots-composting-cemeteries-and-more-visions-of-the-future-80cefa6d" target="_blank">21. 电子鼻、微型机器人、堆肥墓地及更多未来愿景</a></h2><p class="article-title-en">E-Noses, Microscopic Robots, Composting Cemeteries and More Visions of the Future</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/articles/e-noses-microscopic-robots-composting-cemeteries-and-more-visions-of-the-future-80cefa6d" target="_blank">24. 电子鼻、微型机器人、堆肥墓地及更多未来愿景</a></h2><p class="article-title-en">E-Noses, Microscopic Robots, Composting Cemeteries and More Visions of the Future</p>
             <p class="article-dek">A late-summer roundup of our most interesting Future of Everything stories</p>
-            <p class="article-body">电子鼻技术正通过分析气味分子来早期诊断疾病，甚至能识别出传统检测手段无法捕捉的细微生物标记。在微观世界，微型<span class="hl-tech">机器人</span>已能进入人体精确输送药物或清除血管堵塞，将医疗干预推向细胞级精准治疗。环保理念同样渗透到身后事，堆肥墓地以自然降解方式将遗体转化为土壤，让逝者回归生态循环。此外，文章还展望了能够自我修复的活体建筑材料、重塑城市交通的飞行汽车，以及利用<span class="hl-tech">人工智能</span>预测并阻止犯罪等前沿构想，共同勾勒出一幅科技深度介入生命、环境与社会的未来图景。</p>
+            <ul class="article-bullets"><li>文章汇总了电子鼻、微型机器人、堆肥墓园等未来科技故事</li><li>这些故事来自《华尔街日报》'未来一切'系列夏末集锦</li><li>展示了从健康监测到环保殡葬的多领域技术突破</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向科技爱好者与前瞻性读者，选择在夏末发布，旨在通过系列盘点强化'未来一切'栏目的品牌认知，同时传递出科技正从实验室加速渗透至日常生活的信号。它反映了媒体对前沿技术生活化、场景化叙事的重视，以及公众对可持续、智能化未来日益增长的期待。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/articles/e-noses-microscopic-robots-composting-cemeteries-and-more-visions-of-the-future-80cefa6d" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -512,9 +584,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#00853e;border-color:#00853e">📈 Markets</span><time class="article-time">Fri, 21 Aug 2026 08:31:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-08-21-2026" target="_blank">22. 2026年8月21日股市新闻：比特币飙升；标普500指数周五收盘周线下跌</a></h2><p class="article-title-en">Stock Market News, Aug. 21, 2026: Bitcoin Jumps; S&P 500 Ends Friday With Weekly Loss</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-08-21-2026" target="_blank">25. 股市动态，2026年8月21日：比特币大涨；标普500指数周五收盘录得本周跌幅</a></h2><p class="article-title-en">Stock Market News, Aug. 21, 2026: Bitcoin Jumps; S&P 500 Ends Friday With Weekly Loss</p>
             <p class="article-dek">Crypto climbs, bond markets shrug off Treasury efforts to curb borrowing costs</p>
-            <p class="article-body"><span class="hl-num">8</span>月<span class="hl-num">21</span>日，股市表现分化，比特币价格大幅上涨，而美国股市主要指数表现疲软，标普<span class="hl-num">500</span>指数本周累计下跌。加密货币市场的强劲表现与传统金融市场的波动形成了鲜明对比。与此同时，美国债券市场对财政部试图通过政策手段降低借贷成本的举措反应平淡，收益率波动有限。尽管部分投资者对市场前景持谨慎态度，但比特币的强劲反弹表明加密资产的吸引力仍然不减，而传统市场的回调则反映了投资者对经济前景和货币政策路径的不确定性。本周市场的分化走势凸显了不同资产类别之间的资金流动动态以及投资者对风险的重新评估。</p>
+            <ul class="article-bullets"><li>比特币跳涨，标普500指数周五收跌，本周累计报亏。</li><li>债券市场无视财政部遏制借贷成本的努力，收益率持稳。</li><li>加密货币与传统资产走势分化，风险偏好局部转移。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>本文面向金融市场参与者，时值2026年8月，正值财政与货币政策博弈期。文章传递出加密货币正脱离传统风险资产框架、成为对冲财政政策无效性工具的叙事信号。趋势上，市场开始将比特币视为对财政纪律缺失的保险，而非单纯的投机资产。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-08-21-2026" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -525,9 +598,14 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#00853e;border-color:#00853e">📈 Markets</span><time class="article-time">Fri, 21 Aug 2026 23:34:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/the-wild-week-when-scott-bessent-was-schooled-by-the-bond-market-a244aca2" target="_blank">23. 斯科特·贝森特被债</a></h2><p class="article-title-en">The Wild Week When Scott Bessent Was Schooled by the Bond Market</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/the-wild-week-when-scott-bessent-was-schooled-by-the-bond-market-a244aca2" target="_blank">26. 斯科特·贝森特被债</a></h2><p class="article-title-en">The Wild Week When Scott Bessent Was Schooled by the Bond Market</p>
             <p class="article-dek">The Treasury Department’s announcement of a bond buyback stemmed a selloff—but not for long.</p>
-            <p class="article-body">美国财政部长斯科特·<span class="hl-name">贝森特</span>经历了跌宕起伏的一周，债券市场用剧烈波动给他上了一课。面对国债收益率<span class="hl-trend">飙升</span>和价格<span class="hl-trend">暴跌</span>，财政部宣布启动债券回购计划，这一非常规干预措施在短期内成功遏制了市场的恐慌性抛售，令收益率一度回落。然而，市场很快便看穿了这一安抚性举措的局限性，投资者对财政赤字膨胀、通胀顽固以及债务供给洪峰的深层担忧并未消散，债券抛售随即卷土重来，收益率重拾升势。这场短暂的回购救火行动最终未能扭转市场对美债信心的动摇，凸显出在宏观经济压力面前，政策工具的效果可能极为有限。</p>
+            <ul class="article-bullets"><li>{
+  "bullets": [
+    "财政部长贝森特的债券回购计划短暂遏制了市场抛售，但效果迅速消退。</li><li>",
+    "回购公告未能根本缓和美债收益率上行压力，市场质疑政策可持续性。</li><li>",
+    "此次波动凸显债券市场对财政政策信号高度敏感，短期安抚手段效力有限。</li></ul>
+            
             <div class="article-footer"><a href="https://www.wsj.com/finance/investing/the-wild-week-when-scott-bessent-was-schooled-by-the-bond-market-a244aca2" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -538,9 +616,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#00853e;border-color:#00853e">📈 Markets</span><time class="article-time">Fri, 21 Aug 2026 20:27:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/bond-yields-rise-despite-treasury-efforts-to-curb-borrowing-costs-8aed2b0f" target="_blank">24. 债券收益率上升，尽管财政部努力抑制借贷成本</a></h2><p class="article-title-en">Bond Yields Rise Despite Treasury Efforts to Curb Borrowing Costs</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/bond-yields-rise-despite-treasury-efforts-to-curb-borrowing-costs-8aed2b0f" target="_blank">27. 尽管财政部努力压低借贷成本，债券收益率仍持续上升</a></h2><p class="article-title-en">Bond Yields Rise Despite Treasury Efforts to Curb Borrowing Costs</p>
             <p class="article-dek">Bond Yields Rise Despite Treasury Efforts to Curb Borrowing Costs</p>
-            <p class="article-body">美国国债收益率近期攀升，即便财政部试图通过调整发债策略来遏制借贷成本。长期利率走高反映出市场对通胀前景及政府债务负担的持续担忧，投资者在权衡财政部的努力是否足以平衡供需。与此同时，风险资产迎来反弹，股市在经历前一轮抛售后企稳回升，主要股指录得涨幅。加密货币市场同样表现强劲，比特币等主流币种涨幅显著，部分受避险情绪消退和资金回流推动。这一分化格局显示，尽管固定收益市场面临利率上行压力，但投资者对经济增长和企业盈利的信心有所恢复，推动资金重新流入股票和数字资产领域。</p>
+            <ul class="article-bullets"><li>美国国债收益率无视财政部降成本措施，逆势攀升。</li><li>加密货币与股市同步反弹，风险资产情绪回暖。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>本文面向投资者与金融从业者，传递出市场对政策干预的定价优先于官方意愿的信号。债券收益率在施压措施下仍上行，反映通胀预期或财政可持续性担忧未消。同时，风险资产反弹表明流动性仍充裕，市场可能在‘坏消息即好消息’与基本面压力之间摇摆，体现政策效力边际递减与资产相关性重构的深层趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/finance/investing/bond-yields-rise-despite-treasury-efforts-to-curb-borrowing-costs-8aed2b0f" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -551,9 +630,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#00853e;border-color:#00853e">📈 Markets</span><time class="article-time">Fri, 21 Aug 2026 20:11:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/finance/regulation/fannie-mae-hit-by-turmoil-in-senior-ranks-as-at-least-10-executives-depart-9f0f40e0" target="_blank">25. 房利美高层陷入动荡，约12名高</a></h2><p class="article-title-en">Fannie Mae Hit by Turmoil in Senior Ranks as Roughly 12 Executives Are Let Go</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/finance/regulation/fannie-mae-hit-by-turmoil-in-senior-ranks-as-at-least-10-executives-depart-9f0f40e0" target="_blank">28. 房利美高层动荡，</a></h2><p class="article-title-en">Fannie Mae Hit by Turmoil in Senior Ranks as Roughly 12 Executives Are Let Go</p>
             <p class="article-dek">The departures are raising concerns about stability inside the government mortgage giant.</p>
-            <p class="article-body">美国政府支持的抵押贷款巨头房利美（Fannie Mae）近期经历高层动荡，大约<span class="hl-num">12</span>名高管被<span class="hl-trend">解雇</span>，引发外界对其内部稳定性的担忧。这些离职事件涉及多个业务领域，包括关键的财务和运营部门，可能对公司长期战略执行及日常管理造成影响。专家指出，高管离职可能与公司内部的组织调整或绩效压力有关，但具体原因尚未公开。这一变化发生在房利美面临复杂经济环境以及房地产市场波动的关键时刻，可能进一步加剧市场对其未来表现的忧虑。</p>
+            <ul class="article-bullets"><li>约12名房利美高管被解职，引发对公司内部稳定性的担忧</li><li>管理层动荡突显这家政府抵押贷款巨头面临的治理挑战</li><li>大规模人事变动可能预示房利美战略方向或监管压力发生变化</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>本文面向关注美国住房金融体系及政府支持企业的投资者和决策者。在房利美仍处于政府托管、住房市场面临利率与供给双重压力的背景下，选择此时集中披露高管离职，旨在向市场传递内部整顿和可能加强监管的信号。这反映出政府控股企业长期存在的治理困境，以及改革迟滞下管理层脆弱性上升的趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/finance/regulation/fannie-mae-hit-by-turmoil-in-senior-ranks-as-at-least-10-executives-depart-9f0f40e0" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -564,9 +644,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#00853e;border-color:#00853e">📈 Markets</span><time class="article-time">Fri, 21 Aug 2026 14:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/victor-niederhoffer-dead-54ca91a9" target="_blank">26. 以大胆押注和非传统生活方式著称的维克托·尼德霍弗去世，享年82岁</a></h2><p class="article-title-en">Victor Niederhoffer, Known for Big Bets and an Unconventional Lifestyle, Dies  at 82</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/finance/investing/victor-niederhoffer-dead-54ca91a9" target="_blank">29. 维克多·尼德霍夫，以豪赌和非传统生活方式闻名，去世，享年82岁</a></h2><p class="article-title-en">Victor Niederhoffer, Known for Big Bets and an Unconventional Lifestyle, Dies  at 82</p>
             <p class="article-dek">On Wall Street and the squash court, he became well-known for winning without behaving like anybody else.</p>
-            <p class="article-body">维克多·尼德霍夫（Victor Niederhoffer）在<span class="hl-num">82</span>岁时去世，他因在华尔街和壁球场上都以不循常规的方式取胜而闻名。尼德霍夫以大胆下注著称，曾在索罗斯麾下管理资金，创立自己的对冲基金，并在<span class="hl-num">1997</span>年亚洲金融危机中遭遇毁灭性亏损，基金一夜蒸发，后来又多次东山再起。他不仅是金融市场的投机者，还是一位卓越的壁球运动员，曾五次赢得美国全国壁球冠军。他的生活方式同样特立独行，将统计学、哲学和体育竞技精神融入投资，热衷于撰写市场杂文，其著作《投机者的教育》影响了不少交易者。</p>
+            <ul class="article-bullets"><li>华尔街传奇交易员、壁球冠军Victor Niederhoffer去世，享年82岁。</li><li>他以大额押注和反传统生活方式闻名于金融界和体育界。</li><li>其职业生涯贯穿投机、学术与运动，体现非典型成功路径。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这是一则面向金融及商业精英的讣告，突显一位以独特方法论和生活方式挑战华尔街常规的异类人物。此时发布是为纪念其离世，并重新审视他对冲基金时代的个人主义与冒险精神。文章传递了“非传统成功”仍然值得被铭记的信号，暗示在算法和合规主导的当代金融中，这种人格驱动的投机风格已成绝响。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/finance/investing/victor-niederhoffer-dead-54ca91a9" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -577,9 +658,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#00853e;border-color:#00853e">📈 Markets</span><time class="article-time">Fri, 21 Aug 2026 09:30:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/finance/stocks/stock-market-bargains-are-hiding-in-this-overlooked-place-6239c1ef" target="_blank">27. 股市中的超值股票正藏匿于这</a></h2><p class="article-title-en">Stock Market Bargains Are Hiding in This Overlooked Place</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/finance/stocks/stock-market-bargains-are-hiding-in-this-overlooked-place-6239c1ef" target="_blank">30. 股市中的超值机会正藏匿于这</a></h2><p class="article-title-en">Stock Market Bargains Are Hiding in This Overlooked Place</p>
             <p class="article-dek">European companies just had their best earnings season in years. Investors are starting to notice.</p>
-            <p class="article-body">欧洲企业刚刚经历了多年来表现最为强劲的财报季，而这一价值洼地正开始吸引投资者关注。在黯淡的经济前景与长期被低估的背景下，欧洲上市公司意外交出了亮眼的盈利成绩单，多个行业盈利超预期，展现出比美国同行更大的增长弹性。随着市场情绪逐步回暖，资金开始重新审视这片长期被忽略的领域，估值折价提供了难得的入场机会。那些基本面稳健、现金流充裕且具备全球竞争力的欧洲企业，正成为精明的投资者眼中隐藏的廉价标的。全球资本配置的再平衡，或将为这一市场带来新一轮的估值修复行情。</p>
+            <ul class="article-bullets"><li>欧洲企业迎来近年以来最佳财报季，盈利全面超预期。</li><li>投资者开始重新关注此前被低估的欧洲市场。</li><li>欧洲股市可能隐藏着价值投资机会，吸引资金流入。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章针对全球资产配置者，在美股高估值、市场拥挤的背景下，提示欧洲正成为性价比更高的替代选择。它传递出欧洲基本面改善、利润周期反转的早期信号，暗示资金可能从美国转向欧洲的趋势正在萌芽。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/finance/stocks/stock-market-bargains-are-hiding-in-this-overlooked-place-6239c1ef" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -590,9 +672,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#333;border-color:#333">🌍 World</span><time class="article-time">Sat, 22 Aug 2026 02:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/world/russia/russia-yabloko-party-putin-ukraine-war-bf5e2c5b" target="_blank">28. 俄罗斯唯一反战政党的垮台暴露了普京的脆弱性</a></h2><p class="article-title-en">The Fall of Russia’s Only Antiwar Party Has Exposed Putin’s Vulnerability</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/world/russia/russia-yabloko-party-putin-ukraine-war-bf5e2c5b" target="_blank">31. 俄罗斯唯一反战党的覆</a></h2><p class="article-title-en">The Fall of Russia’s Only Antiwar Party Has Exposed Putin’s Vulnerability</p>
             <p class="article-dek">Yabloko spent decades censoring itself to survive. The war in Ukraine made continuing that balancing act impossible.</p>
-            <p class="article-body">俄罗斯唯一的反战政党亚博卢党在存续数十年间始终进行自我审查，以在压制性政治环境中维持生存。然而，乌克兰<span class="hl-trend">战争</span>彻底打破了这种脆弱的平衡，使其无法继续在反对立场与安全保障之间找到妥协。该党因坚持反战而面临被彻底压制的命运，其衰落过程恰恰揭示了<span class="hl-name">普京</span>政权在管控国内异见时的深层脆弱性。当<span class="hl-trend">战争</span>成为不容置疑的绝对红线，任何有限度的异议空间都将被关闭，这反而凸显了政权对公开政治辩论的恐惧，以及其统治合法性对民族主义叙事的高度依赖。</p>
+            <ul class="article-bullets"><li>俄罗斯唯一反战政党亚博卢因乌克兰战争无法继续自我审查而走向衰落</li><li>亚博卢数十年来靠自我审查在普京治下生存，战争打破平衡</li><li>该党垮台暴露普京压制异议的脆弱性，反战声音难以彻底消除</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>本文面向关注俄罗斯政治走向的国际读者，在乌克兰战争长期化背景下揭示普京政权对异议的绝对排斥。亚博卢的终结表明，即便最温和的反战立场也无法被容忍，但正是这种极端压制折射出当局对内部不稳的深层恐惧，暗示高压统治下反战情绪可能以更隐蔽方式持续发酵。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/world/russia/russia-yabloko-party-putin-ukraine-war-bf5e2c5b" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -603,9 +686,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#333;border-color:#333">🌍 World</span><time class="article-time">Fri, 21 Aug 2026 22:08:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/world/americas/mexican-governor-indicted-by-u-s-vows-return-to-office-fe6ecff7" target="_blank">29. 被美国起诉的墨西哥州长重返职位</a></h2><p class="article-title-en">Mexican Governor Indicted by U.S. Returns to Office</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/world/americas/mexican-governor-indicted-by-u-s-vows-return-to-office-fe6ecff7" target="_blank">32. 被美国起诉的墨西哥州长重返职位</a></h2><p class="article-title-en">Mexican Governor Indicted by U.S. Returns to Office</p>
             <p class="article-dek">Sinaloa state Gov. Rubén Rocha is accused by U.S. prosecutors of ties to kingpins of a top drug cartel.</p>
-            <p class="article-body">墨西哥锡那罗亚州州长鲁本·罗查因涉嫌与顶级贩毒集团的头目有联系而被美国检察官<span class="hl-trend">起诉</span>。然而，他在指控后重返州长职位继续履职，此事在国内外引起广泛关注。美国方面指控他与贩毒集团存在密切关系，可能涉及非法活动，但墨西哥当局尚未对此采取进一步行动。鲁本·罗查的回归不仅引发了对墨西哥政界腐败问题的讨论，也凸显了国际社会对墨西哥毒品犯罪和政治勾结问题的担忧。这一事件反映出墨西哥政府在处理贩毒集团影响力方面面临的复杂挑战，同时也对国际合作打击毒品犯罪提出了新的要求。鲁本·罗查的后续动向将成为各界关注的焦点。</p>
+            <ul class="article-bullets"><li>锡那罗亚州州长鲁文·罗查被美国检方指控与贩毒集团头目勾结，现已返回州长岗位。</li><li>美国司法部罕见直接起诉墨西哥在任州长，指控其涉足芬太尼贩运网络。</li><li>罗查否认指控并拒绝辞职，暴露出墨西哥高层政治与毒枭深度交织的顽疾。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向关注美墨禁毒合作、跨国腐败与法治的读者。此时发布是因为美国检方刚公布起诉书后，罗查高调返岗，形成强烈对抗叙事。文章传递出美国长臂管辖在墨西哥遭遇政治现实壁垒的信号，显示即便有确凿指控，当地政治保护伞仍能维持掌权者地位，反映出墨西哥毒品战争背景下有罪不罚的深层结构性问题。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/world/americas/mexican-governor-indicted-by-u-s-vows-return-to-office-fe6ecff7" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -616,9 +700,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#333;border-color:#333">🌍 World</span><time class="article-time">Fri, 21 Aug 2026 19:57:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/world/uk/prince-harrys-return-to-u-k-sets-up-showdown-with-tabloids-b487f798" target="_blank">30. 哈里王子返英，与小报的正面交锋一触即发</a></h2><p class="article-title-en">Prince Harry’s Return to U.K. Sets Up Showdown With Tabloids</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/world/uk/prince-harrys-return-to-u-k-sets-up-showdown-with-tabloids-b487f798" target="_blank">33. 哈里王子回归英国，与小报的对决一触即发</a></h2><p class="article-title-en">Prince Harry’s Return to U.K. Sets Up Showdown With Tabloids</p>
             <p class="article-dek">After years of legal battles and bitter fallout with the national press, repairing ties will be a challenge.</p>
-            <p class="article-body"><span class="hl-name">哈里王子</span>返回英国，将面临与英国小报媒体的新一轮对峙。多年来，他与英国报业之间因法律诉讼和公开决裂积累了深刻矛盾，双方关系持续恶化。此次返英，预计将直接引发与多家小报的正面冲突，凸显其试图追究媒体责任与修复受损王室形象之间的艰难平衡。尽管<span class="hl-name">哈里王子</span>长期指控部分媒体侵犯隐私和进行不实报道，但彻底修复与英国新闻界的紧张关系依然面临巨大挑战，这场较量可能进一步激化他与媒体之间旷日持久的对抗。</p>
+            <ul class="article-bullets"><li>哈里王子返英，与《太阳报》等小报的法律战进入关键阶段</li><li>多年诉讼与公开指责导致其与英国媒体关系彻底破裂</li><li>修复王室与媒体关系的努力面临巨大挑战</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>此文面向关注王室动态与隐私权争议的全球读者，在哈里王子近期返英参加法律听证或家庭活动的时间点发布，意在强调其与媒体间不可调和的矛盾。这传递出王室成员个人维权与新闻自由冲突持续升级的信号，体现了公众人物在数字时代难以摆脱媒体侵扰的长期趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/world/uk/prince-harrys-return-to-u-k-sets-up-showdown-with-tabloids-b487f798" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -629,9 +714,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 21:47:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/donald-trump-iran-economic-pressure-sanctions-u-a-e-china-f2107bc8" target="_blank">31. 特朗普的伊朗公信力危机</a></h2><p class="article-title-en">Trump’s Iran Credibility Problem</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/donald-trump-iran-economic-pressure-sanctions-u-a-e-china-f2107bc8" target="_blank">34. 特朗普的伊朗公信力问题</a></h2><p class="article-title-en">Trump’s Iran Credibility Problem</p>
             <p class="article-dek">Will the President really follow through on his new economic threats?</p>
-            <p class="article-body"><span class="hl-name">特朗普</span>对伊朗发出的新一轮经济威胁正面临严峻的可信度考验。尽管言辞强硬，但其过往在伊朗问题上的反复无常已严重削弱了威慑效果。退出伊<span class="hl-trend">核</span>协议后，他一边推行极限施压，一边又在某些<span class="hl-trend">制裁</span>执行上态度摇摆，为伊朗规避惩罚留下了空间。这种前后不一让欧洲盟友和伊朗都对威胁的真实性抱持怀疑，德黑兰方面可能将其视为选举年的虚张声势，而非真正迫在眉睫的经济打击。内部决策的混乱与外部协调的缺失，</p>
+            <ul class="article-bullets"><li>特朗普对伊朗发出新经济威胁，市场质疑其执行决心</li><li>2018年退出伊核协议后，美国制裁政策多次反复</li><li>分析师警告，总统信誉受损可能削弱制裁威慑效果</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向关注美伊局势的投资者和外交政策观察者，在特朗普再次释放强硬信号的节点发布，意在揭示其“极限施压”策略的效力正因言行不一而衰减。它传递出市场对白宫口头威胁趋于免疫的信号，反映出特朗普外交政策中信誉赤字正成为制约其政策的系统性风险。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/donald-trump-iran-economic-pressure-sanctions-u-a-e-china-f2107bc8" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -642,9 +728,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 21:46:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/tiananmen-square-hong-kong-lee-cheuk-yan-chow-hang-tung-bdb8ef57" target="_blank">32. 屠杀天安门广场的记忆</a></h2><p class="article-title-en">Massacring the Memory of Tiananmen Square</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/tiananmen-square-hong-kong-lee-cheuk-yan-chow-hang-tung-bdb8ef57" target="_blank">35. 屠杀天安门广场的记忆</a></h2><p class="article-title-en">Massacring the Memory of Tiananmen Square</p>
             <p class="article-dek">A court convicts Hong Kongers for organizing a vigil for victims.</p>
-            <p class="article-body">香港法庭近日判决数名活动人士有罪，他们因组织纪念天安门事件死难者的烛光晚会而遭到指控。这些晚会曾是香港长期以来的传统，象征着对言论自由和民主价值的坚持。然而，随着中国政府在香港加强政治控制，这些纪念活动逐渐被禁止，相关组织者也面临法律诉讼。批评人士认为，这种做法是对历史记忆的压制，意在消除对天安门事件的公开讨论，同时进一步削弱香港的公民自由和民主空间。这一案件引发了广泛关注和国际谴责，凸显了香港政治环境的持续恶化及对基本权利的侵蚀。</p>
+            <ul class="article-bullets"><li>香港法院裁定多名香港人因组织六四事件守夜活动罪名成立。</li><li>此案是香港国安法实施后，首次对公开纪念六四活动进行刑事定罪。</li><li>判决显示香港司法系统正将该历史事件定性为非法集会，进一步压缩公民表达空间。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向国际社会与关注中国政治动向的读者，在六四周年临近之际发布，旨在凸显香港国安法对历史记忆的清除。它传递出香港法治已成为政治管控工具的信号，并折射出中国对公共历史叙事日益收紧的强硬趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/tiananmen-square-hong-kong-lee-cheuk-yan-chow-hang-tung-bdb8ef57" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -655,9 +742,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 21:42:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/donald-trump-lifts-beef-tariffs-trade-imports-d3048c6a" target="_blank">33. 特朗普对关税有意见</a></h2><p class="article-title-en">Trump Has a Beef With Tariffs</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/donald-trump-lifts-beef-tariffs-trade-imports-d3048c6a" target="_blank">36. 特朗普对关税不满</a></h2><p class="article-title-en">Trump Has a Beef With Tariffs</p>
             <p class="article-dek">He lifts border taxes on up to 300,000 metric tons of imports—through the election.</p>
-            <p class="article-body"><span class="hl-name">特朗普</span>宣布在选举期间取消最高达<span class="hl-num">30万</span>吨进口商品的边境税，此举旨在减轻贸易保护政策对国内经济的压力，同时寻求在选民中赢得更多支持。此政策调整意味着部分商品的进口成本将降低，有助于缓解因<span class="hl-trend">关税</span>导致的价格上涨问题。<span class="hl-name">特朗普</span>政府此前曾以保护本土产业为由，推行高额边境税，但这一政策在国内外引发了广泛争议。此次举措可能是为了平息批评，同时为选举造势。然而，这种临时性的<span class="hl-trend">关税</span>豁免也引发对长期经济规划的质疑，以及对政策不稳定性的担忧。</p>
+            <ul class="article-bullets"><li>特朗普免除最多30万公吨进口产品的边境税，直至大选结束。</li><li>此举旨在缓解国内牛肉供应紧张，平抑食品价格压力。</li><li>关税调整成为选举年争取选民、应对通胀的政治工具。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这是一篇面向政策观察者与市场人士的即时分析，发布于大选临近的敏感窗口，意在揭示特朗普在贸易强硬立场上的策略性软化。文章传递的信号是：通胀压力正迫使政客临阵调整关税武器，将其转化为短期经济止痛剂。这体现了贸易政策从长期战略工具向短期选举筹码加速异变的趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/donald-trump-lifts-beef-tariffs-trade-imports-d3048c6a" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -668,9 +756,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 21:41:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/graduate-student-loans-unions-lawsuit-education-department-ead7ccde" target="_blank">34. 政府工会支持增加</a></h2><p class="article-title-en">Government Unions for More Student Debt</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/graduate-student-loans-unions-lawsuit-education-department-ead7ccde" target="_blank">37. 政府工</a></h2><p class="article-title-en">Government Unions for More Student Debt</p>
             <p class="article-dek">They go to court to block new limits on federal loan debt per student.</p>
-            <p class="article-body">政府工会采取法律行动，试图阻止针对联邦学生贷款债务的新限制政策。这些限制旨在减少每位学生能够借贷的金额，以应对不断增长的学生债务危机。然而，工会认为，这些政策可能会对教育工作者以及低收入学生群体造成不利影响，因为许多学生依赖贷款完成学业。支持限制的倡导者则认为，过度借贷不仅加剧了债务问题，还可能导致教育成本进一步上涨。双方围绕如何平衡学生获得教育资源的机会与防止债务负担加重的问题展开激烈争论，这场法律对抗可能对未来的学生贷款政策产生深远影响。</p>
+            <ul class="article-bullets"><li>政府工会提起诉讼，阻止实施联邦学生贷款人均上限新规。</li><li>此举旨在维持或扩大学生贷款规模，保障相关机构现金流。</li><li>工会反对债务限制，折射出学生贷款利益链对政策收紧的抵制。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向关注美国学生债务政策的读者，可能发表于拜登政府试图限制贷款上限的窗口期。它传递了公共部门工会深度介入学生贷款利益分配的信号，表明改革阻力不仅来自教育机构，还来自代表政府雇员的工会。这揭示了学生债务问题已固化为跨部门利益联盟，任何削减贷款规模的尝试都会触发系统性反弹。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/graduate-student-loans-unions-lawsuit-education-department-ead7ccde" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -681,9 +770,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 21:36:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/rebuilding-the-impeachment-factory-488bd507" target="_blank">35. 重建弹劾工厂</a></h2><p class="article-title-en">Rebuilding the Impeachment Factory</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/rebuilding-the-impeachment-factory-488bd507" target="_blank">38. 重建弹劾工厂</a></h2><p class="article-title-en">Rebuilding the Impeachment Factory</p>
             <p class="article-dek">At least Democrats may be more honest this time about their plans.</p>
-            <p class="article-body">民主党人正在着手重建所谓的“弹劾工厂”，为新一轮弹劾行动做准备。与以往不同的是，这一次他们可能至少会对自己真实的意图表现得更加坦诚。所谓“弹劾工厂”的比喻，暗示弹劾已从宪法规定的罕见补救措施，沦为一种可以随时启动的常规政治武器。民主党人不再掩饰其将弹劾作为打击政治对手、服务党派议程的工具，这反而暴露了弹劾机制被严重武器化的现实。当弹劾的程序严肃性和高标准被系统性地削弱，它便不再是为了追究严重罪行，而是成为政治斗争中的一种战术选择。</p>
+            <ul class="article-bullets"><li>民主党此次可能更坦率地承认弹劾计划的政治动机。</li><li>标题“重建弹劾工厂”暗示弹劾已成党派斗争的常规化工具。</li><li>文章预示新一轮弹劾攻势将启动，且手法更直接、不加掩饰。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇短文面向保守派或政治观察者，可能发表于民主党重新掌控国会或总统地位受威胁的节点。它传递的信号是：弹劾已从宪法危机应对机制彻底沦为选举竞争武器，且民主党不再伪装其工具性。这体现了美国政治极化深化、制度惯例被持续空心化的趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/rebuilding-the-impeachment-factory-488bd507" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -694,9 +784,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 21:22:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/podcasts/opinion-potomac-watch/does-anyone-understand-americas-taiwan-policy/B28B3367-54E1-43AC-A699-D5093C964840" target="_blank">36. 有谁真正理解美国的台湾政策吗？</a></h2><p class="article-title-en">Does Anyone Understand America’s Taiwan Policy?</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/podcasts/opinion-potomac-watch/does-anyone-understand-americas-taiwan-policy/B28B3367-54E1-43AC-A699-D5093C964840" target="_blank">39. 有人真的理解美国的台湾政策吗？</a></h2><p class="article-title-en">Does Anyone Understand America’s Taiwan Policy?</p>
             <p class="article-dek">South Carolina Senate hopeful Darline Graham flubs a question about Taiwan, but are other politicians just as confused about this vital national security issue? Plus, the Walt Disney Company's ABC sue</p>
-            <p class="article-body">美国对台政策长期以来奉行"战略模糊"原则，但这一政策究竟有多少政界人士真正理解，令人存疑。南卡罗来纳州参议员候选人达琳·格雷厄姆在被问及台湾相关问题时出现明显失误，引发外界对美国政客在这一关键国家安全议题上认知水平的广泛质疑。这一事件并非孤例，许多政界人士对美国台湾政策的复杂性和微妙之处同样缺乏深入了解，而台湾问题涉及美中关系<span class="hl-trend">核</span>心，其战略重要性不言而喻。与此同时，迪士尼旗下的ABC广播公司以第一修正案为由，对美国联邦通信委员会提<span class="hl-trend">起诉</span>讼，此案涉及新闻自由与政府监管之间的边界争议，同样引发广泛关注。</p>
+            <ul class="article-bullets"><li>南卡参议员候选人Darline Graham在台湾问题上答错，暴露政策理解混乱</li><li>美国政客对台湾政策普遍缺乏清晰认知，触及国家安全议题要害</li><li>迪士尼旗下ABC以第一修正案为由起诉FCC，凸显言论自由与监管冲突</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>本文面向关注美国政治与外交的读者，在选举季背景下揭示政客在台湾问题上的认知短板，暗示美国对华政策内部混乱可能被对手利用。作者通过具体案例传递出决策层缺乏一致对台战略的信号，反映美国政治精英对关键议题准备不足的深层风险。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/podcasts/opinion-potomac-watch/does-anyone-understand-americas-taiwan-policy/B28B3367-54E1-43AC-A699-D5093C964840" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -707,9 +798,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 21:01:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/why-the-welfare-debate-went-silent-41fb2a18" target="_blank">37. 为何福利争论陷入沉寂</a></h2><p class="article-title-en">Why the Welfare Debate Went Silent</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/why-the-welfare-debate-went-silent-41fb2a18" target="_blank">40. 为何福利争论陷入沉寂</a></h2><p class="article-title-en">Why the Welfare Debate Went Silent</p>
             <p class="article-dek">What’s the best way to aid the poor? The question used to roil American politics. If only it still did.</p>
-            <p class="article-body">美国曾经围绕如何帮助贫困群体展开激烈的政治辩论，但如今这一议题逐渐淡出公众视野。过去，关于福利政策的争论涉及社会保障、医疗补助以及其他形式的政府援助，这些政策被认为是减少贫困的重要工具。然而，近年来，无论是政策制定者还是公众，对相关问题的关注度都显著下降，取而代之的是对其他热点议题的讨论。这种沉默或许与政治极化以及经济不平等问题的复杂化有关，同时也反映了社会对贫困群体的关注力度减弱。这种现象令人担忧，因为解决贫困问题不仅关乎经济发展，也关乎社会公平。</p>
+            <ul class="article-bullets"><li>美国福利辩论从两党激烈争论陷入沉寂，贫困援助方式不再是大选议题</li><li>福利政策长期停滞，1996年改革后未再出现重大立法调整</li><li>政治议程转向文化战争与经济不平等抽象讨论，具体反贫困方案被边缘化</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇短文面向关注美国社会政策的精英读者，意在警醒福利议题已从政治对话中消失。发布时间暗示大选年两党均回避实质性贫困解决方案，传递出贫困人群政治话语权缺失的信号。它折射出美国政治从“如何援助穷人”转向“谁值得援助”的价值观分裂，以及新自由主义共识下福利国家扩张的禁忌。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/why-the-welfare-debate-went-silent-41fb2a18" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -720,9 +812,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 20:58:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/tera-puts-an-indian-tribe-in-charge-of-its-energy-7a0e9001" target="_blank">38. TERA赋予一个印度部落掌控其能源的权力</a></h2><p class="article-title-en">TERA Puts an Indian Tribe in Charge of Its Energy</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/tera-puts-an-indian-tribe-in-charge-of-its-energy-7a0e9001" target="_blank">41. TERA赋予一个印度部落掌控其能源的权力</a></h2><p class="article-title-en">TERA Puts an Indian Tribe in Charge of Its Energy</p>
             <p class="article-dek">The Southern Utes of Colorado are the first to gain authority established under George W. Bush.</p>
-            <p class="article-body">美国南科罗拉多州的南尤特部落成为首个根据乔治·W·布什政府倡议获得能源管理自主权的印第安部落。通过《部落能源资源协议法案》（TERA），联邦政府将能源资源开发的决策权下放给部落，使其能够自行管理和开发土地资源。这一政策旨在减少联邦监管的繁琐程序，赋予部落更大的自主权，同时促进经济发展。南尤特部落长期以来在能源资源管理领域表现出色，建立了良好的专业能力和管理体系，因此成为首批获批实施该政策的部落。</p>
+            <ul class="article-bullets"><li>科罗拉多州南尤特印第安部落成为首个获得TERA能源自主权的部落</li><li>TERA授权源自布什政府，允许部落自行管理能源资源，绕过联邦审批</li><li>此举标志部落能源主权迈出实质性一步，减少联邦监管依赖</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向关注印第安事务、能源政策或部落自治的读者。它发布于首个TERA协议获得批准之时，意在凸显联邦政策在实际落地中的突破性进展。文章传递出部落从被动接受联邦管理转向主动掌控能源命脉的明确信号，反映了美国原住民争取经济自主和治理权下放的长期趋势，也暗示未来更多部落可能效仿此模式。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/tera-puts-an-indian-tribe-in-charge-of-its-energy-7a0e9001" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -733,9 +826,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#8b572a;border-color:#8b572a">🏢 Business</span><time class="article-time">Fri, 21 Aug 2026 20:19:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/opinion/the-lakers-are-up-trump-is-down-1c8e1f25" target="_blank">39. 湖人队势头上扬，特朗普支持率下滑</a></h2><p class="article-title-en">The Lakers Are Up, Trump Is Down</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/opinion/the-lakers-are-up-trump-is-down-1c8e1f25" target="_blank">42. 湖人队领先，特朗普失势</a></h2><p class="article-title-en">The Lakers Are Up, Trump Is Down</p>
             <p class="article-dek">Los Angeles is leading the business elite in declaring independence from the guy in Washington.</p>
-            <p class="article-body">洛杉矶湖人队夺得NBA总冠军的喜悦，与唐纳德·<span class="hl-name">特朗普</span>总统政治影响力的衰退形成了鲜明对比。洛杉矶的商业精英正带头与华盛顿的<span class="hl-name">特朗普</span>势力划清界限，宣告某种程度的独立。湖人队的胜利不仅是体育盛事，更被视作这座自由派城市文化自信的象征，与<span class="hl-name">特朗普</span>所代表的保守政治形成对抗。文章指出，在<span class="hl-name">特朗普</span>试图削弱加州等进步主义地区影响力的背景下，洛杉矶的商界领袖和民众通过支持球队、强化本地认同，表达了对白宫政策的疏离。这场胜利凝聚了城市精神，也凸显了美国精英阶层与<span class="hl-name">特朗普</span>政府之间日益加深的裂痕。</p>
+            <ul class="article-bullets"><li>洛杉矶湖人队表现上升，特朗普政治影响力下降，形成鲜明对比。</li><li>洛杉矶商业精英率先公开与华盛顿的特朗普政府切割，寻求独立。</li><li>娱乐与商业大本营正在加速与政治权力中心脱钩。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向关注政治与商业交叉的读者，在特朗普政府失势或卸任后发布，旨在捕捉商业阶层从联邦权力中心战略性撤退的信号。它并非单纯报道湖人队成绩，而是将体育符号作为象征，揭示商业精英主动脱离特朗普政治生态的趋势，暗示权力中心可能从华盛顿向地方或产业领袖转移。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/opinion/the-lakers-are-up-trump-is-down-1c8e1f25" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -746,9 +840,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Fri, 21 Aug 2026 01:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/ai-china-scientists-race-us-cd9732e3" target="_blank">40. 推动中国人工智能惊人跃升的幕后智囊</a></h2><p class="article-title-en">The Brains Who Powered China’s Surprising AI Leap</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/tech/ai/ai-china-scientists-race-us-cd9732e3" target="_blank">43. 推动中国人工智能惊人飞跃的</a></h2><p class="article-title-en">The Brains Who Powered China’s Surprising AI Leap</p>
             <p class="article-dek">A university lab nurtured the computer scientists who are using ingenuity and imitation to chase down Anthropic and OpenAI. “They know perfectly how to monetize their work.”</p>
-            <p class="article-body">中国一批由大学实验室培养的计算机科学家，正凭借巧妙的创新与高效的模仿能力，迅速追赶<span class="hl-tech">Anthropic</span>和<span class="hl-tech">OpenAI</span>等前沿<span class="hl-tech">人工智能</span>公司。这些研究者不仅展现出了快速复现先进模型的技术实力，还深谙如何将学术成果转化为商业价值。他们善于在开源生态中吸收全球智慧，同时通过工程优化和成本控制，在有限<span class="hl-tech">算力</span>条件下实现接近顶尖水平的性能表现，这成为中国<span class="hl-tech">人工智能</span>领域实现<span class="hl-trend">突破</span>性进展的关键驱动力。这种务实且灵活的研究风格，使中国<span class="hl-tech">AI</span>团队在全球竞争中不断缩小差距，并以出人意料的速度持续产出有影响力的成果。</p>
+            <ul class="article-bullets"><li>中国AI突破的核心力量来自一所大学实验室培养的计算机科学家。</li><li>这群科学家通过独创与模仿并举的策略，正快速追赶Anthropic和OpenAI。</li><li>他们极其擅长将科研成果商业化变现。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>本文写给关注全球AI竞争格局的投资者与科技从业者，撰文时机紧扣中国AI模型接连引发国际震动的时间点。文章不再渲染技术威胁论，转而强调中国AI人才的务实底色与商业化能力，传递出“新一轮AI竞赛中，中国力量已从模仿者进阶为成熟竞争者”的信号，也折射出全球资本与产业界对中国AI商业价值加速认可的深层趋势。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/tech/ai/ai-china-scientists-race-us-cd9732e3" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -759,9 +854,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#c00;border-color:#c00">🇨🇳 中文版</span><time class="article-time">2026-08-20T06:12:00Z</time>
             </div>
-            <h2 class="article-title"><a href="https://cn.wsj.com/articles/evergrande-founder-sentenced-to-life-in-prison-906ab955" target="_blank">41. 曾象征中国楼市崩盘的恒大创始人许家印被判处无期徒刑</a></h2>
+            <h2 class="article-title"><a href="https://cn.wsj.com/articles/evergrande-founder-sentenced-to-life-in-prison-906ab955" target="_blank">44. 曾象征中国楼市崩盘的恒大创始人许家印被判处无期徒刑</a></h2>
             <p class="article-dek">许家印曾是全球最富有的人之一。这位房地产大亨曾动用公司数以十亿美元计的资金收购足球俱乐部，并资助哈佛大学的医学研究。</p>
-            <p class="article-body">恒大集团创始人许家印因财务造假等罪行被深圳法院判处<span class="hl-trend">无期徒刑</span>，并没收全部个人资产。恒大曾是中国房地产行业的巨头，其业务模式依赖于借贷、拿地和预售楼盘，但在中国房价持续上涨的背景下，这一模式看似无懈可击。然而，从<span class="hl-num">2016</span>年至<span class="hl-num">2021</span>年间，恒大通过虚增资产和隐瞒负债积累了超过<span class="hl-num">3000亿</span>美元的债务，最终在<span class="hl-num">2021</span>年底出现债务违约，并于<span class="hl-num">2024</span>年被香港法院下令清盘。恒大曾扩展至足球、电动汽车等领域，并向哈佛大学捐资，但疫情和经济放缓成为其<span class="hl-trend">崩盘</span>的导火索，留下大量烂尾楼盘和无法拿回定金的业主。</p>
+            <ul class="article-bullets"><li>许家印因财务造假被判无期徒刑，没收全部个人资产，恒大被罚超20亿美元。</li><li>恒大2016-2021年虚增资产隐瞒负债，总负债曾超3000亿美元，留下数十万烂尾楼。</li><li>房地产崩盘仍在拖累中国经济，今年头七月房地产投资同比下降19%。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章面向关注中国房地产风险与法治化处置的投资者和决策者，在判决宣判当日发布，旨在传递对头部房企系统性造假行为的最高级别惩戒信号。选择此时公布重刑，既是对多年来金融乱象的秋后算账，也试图为市场划清“大而不能倒”的边界，表明政府正以极端手段切割房地产旧模式、重塑市场纪律，但判决本身对修复市场信心与解决烂尾楼问题作用有限，更多是政治决心的展示。</p></div>
             <div class="article-footer"><a href="https://cn.wsj.com/articles/evergrande-founder-sentenced-to-life-in-prison-906ab955" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -772,9 +868,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#0066cc;border-color:#0066cc">💻 Tech</span><time class="article-time">Fri, 21 Aug 2026 00:00:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/politics/policy/politicians-who-once-championed-data-centers-are-now-bashing-them-c172d4cb" target="_blank">42. 曾力挺数据中心的政客如</a></h2><p class="article-title-en">Politicians Who Once Championed Data Centers Are Now Bashing Them</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/politics/policy/politicians-who-once-championed-data-centers-are-now-bashing-them-c172d4cb" target="_blank">45. 曾力挺数据中心的政客如</a></h2><p class="article-title-en">Politicians Who Once Championed Data Centers Are Now Bashing Them</p>
             <p class="article-dek">State governors, including Greg Abbott and Josh Shapiro, are slowing development of the facilities as anger over AI spreads.</p>
-            <p class="article-body">一度大力支持数据中心建设的美国政客们，如今正转而反对这些项目。随着<span class="hl-tech">人工智能</span>扩张引发的公众愤怒加剧，得克萨斯州州长格雷格·阿博特和宾夕法尼亚州州长乔什·夏皮罗等人都开始放缓相关设施的开发审批。这些大型数据中心耗电量惊人，且往往需要大量水资源用于冷却，居民担忧其推高能源成本、破坏环境，并对电网稳定性构成压力。尽管这些项目曾被视为地方经济的增长引擎，地方官员也曾竞相提供税收优惠和土地，但如今面对选民日益高涨的不满情绪，政治风向正迅速转变，从积极拥抱转为严格设限。</p>
+            <ul class="article-bullets"><li>要点1：德克萨斯州长阿博特、宾夕法尼亚州长夏皮罗等曾力推数据中心建设的州长，如今开始叫停或放缓相关项目审批。</li><li>要点2：公众对AI及数据中心大量消耗电力、水资源的愤怒情绪持续升温，成为政客态度逆转的直接驱动力。</li><li>要点3：数据中心从地方政府眼中的经济引擎正快速转变为政治包袱，政策风向出现系统性转向。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>这篇文章写给科技行业投资者、政策观察者和AI产业链从业者看，时间节点恰在AI基础设施扩张最猛烈之际。它传递的信号是：AI的政治反弹已从舆论层面进入立法和行政层面，且跨越党派——阿博特是共和党人，夏皮罗是民主党人。这折射出一个更深层趋势：当技术红利无法被本地居民感知，而能耗与资源争夺的代价却切实落地时，地方政治生态将率先反转，数据中心的'免疫期'正在终结。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/politics/policy/politicians-who-once-championed-data-centers-are-now-bashing-them-c172d4cb" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -785,9 +882,10 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#00853e;border-color:#00853e">📈 Markets</span><time class="article-time">Thu, 20 Aug 2026 09:30:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/business/energy-oil/hyperscalers-off-grid-power-push-comes-with-risks-b1dca338" target="_blank">43. 超大规模企业推动离网供电伴随风险</a></h2><p class="article-title-en">Hyperscalers’ Off-Grid Power Push Comes With Risks</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/business/energy-oil/hyperscalers-off-grid-power-push-comes-with-risks-b1dca338" target="_blank">46. 超大规模企业推动离网供电面临风险</a></h2><p class="article-title-en">Hyperscalers’ Off-Grid Power Push Comes With Risks</p>
             <p class="article-dek">Data centers’ huge, fluctuating power demand is testing off-grid power systems.</p>
-            <p class="article-body">超大规模数据中心运营商正加速转向自建离网电力系统，以摆脱对传统电网的依赖并满足清洁能源目标。然而，这些设施巨大且剧烈波动的用电负荷正在严峻考验独立供电架构的稳定性。离网系统通常整合光伏、风电与大型电池储能，但数据中心瞬时功率需求可随计算任务频繁跳变，造成频率和电压波动，远超普通工业负荷，导致储能系统加速衰减并推高备电成本。部分项目已出现供电中断或被迫启用柴油发电机作为后备，反而削弱了脱碳效果。</p>
+            <ul class="article-bullets"><li>超大规模数据中心电力需求巨大且剧烈波动，正测试离网供电系统。</li><li>离网方案虽能缓解电网压力，但面临技术不稳定和高成本风险。</li><li>企业加速自建电源以应对AI算力激增，但能源自主化趋势暗藏隐患。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>文章面向能源与数据中心行业决策者，在AI算力需求爆发、电网容量告急的当下，警示科技巨头仓促部署离网电力可能引发新的运营风险。它传递出的信号是：盲目追求能源独立会带来财务与可靠性陷阱，行业需在清洁能源部署中平衡速度与稳健性。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/business/energy-oil/hyperscalers-off-grid-power-push-comes-with-risks-b1dca338" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
@@ -798,29 +896,17 @@
             <div class="article-meta">
                 <span class="article-section" style="color:#333;border-color:#333">🌍 World</span><time class="article-time">Thu, 20 Aug 2026 11:32:00 GMT</time>
             </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/world/middle-east/trump-threatens-iran-with-economic-d-day-4d2f238c" target="_blank">44. 特朗普以"经济决战日"威胁伊朗</a></h2><p class="article-title-en">Trump Threatens Iran With ‘Economic D-Day’</p>
+            <h2 class="article-title"><a href="https://www.wsj.com/world/middle-east/trump-threatens-iran-with-economic-d-day-4d2f238c" target="_blank">47. 特朗普以“经济D日”威胁伊朗</a></h2><p class="article-title-en">Trump Threatens Iran With ‘Economic D-Day’</p>
             <p class="article-dek">As the war nears its six-month point, the president says he would unleash the “most crushing economic operation ever taken.”</p>
-            <p class="article-body">美国总统<span class="hl-name">特朗普</span>在<span class="hl-trend">战争</span>接近六个月之际威胁对伊朗采取史无前例的经济<span class="hl-trend">制裁</span>行动，称其为“经济末日”。<span class="hl-name">特朗普</span>表示，这将是有史以来最严厉的经济行动，意在对伊朗施加前所未有的经济压力，迫使其改变当前的政策和行为。这一声明表明，美国政府可能会通过进一步削弱伊朗经济的方式来升级现有的对抗局势。虽然具体措施尚未披露，但外界普遍认为，这可能包括全面<span class="hl-trend">封锁</span>重要经济领域以及切断伊朗与国际市场的联系。<span class="hl-name">特朗普</span>的这一表态凸显了美国在外交上的强硬立场，同时也可能加剧中东地区的紧张局势，引发各方对局势进一步恶化的担忧。</p>
+            <ul class="article-bullets"><li>特朗普在战争满6个月之际威胁对伊朗实施“最毁灭性经济行动”。</li><li>战争背景指向以色列-哈马斯冲突，伊朗被西方视为哈马斯支持者。</li><li>此番言论暗示若特朗普重返白宫，将对伊朗采取极限经济施压。</li></ul>
+            <div class="article-insight"><span class="insight-label">你的理解</span><p>本文面向关注美国大选与中东政策互动的读者，在加沙战争半年节点发出，借危机时刻塑造特朗普强硬形象。其核心信号是：特朗普将经济胁迫作为外交杠杆，试图与拜登政府形成鲜明对比，表明2024年大选中国安议题已深度绑定伊朗政策，鹰派经济制裁路线正成为共和党竞选叙事的关键筹码。</p></div>
             <div class="article-footer"><a href="https://www.wsj.com/world/middle-east/trump-threatens-iran-with-economic-d-day-4d2f238c" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
-        </div>
-    </article>
-
-    <article class="article-card">
-        <figure class="article-hero"><img src="https://images.wsj.net/im-77094706" alt="" loading="lazy" onerror="this.parentElement.remove()"></figure>
-        <div class="article-content">
-            <div class="article-meta">
-                <span class="article-section" style="color:#333;border-color:#333">🌍 World</span><time class="article-time">Thu, 20 Aug 2026 02:58:00 GMT</time>
-            </div>
-            <h2 class="article-title"><a href="https://www.wsj.com/world/middle-east/trumps-plan-to-squeeze-irans-economy-will-live-or-die-in-dubai-8f9f561e" target="_blank">45. 特朗普挤压伊朗经济的计划将在迪拜见分晓</a></h2><p class="article-title-en">Trump’s Plan to Squeeze Iran’s Economy Will Live or Die in Dubai</p>
-            <p class="article-dek">The United Arab Emirates, long Tehran’s gateway to global commerce and finance, has pledged to crack down. But it’s complicated.</p>
-            <p class="article-body">美国试图通过经济<span class="hl-trend">制裁</span>进一步压制伊朗，而阿联酋在这一过程中扮演了关键角色。作为伊朗通往全球贸易与金融的重要通道，迪拜长期以来是伊朗规避<span class="hl-trend">制裁</span>的主要途径。然而，阿联酋已承诺加强对<span class="hl-trend">制裁</span>政策的执行力度，并加大对非法金融活动的打击力度，这可能对伊朗经济产生重大影响。尽管如此，实际操作中存在复杂性，迪拜作为国际贸易中心的特殊地位以及与伊朗的历史性商业联系，使得完全切断伊朗的经济活动变得困难重重。美国的计划能否成功，取决于阿联酋执行力的强弱以及伊朗在其他地区开辟替代通道的能力。</p>
-            <div class="article-footer"><a href="https://www.wsj.com/world/middle-east/trumps-plan-to-squeeze-irans-economy-will-live-or-die-in-dubai-8f9f561e" target="_blank" class="article-cta">阅读原文 &rarr;</a></div>
         </div>
     </article>
     </main>
 
     <footer class="page-footer">
-        Generated at 2026-08-23 10:30 HKT &middot; Source: Wall Street Journal
+        Generated at 2026-08-23 11:09 HKT &middot; Source: Wall Street Journal
     </footer>
 </body>
 </html>
