@@ -767,10 +767,12 @@ def fetch_fulltext_batch(articles, timeout=30):
                 # 优先使用文章自带的 dek 作为导语
                 if dek and len(dek) > 10:
                     art["lead"] = dek[:500]
+                    art["lead_en"] = dek[:500]  # 保存英文原文供双语显示
                     _, remaining = extract_lead(text)
                 else:
                     lead, remaining = extract_lead(text)
                     art["lead"] = lead
+                    art["lead_en"] = lead  # fallback 正文首段也保存
                 cleaned_body = clean_summary(remaining or text, max_len=1000)
                 art["summary"] = cleaned_body
                 ok += 1

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""WSJ 经典报刊风格 HTML 生成器 — 纯白底 + 衬线正文 + 红色分类 + 细灰线分隔"""
+"""WSJ 经典报刊风格 HTML 生成器 — 纯白底 + 衬线正文 + 红色分类 + 细灰线分隔
+v2: 双语标题/导语 + 摘要关键词高亮
+"""
 
+import re
 from datetime import datetime, timedelta, timezone
 
 SH_TZ = timezone(timedelta(hours=8))
@@ -15,33 +18,105 @@ SECTION_COLORS = {
 }
 
 
+def _highlight_summary(text):
+    """在摘要正文中高亮关键信息"""
+    if not text:
+        return text
+
+    # 用占位符策略避免重复替换：先替换为唯一占位符，最后统一替换为 HTML
+
+    placeholders = {}
+
+    def _add_placeholder(match_str, css_class):
+        key = f"\x00{css_class}_{len(placeholders)}\x00"
+        placeholders[key] = f'<span class="{css_class}">{match_str}</span>'
+        return key
+
+    # 1. 金额/数字+单位（$60亿、3660亿、18%、$1.2万亿）
+    text = re.sub(
+        r'(\$?[\d,.]+[亿万]?\s*[%％]?)',
+        lambda m: _add_placeholder(m.group(0), 'hl-num'),
+        text
+    )
+
+    # 2. AI/科技关键词
+    tech_terms = [
+        'AI', '人工智能', '大模型', '大语言模型', '芯片', '半导体', '算力',
+        'GPU', '英伟达', 'OpenAI', 'Anthropic', 'DeepSeek', '谷歌', '微软',
+        '苹果', '特斯拉', '华为', '量子', '机器人', '自动驾驶',
+        'ChatGPT', 'Claude', 'GPT', 'AGI', '世界模型',
+    ]
+    for term in sorted(tech_terms, key=len, reverse=True):
+        text = text.replace(term, _add_placeholder(term, 'hl-tech'))
+
+    # 3. 关键动作/趋势词
+    trend_terms = [
+        '飙升', '暴涨', '崩盘', '暴跌', '创纪录', '突破', '制裁',
+        '封锁', '出口管制', '合并', '收购', '并购', 'IPO',
+        '解雇', '辞职', '调查', '起诉', '定罪', '无期徒刑',
+        '战争', '导弹', '核', '关税', '贸易战',
+    ]
+    for term in sorted(trend_terms, key=len, reverse=True):
+        text = text.replace(term, _add_placeholder(term, 'hl-trend'))
+
+    # 4. 关键人名
+    names = [
+        '特朗普', '拜登', '习近平', '丁薛祥', '马斯克', '普京',
+        '哈里王子', '贝森特',
+    ]
+    for name in sorted(names, key=len, reverse=True):
+        text = text.replace(name, _add_placeholder(name, 'hl-name'))
+
+    # 替换占位符为 HTML span
+    for key, val in placeholders.items():
+        text = text.replace(key, val)
+
+    return text
+
+
 def _card(a, num):
-    """生成单篇文章卡片 — WSJ 经典风"""
+    """生成单篇文章卡片 — WSJ 经典风 + 双语"""
     title = a.get('title', '')
+    title_en = a.get('title_en', '')
     url = a.get('url') or a.get('link', '')
     img = a.get('image', '')
     lead = a.get('lead', '') or ''
+    lead_en = a.get('lead_en', '')
     summary = a.get('ai_summary', '') or a.get('summary', '') or ''
     section = a.get('section', '')
     pub_time = a.get('published', '')
+    source = a.get('source', '')
 
     # 分类颜色
     sec_color = SECTION_COLORS.get(section, '#333')
 
-    # 图片（大图 hero 风格）
+    # 是否是 RSS 文章（需要双语）
+    is_rss = source == 'rss'
+
+    # 图片
     img_html = ''
     if img:
         img_html = f'<figure class="article-hero"><img src="{img}" alt="" loading="lazy" onerror="this.parentElement.remove()"></figure>'
 
-    # 导语（粗体，灰色背景条）
+    # 标题：中文主标题 + 英文副标题
+    if is_rss and title_en and title_en != title:
+        title_html = f'<h2 class="article-title"><a href="{url}" target="_blank">{num}. {title}</a></h2>'
+        title_html += f'<p class="article-title-en">{title_en}</p>'
+    else:
+        title_html = f'<h2 class="article-title"><a href="{url}" target="_blank">{num}. {title}</a></h2>'
+
+    # 导语：中文 + 英文原文
     lead_html = ''
     if lead:
         lead_html = f'<p class="article-dek">{lead}</p>'
+    if is_rss and lead_en and lead_en != lead:
+        lead_html += f'<p class="article-dek-en">{lead_en}</p>'
 
-    # 摘要正文
+    # 摘要正文（高亮）
     summary_html = ''
     if summary:
-        summary_html = f'<p class="article-body">{summary}</p>'
+        highlighted = _highlight_summary(summary)
+        summary_html = f'<p class="article-body">{highlighted}</p>'
 
     # 原文链接
     link_html = f'<a href="{url}" target="_blank" class="article-cta">阅读原文 &rarr;</a>' if url else ''
@@ -59,7 +134,7 @@ def _card(a, num):
             <div class="article-meta">
                 {sec_html}{time_html}
             </div>
-            <h2 class="article-title"><a href="{url}" target="_blank">{num}. {title}</a></h2>
+            {title_html}
             {lead_html}
             {summary_html}
             <div class="article-footer">{link_html}</div>
@@ -68,10 +143,7 @@ def _card(a, num):
 
 
 def generate_html(articles, date_str, generated_at):
-    """
-    生成 WSJ 风格 HTML 页面
-    文章已在调用方按权重排序（时间+主题），此处保持原序
-    """
+    """生成 WSJ 风格 HTML 页面"""
 
     article_num = 0
     all_cards = []
@@ -205,6 +277,15 @@ def generate_html(articles, date_str, generated_at):
         .article-title a:hover {{
             color: var(--wsj-red);
         }}
+        /* English subtitle (RSS articles) */
+        .article-title-en {{
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--wsj-light);
+            margin: 0 0 8px;
+            line-height: 1.4;
+        }}
 
         /* Dek (lead) */
         .article-dek {{
@@ -217,6 +298,16 @@ def generate_html(articles, date_str, generated_at):
             background: var(--wsj-dek-bg);
             border-left: 3px solid var(--wsj-red);
         }}
+        /* English dek (RSS articles) */
+        .article-dek-en {{
+            font-size: 13px;
+            font-style: italic;
+            color: var(--wsj-gray);
+            line-height: 1.5;
+            margin: 0 0 8px;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--wsj-rule);
+        }}
 
         /* Body (summary) */
         .article-body {{
@@ -224,6 +315,30 @@ def generate_html(articles, date_str, generated_at):
             color: var(--wsj-gray);
             line-height: 1.65;
             margin: 0 0 8px;
+        }}
+
+        /* ── Highlight styles ── */
+        .hl-num {{
+            color: #0066cc;
+            font-weight: 700;
+        }}
+        .hl-tech {{
+            background: #e8f0fe;
+            color: #0066cc;
+            font-weight: 600;
+            padding: 0 2px;
+            border-radius: 2px;
+        }}
+        .hl-trend {{
+            background: #fff3cd;
+            color: #856404;
+            font-weight: 600;
+            padding: 0 2px;
+            border-radius: 2px;
+        }}
+        .hl-name {{
+            color: #c00;
+            font-weight: 700;
         }}
 
         /* CTA */
@@ -283,7 +398,7 @@ def generate_html(articles, date_str, generated_at):
 
 
 def generate_index(articles, date_str):
-    """索引页 — 同样采用 WSJ 风格"""
+    """索引页"""
     items = []
     for i, a in enumerate(articles, 1):
         title = a.get('title', '')

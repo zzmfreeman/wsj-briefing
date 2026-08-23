@@ -814,6 +814,7 @@ if __name__ == "__main__":
                         if idx > 5:
                             translated = translated[:idx].strip()
                     if translated and len(translated) < 150:
+                        a['title_en'] = a.get('title', '')  # 保存英文原文
                         a['title'] = translated
                         a['title_translated'] = True
                         return (a, translated)
@@ -855,6 +856,48 @@ if __name__ == "__main__":
     for a in articles:
         if a.get('lead'):
             a['lead'] = postprocess_lead(a['lead'])
+
+    # 翻译 RSS 文章的英文导语为中文（保留双语）
+    rss_dek_to_translate = [a for a in articles if a.get('lead_en') and not a.get('lead_zh') and a.get('source') == 'rss']
+    if rss_dek_to_translate:
+        print(f"RSS导语翻译: {len(rss_dek_to_translate)} 篇...")
+        def _translate_dek_one(a):
+            dek_en = a.get('lead_en', '')
+            for attempt in range(3):
+                try:
+                    result = llm_call(
+                        f"将以下英文新闻导语翻译为简体中文。只输出翻译后的文本，不要解释，不要加引号。\n\n{dek_en}",
+                        max_tokens=200,
+                        temperature=0.3,
+                    )
+                    translated = result.strip()
+                    if translated and len(translated) < 500:
+                        a['lead_zh'] = translated
+                        a['lead'] = translated  # 主 lead 字段用中文
+                        return (a, translated)
+                except Exception as e:
+                    if attempt < 2:
+                        import time; time.sleep(3 * (attempt + 1))
+            return (a, None)
+        done = 0
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            futures = {pool.submit(_translate_dek_one, a): a for a in rss_dek_to_translate}
+            import concurrent.futures as _cf
+            _completed = []
+            try:
+                for future in as_completed(futures, timeout=600):
+                    _completed.append(future)
+            except _cf.TimeoutError:
+                _completed = [f for f in futures if f.done()]
+            for future in _completed:
+                a, translated = future.result()
+                done += 1
+                if translated:
+                    print(f"  [{done}/{len(rss_dek_to_translate)}] {a.get('title', '')[:30]}... ✓")
+                else:
+                    print(f"  [{done}/{len(rss_dek_to_translate)}] ✗")
+        ok_count = sum(1 for a in rss_dek_to_translate if a.get('lead_zh'))
+        print(f"RSS导语翻译完成: {ok_count}/{len(rss_dek_to_translate)}")
 
     # LLM-based lead generation for articles with fulltext but no good lead
     # Also include RSS articles without fulltext — use ai_summary as input for lead generation
