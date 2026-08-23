@@ -76,6 +76,11 @@ def llm_call(prompt, system_msg="你是一名专业的财经信息分析师", ma
 
 
 def postprocess_lead(lead):
+    # v37b: 清理 ai_summary 的格式标记
+    if lead and '|||BULLETS|||' in lead:
+        after_b = lead.split('|||BULLETS|||', 1)[1]
+        bullets_part = after_b.split('|||INSIGHT|||')[0] if '|||INSIGHT|||' in after_b else after_b
+        lead = bullets_part.split('|||')[0].strip()
     """Post-process lead text: strip markdown headers, clean whitespace."""
     if not lead:
         return lead
@@ -88,6 +93,8 @@ def postprocess_lead(lead):
                     "《华尔街日报》报道，", "报道称，", "据报道，", "据悉，"]:
         if lead.startswith(prefix):
             lead = lead[len(prefix):].strip()
+    # v37c: Strip bullet prefixes from ai_summary extraction
+    lead = re.sub(r"^\u8981\u70b9[\d]+[\uff1a\u3001]\s*", "", lead)
     # Strip leading/trailing whitespace and newlines
     lead = lead.strip()
     # Collapse multiple spaces

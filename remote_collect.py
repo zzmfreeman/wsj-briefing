@@ -528,7 +528,7 @@ def scrape_cn_homepage(limit=30):
                         const img_src = img.src || '';
                         if (img_src.indexOf('images.wsj.net') === -1) continue;
                         
-                        let title = img.alt || '';
+                        let title = (img.alt || '').replace(/^Image thumbnail for article titled\s*/i, '');
                         if (!title || title.length < 4) {
                             const parent = link.parentElement;
                             if (parent) {
