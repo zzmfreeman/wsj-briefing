@@ -258,72 +258,120 @@ def clip_summary(summary, max_len=250):
 
 
 def _make_summary_prompt(a):
-    """为单篇文章构建 LLM prompt，返回 prompt 字符串"""
+    """为单篇文章构建 LLM prompt，返回结构化摘要（要点+洞察）"""
     title = a.get('title', '')
     ft = a.get('fulltext', '')
     summary = a.get('summary', '')
     if ft and ft != title and len(ft) > 50:
         content = ft[:4000] if len(ft) > 4000 else ft
-        prompt = f"""请为以下文章生成一段150-200字的中文摘要。
+        prompt = f"""请为以下文章生成结构化中文摘要。
+
 标题：{title}
 
 文章内容：
 {content}
 
+输出JSON格式（不要加```json标记，直接输出JSON）：
+{{
+  "bullets": [
+    "要点1：一句话概括核心事实，含关键数字/人名",
+    "要点2：一句话概括背景或影响",
+    "要点3：一句话概括结论或趋势"
+  ],
+  "insight": "你的理解：这篇文章是给什么人看的？为什么在这个时间点写？传递了什么信号？体现了什么趋势？2-3句话，要有洞察深度，不要复述摘要。"
+}}
+
 要求：
-1. 提取核心观点和关键事实
-2. 用流畅的中文段落表述（不要用列表）
-3. 150-200字，必须以完整句子结尾（句号、问号或感叹号）
-4. 只输出摘要正文，不要加标题号或其他格式
-5. 不要用"据《华尔街日报》报道"等来源引用开头，不要用"报道称"等转述词，直接陈述事实
-6. 不要使用markdown链接格式（如[文字](链接)）"""
+1. bullets 2-3条，每条不超过40字，必须有实质信息量
+2. insight 必须有独立思考，分析文章背后的目的和趋势
+3. 直接陈述事实，不要用"据报道""报道称"等转述词
+4. 不要使用markdown链接格式"""
     elif summary and len(summary) > 10:
         desc = summary[:500]
-        prompt = f"""根据以下新闻标题和简短描述，生成一段150-200字的中文摘要。
+        prompt = f"""根据以下新闻标题和简短描述，生成结构化中文摘要。
 
 标题：{title}
 描述：{desc}
 
+输出JSON格式（不要加```json标记，直接输出JSON）：
+{{
+  "bullets": [
+    "要点1：一句话概括核心事实",
+    "要点2：一句话概括影响或意义"
+  ],
+  "insight": "你的理解：这篇文章的目标读者是谁？传递了什么信号？体现了什么趋势？2-3句话，要有洞察深度。"
+}}
+
 要求：
-1. 用流畅的中文段落表述
-2. 150-200字，必须以完整句子结尾
-3. 只输出摘要正文
-4. 只针对这一篇文章的内容，不要提及其他文章
-5. 不要用"据《华尔街日报》报道"等来源引用开头，不要用"报道称"等转述词，直接陈述事实"""
+1. bullets 2-3条，每条不超过40字
+2. insight 必须有独立思考，不要复述摘要
+3. 直接陈述事实"""
     else:
-        # Title-only: no fulltext, no summary — generate from title alone
-        prompt = f"""根据以下新闻标题，生成一段150-200字的中文摘要。基于标题主题合理推测文章核心内容，补充行业背景和分析。
+        prompt = f"""根据以下新闻标题，生成结构化中文摘要。基于标题主题合理推测文章核心内容。
 
 标题：{title}
 
+输出JSON格式（不要加```json标记，直接输出JSON）：
+{{
+  "bullets": [
+    "要点1：一句话概括核心事实",
+    "要点2：一句话概括行业背景"
+  ],
+  "insight": "你的理解：这篇文章为什么重要？体现了什么趋势？2-3句话。"
+}}
+
 要求：
-1. 用流畅的中文段落表述
-2. 150-200字，必须以完整句子结尾
-3. 只输出摘要正文
-4. 只针对这一篇文章的主题，不要提及其他不相关的话题
-5. 不要用"据《华尔街日报》报道"等来源引用开头，不要用"报道称"等转述词，直接陈述事实"""
+1. bullets 2-3条，每条不超过40字
+2. insight 必须有独立思考"""
     return prompt
 
 
 def _process_one_summary(args):
-    """Worker: 调 LLM 生成单篇摘要，返回 (article, result_or_None)。含重试。"""
+    """Worker: 调 LLM 生成结构化摘要，返回 (article, result_or_None)。含重试。"""
     a, prompt = args
     for attempt in range(3):
         try:
-            result = llm_call(prompt, max_tokens=500)
+            result = llm_call(prompt, max_tokens=600)
             result = result.strip()
-            if result.startswith("摘要：") or result.startswith("摘要:"):
-                result = result[3:].strip()
-            # Strip markdown links
-            result = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", result)
-            # Strip leading source citations
-            for prefix in ["据《华尔街日报》报道，", "据《华尔街日报》独家报道，", "根据《华尔街日报》报道，",
-                            "《华尔街日报》报道，", "报道称，", "据报道，", "据悉，"]:
-                if result.startswith(prefix):
-                    result = result[len(prefix):].strip()
-            # Enforce hard limit: clip at sentence boundary if >250 chars
-            result = clip_summary(result, max_len=250)
-            return (a, result)
+            # 去除可能的 markdown json fence
+            if result.startswith("```"):
+                result = re.sub(r'^```(?:json)?\s*', '', result)
+                result = re.sub(r'\s*```$', '', result).strip()
+            # 尝试解析 JSON
+            try:
+                parsed = json.loads(result)
+                bullets = parsed.get("bullets", [])
+                insight = parsed.get("insight", "")
+                # 组合为带分隔标记的文本（HTML生成时解析）
+                parts = []
+                if bullets:
+                    parts.append("|||BULLETS|||" + "|||".join(bullets))
+                if insight:
+                    parts.append("|||INSIGHT|||" + insight)
+                combined = "\n".join(parts)
+                if combined:
+                    return (a, combined)
+            except (json.JSONDecodeError, TypeError):
+                # Fallback: 用正则从文本中提取 bullets 和 insight
+                bullets = re.findall(r'["\']([^"\']{10,80})["\']', result)
+                # Filter out JSON keys
+                bullets = [b for b in bullets if b not in ('bullets', 'insight') and not b.startswith('要点')]
+                insight_m = re.search(r'(?:insight|"insight")\s*[:：]\s*["\'](.+?)["\']', result, re.S)
+                insight = insight_m.group(1) if insight_m else ""
+                if bullets:
+                    parts = ["|||BULLETS|||" + "|||".join(bullets[:3])]
+                    if insight:
+                        parts.append("|||INSIGHT|||" + insight)
+                    return (a, "\n".join(parts))
+                # Last resort: treat as plain text
+                result = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", result)
+                result = re.sub(r'[{}"\[\]]', '', result).strip()
+                for prefix in ["据《华尔街日报》报道，", "据《华尔街日报》独家报道，", "根据《华尔街日报》报道，",
+                                "《华尔街日报》报道，", "报道称，", "据报道，", "据悉，"]:
+                    if result.startswith(prefix):
+                        result = result[len(prefix):].strip()
+                result = clip_summary(result, max_len=300)
+                return (a, result)
         except Exception:
             if attempt < 2:
                 import time
