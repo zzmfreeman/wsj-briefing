@@ -906,6 +906,10 @@ if __name__ == "__main__":
             a['lead'] = postprocess_lead(a['lead'])
 
     # 翻译 RSS 文章的英文导语为中文（保留双语）
+    # 确保 RSS 文章有 lead_en（英文原文）
+    for a in articles:
+        if a.get('source') == 'rss' and a.get('lead') and not a.get('lead_en'):
+            a['lead_en'] = a['lead']  # lead 本身就是英文
     rss_dek_to_translate = [a for a in articles if a.get('lead_en') and not a.get('lead_zh') and a.get('source') == 'rss']
     if rss_dek_to_translate:
         print(f"RSS导语翻译: {len(rss_dek_to_translate)} 篇...")

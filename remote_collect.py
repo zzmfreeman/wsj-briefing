@@ -782,6 +782,7 @@ def fetch_fulltext_batch(articles, timeout=30):
                 if home_summary and "dd=" not in home_summary and "captcha" not in home_summary.lower() and len(home_summary) > 50:
                     art["fulltext"] = home_summary
                     art["lead"] = home_summary[:200]
+                    art["lead_en"] = home_summary[:200]  # 保存英文原文
                 else:
                     title = art.get("title", "")
                     art["fulltext"] = title
