@@ -861,19 +861,29 @@ if __name__ == "__main__":
                         idx = translated.find(marker)
                         if idx > 5:
                             translated = translated[:idx].strip()
-                    if translated and len(translated) < 150:
+                    # 验证翻译结果必须包含中文字符（防止 LLM 返回 meta-text）
+                    if not re.search(r'[\u4e00-\u9fff]', translated):
+                        print(f"    [标题翻译] 无中文字符, attempt={attempt}: {translated[:50]}")
+                        continue
+                    # v37: 拒绝 LLM reasoning text（thinking 模型泄漏内部推理）
+                    if re.search(r'The user wants|I need to translate|I should translate|让我翻译|用户想要', translated, re.IGNORECASE):
+                        print(f"    [标题翻译] reasoning text, attempt={attempt}: {translated[:50]}")
+                        continue
+                    if translated and len(translated) < 200:
                         a['title_en'] = a.get('title', '')  # 保存英文原文
                         a['title'] = translated
                         a['title_translated'] = True
                         return (a, translated)
                     else:
+                        print(f"    [标题翻译] 结果被过滤: len={len(translated)}, title={title[:40]}")
                         return (a, None)
                 except Exception as e:
+                    print(f"    [标题翻译] 异常 attempt={attempt}: {e}")
                     if attempt < 2:
                         import time
                         time.sleep(3 * (attempt + 1))
                     else:
-                        print(f"    DEBUG error for {title[:30]}: {e}")
+                        print(f"    [标题翻译] 3次全部失败: {title[:40]}")
             return (a, None)
         
         done = 0
