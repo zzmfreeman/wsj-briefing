@@ -118,7 +118,7 @@ def translate_rss_description_as_lead(rss_summary, title):
 描述：
 {rss_summary}"""
     try:
-        result = llm_call(prompt, max_tokens=200, temperature=0.3,
+        result = llm_call(prompt, max_tokens=500, temperature=0.3,
                          system_msg="你是一名专业的财经翻译，只负责忠实翻译，不添加任何原文没有的信息。")
         result = result.strip()
         # Clean up
@@ -167,7 +167,7 @@ def generate_lead_from_summary(summary, title):
 
 只输出导语文字，不要解释，不要加引号。"""
     try:
-        result = llm_call(prompt, max_tokens=200, temperature=0.5,
+        result = llm_call(prompt, max_tokens=500, temperature=0.5,
                          system_msg="你是一名专业的新闻编辑，擅长撰写简洁有力的导语。")
         result = result.strip()
         # Clean up
@@ -218,7 +218,7 @@ Requirements:
 3. Pure text only, no formatting
 4. Write in Chinese"""
     try:
-        result = llm_call(prompt, max_tokens=200, temperature=0.6,
+        result = llm_call(prompt, max_tokens=500, temperature=0.6,
                          system_msg="你是一名专业的新闻编辑，擅长撰写简洁有力的导语。")
         result = result.strip()
         # Strip any markdown that might have been added
@@ -545,7 +545,7 @@ def verify_image_title_match(articles):
     
     mismatch_ids = set()
     try:
-        result = llm_call(prompt, max_tokens=200, temperature=0.3,
+        result = llm_call(prompt, max_tokens=500, temperature=0.3,
                          system_msg="你是一名图片匹配验证助手。判断图片描述与文章标题是否语义相关。")
         result = result.strip()
         
@@ -683,7 +683,7 @@ def verify_image_title_match(articles):
     
     mismatch_ids = set()
     try:
-        result = llm_call(prompt, max_tokens=200, temperature=0.3,
+        result = llm_call(prompt, max_tokens=500, temperature=0.3,
                          system_msg="你是一名图片匹配验证助手。判断图片描述与文章标题是否语义相关。")
         result = result.strip()
         
@@ -852,8 +852,8 @@ if __name__ == "__main__":
             for attempt in range(3):
                 try:
                     result = llm_call(
-                        f"将以下英文新闻标题翻译为简体中文。只输出翻译后的标题，不要解释，不要加引号，不要加前缀。\n\n{title}",
-                        max_tokens=100,
+                        f"任务：英文新闻标题翻译。\n输入：{title}\n输出要求：只输出简体中文翻译，不要解释，不要加引号，不要加前缀。\n参考风格：华尔街日报中文版标题风格，简洁专业。\n现在输出翻译：",
+                        max_tokens=500,
                         temperature=0.3,
                     )
                     translated = result.strip()
@@ -938,7 +938,7 @@ if __name__ == "__main__":
                 try:
                     result = llm_call(
                         f"将以下英文新闻导语翻译为简体中文。只输出翻译后的文本，不要解释，不要加引号。\n\n{dek_en}",
-                        max_tokens=200,
+                        max_tokens=500,
                         temperature=0.3,
                     )
                     translated = result.strip()
