@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""WSJ 经典报刊风格 HTML 生成器 v3
-- 双语标题/导语
-- 结构化摘要：bullet 要点 + insight box
-- 去掉词级高亮，用结构化提升信息密度
+"""WSJ 仪表盘风格 HTML 生成器 v4
+- 顶部统计栏 + 板块饼图
+- 左侧板块筛选 + 搜索
+- 卡片默认折叠(标题+导语+洞察)，点击展开(图片+摘要bullets)
 """
 
 import re
@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 SH_TZ = timezone(timedelta(hours=8))
 
 SECTION_COLORS = {
-    '🇨🇳 中文版':   '#c00',
+    '🇨🇳 中文版':   '#c41e3a',
     '💻 Tech':     '#0066cc',
     '📈 Markets':  '#00853e',
     '🌍 World':    '#333',
@@ -23,15 +23,15 @@ def _parse_summary(summary):
     """解析结构化摘要，返回 (bullets list, insight str)"""
     if not summary:
         return ([], "")
-    
+
     bullets = []
     insight = ""
-    
+
     if "|||BULLETS|||" in summary:
         parts = summary.split("|||INSIGHT|||")
         bullet_part = parts[0]
         insight = parts[1].strip() if len(parts) > 1 else ""
-        
+
         bullet_lines = bullet_part.replace("|||BULLETS|||", "").split("|||")
         bullets = [b.strip() for b in bullet_lines if b.strip()]
         # 确保每条 bullet 有正确前缀
@@ -47,12 +47,12 @@ def _parse_summary(summary):
         # Fallback: 纯文本摘要，按句号分拆为 bullets
         sentences = re.split(r'(?<=[。！？])\s*', summary)
         bullets = [s.strip() for s in sentences if len(s.strip()) > 10][:3]
-    
+
     return (bullets, insight)
 
 
 def _card(a, num):
-    """生成单篇文章卡片"""
+    """生成单篇文章卡片（仪表盘折叠式）"""
     title = a.get('title', '')
     title_en = a.get('title_en', '')
     url = a.get('url') or a.get('link', '')
@@ -67,68 +67,74 @@ def _card(a, num):
     sec_color = SECTION_COLORS.get(section, '#333')
     is_rss = source == 'rss'
 
-    # 图片
-    img_html = ''
-    if img:
-        img_html = f'<figure class="article-hero"><img src="{img}" alt="" loading="lazy" onerror="this.parentElement.remove()"></figure>'
-
     # 标题：中文主标题 + 英文副标题
     if is_rss and title_en and title_en != title:
-        title_html = f'<h2 class="article-title"><a href="{url}" target="_blank">{num}. {title}</a></h2>'
-        title_html += f'<p class="article-title-en">{title_en}</p>'
+        title_html = f'<h3 class="card-title">{title}</h3><span class="card-title-en">{title_en}</span>'
     else:
-        title_html = f'<h2 class="article-title"><a href="{url}" target="_blank">{num}. {title}</a></h2>'
+        title_html = f'<h3 class="card-title">{title}</h3>'
 
-    # 导语：中文 + 英文原文
+    # 导语：完整显示（首页可见）
     lead_html = ''
     if lead:
-        lead_html = f'<p class="article-dek">{lead}</p>'
+        lead_html = f'<p class="card-dek">{lead}</p>'
     if is_rss and lead_en and lead_en != lead:
-        lead_html += f'<p class="article-dek-en">{lead_en}</p>'
+        lead_html += f'<p class="card-dek-en">{lead_en}</p>'
 
     # 结构化摘要
     bullets, insight = _parse_summary(summary)
-    
-    summary_html = ''
+
+    # 图片（展开时显示）
+    img_html = ''
+    if img:
+        img_html = f'<figure class="card-hero"><img src="{img}" alt="" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></figure>'
+
+    # bullets（展开时显示）
+    bullets_html = ''
     if bullets:
         items = ''.join(f'<li>{b}</li>' for b in bullets)
-        summary_html = f'<ul class="article-bullets">{items}</ul>'
+        bullets_html = f'<ul class="card-bullets">{items}</ul>'
     elif summary:
-        # Fallback 纯文本
-        summary_html = f'<p class="article-body">{summary}</p>'
-    
-    # Insight box
+        bullets_html = f'<p class="card-body-text">{summary}</p>'
+
+    # 洞察（首页可见）
     insight_html = ''
     if insight:
-        insight_html = f'<div class="article-insight"><span class="insight-label">洞察</span><p>{insight}</p></div>'
+        insight_html = f'<div class="card-insight"><span class="insight-label">洞察</span><p>{insight}</p></div>'
 
     # 原文链接
-    link_html = f'<a href="{url}" target="_blank" class="article-cta">阅读原文 &rarr;</a>' if url else ''
+    link_html = f'<a href="{url}" target="_blank" class="card-cta">阅读原文 &rarr;</a>' if url else ''
 
-    # 分类标签
-    sec_html = f'<span class="article-section" style="color:{sec_color};border-color:{sec_color}">{section}</span>' if section else ''
-
-    # 发布时间
-    time_html = f'<time class="article-time">{pub_time}</time>' if pub_time else ''
+    # 时间
+    time_str = ''
+    if pub_time:
+        try:
+            dt = datetime.fromisoformat(pub_time.replace('Z', '+00:00'))
+            time_str = dt.astimezone(SH_TZ).strftime('%H:%M')
+        except Exception:
+            time_str = pub_time[:10]
 
     return f'''
-    <article class="article-card">
+    <div class="card" data-section="{section}" data-title="{title}">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">{num:02d}</span>
+        <div class="card-titles">{title_html}</div>
+        <span class="card-section" style="background:{sec_color}">{section}</span>
+        {f'<time class="card-time">{time_str}</time>' if time_str else ''}
+      </div>
+      <div class="card-preview">
+        {lead_html}
+        {insight_html}
+      </div>
+      <div class="card-detail">
         {img_html}
-        <div class="article-content">
-            <div class="article-meta">
-                {sec_html}{time_html}
-            </div>
-            {title_html}
-            {lead_html}
-            {summary_html}
-            {insight_html}
-            <div class="article-footer">{link_html}</div>
-        </div>
-    </article>'''
+        {bullets_html}
+        {link_html}
+      </div>
+    </div>'''
 
 
 def generate_html(articles, date_str, generated_at):
-    """生成 WSJ 风格 HTML 页面"""
+    """生成仪表盘风格 HTML 页面"""
 
     article_num = 0
     all_cards = []
@@ -137,6 +143,29 @@ def generate_html(articles, date_str, generated_at):
         all_cards.append(_card(a, article_num))
 
     cards_html = '\n'.join(all_cards)
+
+    # 统计板块分布
+    sections = {}
+    for a in articles:
+        s = a.get('section', '')
+        sections[s] = sections.get(s, 0) + 1
+
+    # 饼图 CSS conic-gradient
+    total = len(articles)
+    pie_parts = []
+    angle = 0
+    for sec, count in sections.items():
+        pct = count / total if total else 0
+        color = SECTION_COLORS.get(sec, '#333')
+        end_angle = angle + pct * 360
+        pie_parts.append(f"{color} {angle}deg {end_angle}deg")
+        angle = end_angle
+    pie_css = " ".join(pie_parts)
+
+    # 板块筛选按钮
+    filter_btns = '<button class="filter-btn active" data-filter="all">全部</button>'
+    for sec, count in sections.items():
+        filter_btns += f'<button class="filter-btn" data-filter="{sec}">{sec} <span class="filter-count">{count}</span></button>'
 
     return f'''<!DOCTYPE html>
 <html lang="zh-CN">
@@ -148,237 +177,446 @@ def generate_html(articles, date_str, generated_at):
         *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 
         :root {{
-            --wsj-red: #c00;
-            --wsj-black: #111;
-            --wsj-text: #333;
-            --wsj-gray: #666;
-            --wsj-light: #999;
-            --wsj-rule: #ddd;
-            --wsj-bg: #fff;
-            --wsj-dek-bg: #f5f5f5;
-            --max-w: 720px;
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
             --insight-bg: #f0f4ff;
             --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
         }}
 
         body {{
-            font-family: Georgia, 'Times New Roman', Times, serif;
-            background: var(--wsj-bg);
-            color: var(--wsj-text);
-            line-height: 1.65;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }}
 
-        /* ── Masthead ── */
-        .masthead {{
-            max-width: var(--max-w);
-            margin: 0 auto;
-            padding: 24px 0 12px;
-            border-bottom: 3px double var(--wsj-black);
-        }}
-        .masthead-inner {{
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {{
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }}
-        .masthead h1 {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 28px;
+        .dashboard-header h1 {{
+            font-size: 22px;
             font-weight: 700;
-            letter-spacing: -0.5px;
-            color: var(--wsj-black);
-            text-transform: uppercase;
+            color: var(--accent);
+            letter-spacing: -0.3px;
         }}
-        .masthead h1 span {{ color: var(--wsj-red); }}
-        .masthead .date {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 12px;
-            color: var(--wsj-light);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .dashboard-header h1 span {{
+            color: var(--text);
         }}
-
-        /* ── Container ── */
-        .container {{
-            max-width: var(--max-w);
-            margin: 0 auto;
-            padding: 0 16px;
-        }}
-
-        /* ── Article Card ── */
-        .article-card {{
-            padding: 20px 0;
-            border-bottom: 1px solid var(--wsj-rule);
-        }}
-        .article-card:last-child {{ border-bottom: none; }}
-
-        .article-hero {{ margin: 0 0 12px; }}
-        .article-hero img {{ width: 100%; height: auto; display: block; }}
-
-        .article-meta {{ margin-bottom: 6px; }}
-        .article-section {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: 1px solid;
-            padding: 1px 6px;
-            margin-right: 8px;
-        }}
-        .article-time {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 11px;
-            color: var(--wsj-light);
-        }}
-
-        /* Title */
-        .article-title {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            line-height: 1.25;
-            margin: 0 0 8px;
-            color: var(--wsj-black);
-        }}
-        .article-title a {{ color: inherit; text-decoration: none; }}
-        .article-title a:hover {{ color: var(--wsj-red); }}
-        .article-title-en {{
-            font-family: Georgia, serif;
+        .stat-pill {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
             font-size: 13px;
-            font-style: italic;
-            color: var(--wsj-light);
-            margin: 0 0 8px;
-            line-height: 1.4;
+            color: var(--text-sec);
+        }}
+        .stat-pill strong {{
+            color: var(--text);
+            font-size: 16px;
         }}
 
-        /* Dek */
-        .article-dek {{
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--wsj-text);
-            line-height: 1.5;
-            margin: 0 0 10px;
-            padding: 8px 12px;
-            background: var(--wsj-dek-bg);
-            border-left: 3px solid var(--wsj-red);
-        }}
-        .article-dek-en {{
-            font-size: 13px;
-            font-style: italic;
-            color: var(--wsj-gray);
-            line-height: 1.5;
-            margin: 0 0 10px;
-            padding: 4px 12px 4px 15px;
-            border-left: 3px solid var(--wsj-rule);
-        }}
-
-        /* ── Bullets ── */
-        .article-bullets {{
-            list-style: none;
-            margin: 0 0 10px;
-            padding: 0;
-        }}
-        .article-bullets li {{
+        /* 饼图 */
+        .pie-chart {{
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient({pie_css});
             position: relative;
-            padding-left: 20px;
-            margin-bottom: 6px;
-            font-size: 14.5px;
-            color: var(--wsj-text);
-            line-height: 1.55;
+            flex-shrink: 0;
         }}
-        .article-bullets li::before {{
+        .pie-chart::after {{
             content: '';
             position: absolute;
-            left: 0;
-            top: 9px;
-            width: 6px;
-            height: 6px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
             border-radius: 50%;
-            background: var(--wsj-red);
+            background: var(--card-bg);
         }}
 
-        /* ── Insight Box ── */
-        .article-insight {{
-            margin: 0 0 10px;
-            padding: 10px 14px;
+        .search-box {{
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }}
+        .search-box:focus {{
+            border-color: var(--accent);
+        }}
+
+        /* ── 主布局 ── */
+        .dashboard-body {{
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }}
+
+        /* 左侧筛选栏 */
+        .sidebar {{
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }}
+        .sidebar h3 {{
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }}
+        .filter-btn {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }}
+        .filter-btn:hover {{
+            background: var(--bg);
+        }}
+        .filter-btn.active {{
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }}
+        .filter-btn.active .filter-count {{
+            color: rgba(255,255,255,0.8);
+        }}
+        .filter-count {{
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }}
+        .filter-btn.active .filter-count {{
+            background: rgba(255,255,255,0.2);
+        }}
+
+        /* ── 卡片流 ── */
+        .card-stream {{
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }}
+
+        .card {{
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }}
+        .card:hover {{
+            box-shadow: var(--shadow-hover);
+        }}
+        .card.hidden {{
+            display: none;
+        }}
+
+        /* 卡片头部（可点击展开） */
+        .card-header {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }}
+        .card-header:hover {{
+            background: #fafafa;
+        }}
+        .card-num {{
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }}
+        .card-titles {{
+            flex: 1;
+            min-width: 0;
+        }}
+        .card-title {{
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }}
+        .card-title-en {{
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }}
+        .card-section {{
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }}
+        .card-time {{
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }}
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {{
+            padding: 0 16px 10px;
+        }}
+
+        /* 导语 */
+        .card-dek {{
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }}
+        .card-dek-en {{
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }}
+
+        /* 洞察 */
+        .card-insight {{
+            padding: 8px 12px;
             background: var(--insight-bg);
             border-left: 3px solid var(--insight-border);
             border-radius: 0 4px 4px 0;
         }}
         .insight-label {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--insight-border);
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }}
-        .article-insight p {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        .card-insight p {{
             font-size: 13px;
             color: #2a2a2a;
-            line-height: 1.55;
+            line-height: 1.5;
             margin: 0;
         }}
 
-        /* Fallback body */
-        .article-body {{
-            font-size: 14.5px;
-            color: var(--wsj-gray);
-            line-height: 1.65;
-            margin: 0 0 8px;
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {{
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }}
+        .card.expanded .card-detail {{
+            max-height: 1000px;
+            padding: 0 16px 12px;
+        }}
+
+        /* 图片 */
+        .card-hero {{
+            margin: 0 0 10px;
+        }}
+        .card-hero img {{
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }}
+
+        /* Bullets */
+        .card-bullets {{
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }}
+        .card-bullets li {{
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }}
+        .card-bullets li::before {{
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }}
+
+        .card-body-text {{
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
         }}
 
         /* CTA */
-        .article-footer {{ margin-top: 4px; }}
-        .article-cta {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 12px;
+        .card-cta {{
+            font-size: 11px;
             font-weight: 600;
-            color: var(--wsj-red);
+            color: var(--accent);
             text-decoration: none;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }}
-        .article-cta:hover {{ text-decoration: underline; }}
+        .card-cta:hover {{
+            text-decoration: underline;
+        }}
 
-        /* ── Footer ── */
+        /* ── 页脚 ── */
         .page-footer {{
-            max-width: var(--max-w);
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 16px 0 40px;
-            border-top: 3px double var(--wsj-black);
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            padding: 16px 24px 40px;
             font-size: 11px;
-            color: var(--wsj-light);
+            color: var(--text-light);
             text-align: center;
         }}
 
-        @media (max-width: 600px) {{
-            .masthead h1 {{ font-size: 22px; }}
-            .article-title {{ font-size: 17px; }}
-            .article-dek {{ font-size: 14px; }}
+        @media (max-width: 768px) {{
+            .sidebar {{
+                display: none;
+            }}
+            .dashboard-body {{
+                padding: 8px;
+            }}
+            .card-stream {{
+                padding: 0;
+            }}
+            .search-box {{
+                width: 140px;
+            }}
+            .card-title {{
+                font-size: 14px;
+            }}
         }}
     </style>
 </head>
 <body>
-    <header class="masthead">
-        <div class="masthead-inner">
-            <h1><span>WSJ</span> 日报</h1>
-            <span class="date">{date_str}</span>
-        </div>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>{total}</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
     </header>
 
-    <main class="container">
-        {cards_html}
-    </main>
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            {filter_btns}
+        </aside>
+        <div class="card-stream">
+            {cards_html}
+        </div>
+    </div>
 
     <footer class="page-footer">
         Generated at {generated_at} &middot; Source: Wall Street Journal
     </footer>
+
+    <script>
+        function toggleCard(header) {{
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }}
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {{
+            btn.onclick = function() {{
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {{
+                    if (filter === 'all' || c.dataset.section === filter) {{
+                        c.classList.remove('hidden');
+                    }} else {{
+                        c.classList.add('hidden');
+                    }}
+                }});
+            }};
+        }});
+
+        // 搜索
+        function filterSearch(q) {{
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {{
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {{
+                    c.classList.remove('hidden');
+                }} else {{
+                    c.classList.add('hidden');
+                }}
+            }});
+        }}
+    </script>
 </body>
 </html>'''
 
