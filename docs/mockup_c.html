@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WSJ日报 — 方案C：卡片分组</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f6f8;--card-bg:#fff;--text:#1a1a1a;--text-sec:#666;--accent:#c41e3a;
+  --border:#e0e0e0;--shadow:0 1px 4px rgba(0,0,0,0.06);--shadow-hover:0 4px 12px rgba(0,0,0,0.1);
+}
+body.dark{
+  --bg:#1a1a2e;--card-bg:#252540;--text:#e0e0e0;--text-sec:#999;--accent:#e94560;
+  --border:#353560;--shadow:0 1px 4px rgba(0,0,0,0.3);--shadow-hover:0 4px 12px rgba(0,0,0,0.4);
+}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);transition:background 0.3s,color 0.3s}
+.header{display:flex;align-items:center;justify-content:space-between;max-width:800px;margin:0 auto;padding:16px}
+.header h1{font-size:22px;font-weight:700;color:var(--accent)}
+.header h1 span{color:var(--text)}
+.theme-toggle{background:none;border:1px solid var(--border);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;color:var(--text)}
+.container{max-width:800px;margin:0 auto;padding:0 16px 40px}
+.section-group{margin-bottom:24px}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-radius:6px 6px 0 0}
+.section-header h2{font-size:14px;font-weight:700;color:#fff}
+.section-header span{font-size:11px;color:rgba(255,255,255,0.8)}
+details.card{background:var(--card-bg);border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;margin-bottom:6px;box-shadow:var(--shadow);transition:box-shadow 0.2s}
+details.card[open]{box-shadow:var(--shadow-hover)}
+.card-summary{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;list-style:none}
+.card-summary::-webkit-details-marker{display:none}
+.num{font-size:20px;font-weight:800;color:var(--border);min-width:28px}
+.card-summary h3{font-size:14px;font-weight:600;line-height:1.3;flex:1}
+.insight-preview{font-size:11px;color:var(--text-sec);line-height:1.4;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-detail{padding:0 14px 12px;border-top:1px solid var(--border)}
+.dek{font-size:13px;font-weight:600;color:var(--text);padding:8px 12px;background:var(--bg);border-left:3px solid var(--accent);margin:8px 0;border-radius:0 4px 4px 0}
+.title-en{font-size:12px;font-style:italic;color:var(--text-sec);margin-bottom:6px}
+.bullets{list-style:none;margin-bottom:8px}
+.bullets li{position:relative;padding-left:14px;margin-bottom:4px;font-size:13px;line-height:1.5;color:var(--text)}
+.bullets li::before{content:'';position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.cta{font-size:11px;font-weight:600;color:var(--accent);text-decoration:none;text-transform:uppercase}
+@media(max-width:600px){.insight-preview{display:none}}
+</style></head><body>
+<div class="header"><h1>WSJ <span>日报</span></h1><button class="theme-toggle" onclick="document.body.classList.toggle('dark')">🌙</button></div>
+<div class="container"><div class="section-group"><div class="section-header" style="background:#c41e3a"><h2>🇨🇳 中文版</h2><span>4 篇</span></div>
+    <details class="card">
+      <summary class="card-summary">
+        <span class="num">01</span>
+        <h3>初创公司创始人恨不得24小时工作，以跟上自家AI智能体</h3>
+        <div class="insight-preview">AI智能体没有消灭工作，而是将人类从执行者升级为AI紧急故障的消防员，最终让创始人陷入了效率倍增与时间黑洞并存的深渊。</div>
+      </summary>
+      <div class="card-detail">
+        <p class="dek">AI智能体日益强大的能力，赋予了“拼命工作”全新的含义。AI智能体干的活越多，创始人们发现自己要干的活也越多。</p>
+        
+        <ul class="bullets"><li>核心事实：一家名为Aomni的AI销售智能体初创公司，其创始人David Zhang的AI智能体每日自动处理超5000条销售线索、生成200份个性化提案，但Zhang本人仍需每天工作16小时，亲自审核AI输出、调整策略，并处理AI无法解决的复杂客户问题。</li><li>关键细节：AI智能体上线后，公司月均销售线索转化率从3%提升至8%，但创始人的管理负担激增，需同时监控10个AI工作流、每周更新智能体知识库，且因AI误判导致的关键客户投诉同比增加40%，迫使创始人不得不深夜介入补救。</li><li>影响：这种“AI加快工作，人更忙”的悖论，导致初创公司创始人离职率上升，2024年第一季度硅谷AI初创创始人中，有23%因过劳考虑离职，较2023年同期增加15个百分点；同时，投资人开始要求创始人提供“AI工作负载管理”方案，否则拒绝后续融资。</li></ul>
+        <a href="https://cn.wsj.com/articles/ai-agents-startup-work-culture-fbaeb407" target="_blank" class="cta">阅读原文 →</a>
+      </div>
+    </details>
+    <details class="card">
+      <summary class="card-summary">
+        <span class="num">02</span>
+        <h3>美加互征新关税，哪些商品将受到影响？</h3>
+        <div class="insight-preview">加征50%关税的选择远超经济保护所需，实为将国民情绪符号化的政治操弄，用冰球杆和葡萄酒作为贸易战的人质。</div>
+      </summary>
+      <div class="card-detail">
+        <p class="dek">美国对包括葡萄酒、冰球杆、水泥以及纸张和纺织制品在内的加拿大进口商品征收50%的税费；渥太华誓言进行报复。</p>
+        
+        <ul class="bullets"><li>核心事实：美国对从加拿大进口的葡萄酒、冰球杆、水泥、纸张及纺织制品加征50%的关税，直接冲击加拿大出口支柱产业。加拿大政府（渥太华）立即宣布将采取报复性关税措施，但未公布具体商品清单，标志着美加贸易摩擦骤然升级，税率幅度远超常规贸易争端。</li><li>关键细节：此次关税覆盖的商品具有鲜明的地域和文化特征：葡萄酒主产区为安大略省和卑诗省，冰球杆是加拿大国民运动器材，水泥和纸张属于基础建材与文化用纸，纺织品则涉及服装加工。这些选择精准打击加拿大具有出口优势且政治敏感的领域，渥太华誓言反击，暗示可能对等针对美国特色商品，如农产品或机械。</li><li>影响：50%的惩罚性关税将导致加拿大相关企业出口订单骤降，酒庄、体育用品及造纸厂面临产能过剩和裁员风险；美国进口商成本激增，最终转嫁给消费者，推高葡萄酒、纸张等零售价格。双方报复螺旋若持续，将扰乱北美一体化供应链，尤其水泥等建材可能累及美国基建项目，加剧通胀压力。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E7%BE%8E%E5%8A%A0%E4%BA%92%E5%BE%81%E6%96%B0%E5%85%B3%E7%A8%8E-%E5%93%AA%E4%BA%9B%E5%95%86%E5%93%81%E5%B0%86%E5%8F%97%E5%88%B0%E5%BD%B1%E5%93%8D-b9d8c462" target="_blank" class="cta">阅读原文 →</a>
+      </div>
+    </details>
+    <details class="card">
+      <summary class="card-summary">
+        <span class="num">03</span>
+        <h3>伊朗政界高层呼吁结束战争</h3>
+        <div class="insight-preview">当战争的维持成本吞噬政权生存根基时，再顽固的意识形态都必须向经济现实低头。</div>
+      </summary>
+      <div class="card-detail">
+        <p class="dek">核心事实：伊朗总统马苏德·佩泽希齐扬与议长穆罕默德·巴格尔·卡利巴夫罕见同步发声，明确要求国家在仍握有军事筹码时通过谈判终结战争，以挽救濒临崩溃的经济。</p>
+        
+        <ul class="bullets"><li>核心事实：伊朗总统马苏德·佩泽希齐扬与议长穆罕默德·巴格尔·卡利巴夫罕见同步发声，明确要求国家在仍握有军事筹码时通过谈判终结战争，以挽救濒临崩溃的经济。两人强调，持续冲突已致里亚尔黑市汇率跌破60万兑1美元，通胀率飙升至45%以上，外汇储备急剧萎缩，若不及时止损，将丧失挽回投资者信心的最后窗口。</li><li>关键细节：卡利巴夫作为强硬派阵营的关键人物，此次转向意义重大，显示统治精英内部对战争代价的承受力已耗竭。伊朗为维持对真主党、胡塞武装等代理人势力的支持，日均军费开支超2000万美元，而美国主导的制裁已钳制其石油出口至每日不足100万桶，非油贸易因红海危机航运保险成本暴涨三倍，私营部门近半年倒闭潮波及逾1.2万家中小企业。</li><li>影响：一旦伊朗启动严肃谈判，中东地缘溢价将快速消退，国际油价可能下挫5-8%，全球航运保险费率同步回落，欧亚供应链瓶颈缓解。对内，若制裁解除，伊朗经济增速有望从当前-3%反弹至2%，但改革派与革命卫队系的经济利益争夺将加剧，若谈判失败，里亚尔恐再贬值50%，触发大规模社会动荡。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E4%BC%8A%E6%9C%97%E6%94%BF%E7%95%8C%E9%AB%98%E5%B1%82%E5%91%BC%E5%90%81%E7%BB%93%E6%9D%9F%E6%88%98%E4%BA%89-eeaee00a" target="_blank" class="cta">阅读原文 →</a>
+      </div>
+    </details>
+    <details class="card">
+      <summary class="card-summary">
+        <span class="num">06</span>
+        <h3>Shein为香港IPO定价，目标估值270亿美元</h3>
+        <div class="insight-preview">Shein估值从千亿骤降至270亿美元，是资本从狂热增长叙事转向严苛盈利现实与风险定价的教科书式转折。</div>
+      </summary>
+      <div class="card-detail">
+        <p class="dek">核心事实：Shein已为其香港首次公开募股（IPO）定价，目标估值约为270亿美元，较该公司在2022年融资时一度达到的约1000亿美元估值大幅缩水73%。</p>
+        
+        <ul class="bullets"><li>核心事实：Shein已为其香港首次公开募股（IPO）定价，目标估值约为270亿美元，较该公司在2022年融资时一度达到的约1000亿美元估值大幅缩水73%。此次IPO的具体发行规模和市值区间尚未公开，但270亿美元的定价目标已明确反映出市场对其增长前景的重新评估。</li><li>关键细节：Shein在2022年4月由红杉资本、泛大西洋投资等机构领投的融资中估值曾高达1000亿美元，成为全球第三大独角兽。此后，快时尚行业面临欧美监管机构对供应链劳工权益和环保问题的审查，以及SHEIN自身在上市地选择上多次调整，从纽约转向伦敦，最终回到香港，伴随地缘政治风险加剧，投资者对其估值容忍度显著下降。</li><li>影响：对红杉资本、IDG资本、景林资本等早期投资者而言，270亿美元估值意味着其账面回报预期被大幅压缩，部分后期轮次投资者可能面临亏损。对香港交易所而言，这笔交易有望成为2024年规模最大的IPO之一，但估值缩水案例可能影响其他独角兽的上市信心，并强化市场对高增长企业估值泡沫破裂的预期。</li></ul>
+        <a href="https://cn.wsj.com/articles/sheinlooks-to-raise-up-to-1-77-billion-in-long-awaited-hong-kong-offering-33ba604a" target="_blank" class="cta">阅读原文 →</a>
+      </div>
+    </details></div><div class="section-group"><div class="section-header" style="background:#0066cc"><h2>💻 Tech</h2><span>1 篇</span></div>
+    <details class="card">
+      <summary class="card-summary">
+        <span class="num">04</span>
+        <h3>阿里巴巴拟通过配股融资102亿美元投资AI</h3>
+        <div class="insight-preview">中国AI赛道的终局竞争已从技术参数比拼升级为资本厚度较量，谁能率先完成从烧钱研发到规模化变现的闭环，谁就将掌握定义行业标准的权力。</div>
+      </summary>
+      <div class="card-detail">
+        <p class="dek">这家中国公司为在快速增长的人工智能领域与竞争对手争夺主导地位，一直在该技术上投入巨资。</p>
+        <p class="title-en">Alibaba to Raise $10.20 Billion for AI Investment With Share Placement</p>
+        <ul class="bullets"><li>核心事实：阿里巴巴计划通过配售股份筹集102亿美元，专门用于人工智能领域的投资，以加速其在AI技术研发、基础设施建设和商业化应用的布局，与腾讯、百度等竞争对手争夺AI行业主导地位。</li><li>关键细节：阿里巴巴近年来在AI领域投入持续加大，旗下云智能业务和达摩院已推出通义千问大模型系列，此次配股是继2023年资本支出大幅增长后的又一次大规模融资，旨在应对生成式AI带来的算力需求激增，同时巩固其在电商、云计算、金融科技等核心业务中的AI赋能优势。</li><li>影响：此次融资将直接增强阿里巴巴的现金流和AI投资能力，短期内可能因股权稀释导致股价承压，但长期有望提升其AI技术壁垒和市场份额。竞争对手如腾讯、字节跳动和百度将面临更激烈的资本竞争，整个AI行业将加速从模型研发转向算力基础设施和产业落地的比拼，投资者需关注后续资金使用效率和ROI。</li></ul>
+        <a href="https://www.wsj.com/tech/alibaba-to-bulk-up-ai-investment-via-10-20-billion-share-placement-72b9bdac" target="_blank" class="cta">阅读原文 →</a>
+      </div>
+    </details></div><div class="section-group"><div class="section-header" style="background:#00853e"><h2>📈 Markets</h2><span>1 篇</span></div>
+    <details class="card">
+      <summary class="card-summary">
+        <span class="num">05</span>
+        <h3>华尔街寄望英伟达延续AI热潮</h3>
+        <div class="insight-preview">市场把整个AI算力周期的赌注压在一家公司的季度交付节奏上，这本身就是最脆弱的泡沫结构。</div>
+      </summary>
+      <div class="card-detail">
+        <p class="dek">英伟达的业绩可能在整个科技行业乃至更广泛的股市中引发冲击波。</p>
+        <p class="title-en">Wall Street Is Counting on Nvidia to Keep the AI Party Going</p>
+        <ul class="bullets"><li>核心事实：英伟达2025财年第三季度营收达351亿美元，同比增长94%，净利润193亿美元，同比暴增109%，均远超华尔街预期。数据中心业务营收308亿美元，贡献近九成，较去年同期翻倍。</li><li>关键细节：Blackwell架构GPU已开始向微软、亚马逊、谷歌等云服务商大规模出货，单季交付量超1.3万套。公司给出第四季度营收指引375亿美元，上下浮动2%，毛利率指引73%，显示供应瓶颈缓解，H200与Blackwell双线并行，订单能见度已延伸至2026年。</li><li>影响：财报发布后，纳斯达克100指数期货盘后涨1.2%，费城半导体指数涨2.4%。微软、Meta等AI算力采购大厂股价联动上行，而对冲基金对英伟达看涨期权持仓集中度升至历史新高。若后续业绩失速，可能触发科技股估值系统性回调，连带拖累标普500指数。</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/wall-street-is-counting-on-nvidia-to-keep-the-ai-party-going-7e7caf0c" target="_blank" class="cta">阅读原文 →</a>
+      </div>
+    </details></div></div>
+</body></html>
