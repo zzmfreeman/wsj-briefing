@@ -1,0 +1,411 @@
+#!/usr/bin/env python3
+"""
+WSJ Briefing 远程采集模块（v3 - autocli read 版）
+在Mac Mini上通过SSH执行
+1. cn.wsj.com 首页 → autocli read 提取文章链接+标题
+2. RSS 4板块 → urllib 抓取
+3. 每篇文章全文 → autocli read（cn+英文均绕过paywall）
+4. og:image 配图 → 轻量HTTP请求提取meta标签
+"""
+import json, re, time, urllib.request, urllib.error, os
+import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+SH_TZ = timezone(timedelta(hours=8))
+IMAGE_CACHE_FILE = Path.home() / ".openclaw/workspace/wsj-briefing/image_cache.json"
+SEEN_URLS_FILE = Path.home() / ".openclaw/workspace/wsj-briefing/seen_urls.json"
+# 过去 N 天已发过的文章不再重复收录
+DEDUP_DAYS = 7
+AUTOCLI = "/usr/local/bin/autocli"
+
+# Google News RSS for WSJ articles (WSJ's own RSS feeds are all dead: 401/403/404)
+# Google News links redirect to wsj.com — we use them directly as article URLs
+RSS_FEEDS = [
+    ("💻 Tech",    "https://news.google.com/rss/search?q=site:wsj.com+when:1d+technology+OR+AI+OR+chip&hl=en-US&gl=US&ceid=US:en"),
+    ("📈 Markets", "https://news.google.com/rss/search?q=site:wsj.com+when:1d+market+OR+stock+OR+federal+reserve&hl=en-US&gl=US&ceid=US:en"),
+    ("🌍 World",   "https://news.google.com/rss/search?q=site:wsj.com+when:1d+world+OR+politics+OR+geopolit&hl=en-US&gl=US&ceid=US:en"),
+    ("🏢 Business", "https://news.google.com/rss/search?q=site:wsj.com+when:1d+business+OR+economy+OR+corporate&hl=en-US&gl=US&ceid=US:en"),
+]
+ARTICLES_PER_SECTION = 10
+CN_ARTICLES_LIMIT = 15
+
+
+# ── autocli read 封装 ─────────────────────────────────
+import subprocess
+
+def autocli_read(url, timeout=30):
+    """调用 autocli read，返回 markdown 内容或 None"""
+    try:
+        r = subprocess.run(
+            [AUTOCLI, "read", url, "-f", "md"],
+            capture_output=True, text=True, timeout=timeout
+        )
+        if r.returncode == 0 and len(r.stdout) > 100:
+            return r.stdout
+    except subprocess.TimeoutExpired:
+        print(f"    [autocli超时] {url[:60]}")
+    except Exception as e:
+        print(f"    [autocli异常] {e}")
+    return None
+
+def pw_fetch_homepage(url, timeout=30):
+    """用 Playwright 抓取页面，返回 (text, html)
+    Stealth mode: realistic UA, viewport, locale, extra headers, script injection
+    to bypass DataDome CAPTCHA on cn.wsj.com"""
+    import asyncio
+    from playwright.async_api import async_playwright
+    
+    async def _fetch():
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True, channel="chrome")
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080},
+                locale="zh-CN",
+                extra_http_headers={
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "DNT": "1",
+                    "Connection": "keep-alive",
+                    "Upgrade-Insecure-Requests": "1",
+                }
+            )
+            # Inject stealth script to hide automation signals
+            await context.add_init_script("""
+                // Hide webdriver flag
+                Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+                // Mock plugins
+                Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
+                // Mock languages
+                Object.defineProperty(navigator, 'languages', {get: () => ['zh-CN', 'zh', 'en']});
+                // Override Chrome runtime
+                window.chrome = { runtime: {} };
+                // Mock permissions
+                const originalQuery = window.navigator.permissions.query;
+                window.navigator.permissions.query = (parameters) => (
+                    parameters.name === 'notifications' ?
+                        Promise.resolve({ state: Notification.permission }) :
+                        originalQuery(parameters)
+                );
+            """)
+            page = await context.new_page()
+            try:
+                resp = await page.goto(url, wait_until="domcontentloaded", timeout=timeout*1000)
+                if not resp or resp.status != 200:
+                    print(f"    [pw状态] {resp.status if resp else 'None'} for {url[:50]}")
+                    await browser.close()
+                    return None, None
+                await page.wait_for_timeout(3000)
+                text = await page.inner_text("body")
+                html = await page.content()
+                return text, html
+            except Exception as e:
+                print(f"    [pw错误] {e}")
+                return None, None
+            finally:
+                await browser.close()
+    
+    return asyncio.run(_fetch())
+
+
+def pw_fetch_og_image(url, timeout=15):
+    """用 Playwright 提取 og:image（单篇，HTTP 请求被 wsj.com 401 挡掉）"""
+    import asyncio
+    from playwright.async_api import async_playwright
+    
+    async def _fetch():
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True, channel="chrome")
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080},
+                extra_http_headers={
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language": "en-US,en;q=0.9",
+                }
+            )
+            page = await context.new_page()
+            try:
+                resp = await page.goto(url, wait_until="domcontentloaded", timeout=timeout*1000)
+                if not resp:
+                    await browser.close()
+                    return ""
+                await page.wait_for_timeout(2000)
+                html = await page.content()
+                import re
+                # og:image
+                m = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
+                if not m:
+                    m = re.search(r'content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']', html, re.I)
+                if not m:
+                    m = re.search(r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
+                if m:
+                    img = m.group(1)
+                    if "/social" in img:
+                        img = img.replace("/social", "/large")
+                    return img
+                return ""
+            except Exception as e:
+                return ""
+            finally:
+                await browser.close()
+    
+    return asyncio.run(_fetch())
+
+
+def pw_batch_og_images(urls, timeout=12):
+    """批量用 Playwright 提取 og:image（一个 browser session 处理所有 URL）
+    返回 {url: image_url} 字典"""
+    import asyncio
+    from playwright.async_api import async_playwright
+    import re as _re
+    
+    async def _batch():
+        results = {}
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True, channel="chrome")
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080},
+                extra_http_headers={
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language": "en-US,en;q=0.9",
+                }
+            )
+            page = await context.new_page()
+            for url in urls:
+                try:
+                    resp = await page.goto(url, wait_until="domcontentloaded", timeout=timeout*1000)
+                    if not resp:
+                        results[url] = ""
+                        continue
+                    await page.wait_for_timeout(1500)
+                    html = await page.content()
+                    m = _re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html, _re.I)
+                    if not m:
+                        m = _re.search(r'content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']', html, _re.I)
+                    if not m:
+                        m = _re.search(r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']', html, _re.I)
+                    if m:
+                        img = m.group(1)
+                        if "/social" in img:
+                            img = img.replace("/social", "/large")
+                        results[url] = img
+                    else:
+                        results[url] = ""
+                except Exception:
+                    results[url] = ""
+            await browser.close()
+        return results
+    
+    return asyncio.run(_batch())
+
+
+def extract_article_first_image(url, timeout=15):
+    """Use Playwright to fetch article page and extract first body image.
+    Looks for images inside <article> tag or article-body div, skipping
+    header/nav thumbnails, logos, and tracking pixels.
+    Returns image URL string or empty string."""
+    import asyncio
+    from playwright.async_api import async_playwright
+
+    async def _fetch():
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True, channel="chrome")
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080},
+                locale="zh-CN" if "cn.wsj.com" in url else "en-US",
+                extra_http_headers={
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8" if "cn.wsj.com" in url else "en-US,en;q=0.9",
+                }
+            )
+            await context.add_init_script("""
+                Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+                Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
+                window.chrome = { runtime: {} };
+            """)
+            page = await context.new_page()
+            try:
+                resp = await page.goto(url, wait_until="domcontentloaded", timeout=timeout*1000)
+                if not resp:
+                    await browser.close()
+                    return ""
+                await page.wait_for_timeout(3000)
+                img_url = await page.evaluate(_JS_EXTRACT_BODY_IMAGE)
+                await browser.close()
+                return img_url or ""
+            except Exception as e:
+                print(f"    [article_image_error] {e}")
+                try:
+                    await browser.close()
+                except:
+                    pass
+                return ""
+
+    return asyncio.run(_fetch())
+
+
+# Shared JS snippet for body image extraction
+_JS_EXTRACT_BODY_IMAGE = r"""
+() => {
+    const skipPatterns = [
+        /logo/i, /icon/i, /sprite/i, /pixel/i, /tracking/i,
+        /avatar/i, /badge/i, /1x1/i, /spacer/i, /blank\.gif/i,
+        /data:image/i, /social-media-icon/, /nav-/, /header-logo/,
+        /wsj-logo/, /the-wall-street-journal/, /breadcrumb/
+    ];
+    function isValidImage(img) {
+        const src = img.src || img.getAttribute('data-src') || '';
+        if (!src || src.startsWith('data:')) return false;
+        if (img.naturalWidth && img.naturalWidth < 100) return false;
+        if (img.naturalHeight && img.naturalHeight < 100) return false;
+        const w = parseInt(img.getAttribute('width') || '0');
+        if (w > 0 && w < 100) return false;
+        for (const pat of skipPatterns) {
+            if (pat.test(src)) return false;
+        }
+        if (!src.includes('images.wsj.net') &&
+            !src.includes('wsj.net') &&
+            !src.includes('wsj.com') &&
+            !src.includes('dowjones') &&
+            !src.includes('cloudfront') &&
+            !src.includes('cdn')) {
+            return false;
+        }
+        return true;
+    }
+    // Strategy 1: <article> tag
+    const articleEl = document.querySelector('article');
+    if (articleEl) {
+        const imgs = articleEl.querySelectorAll('img');
+        for (const img of imgs) {
+            if (isValidImage(img)) {
+                return (img.src || img.getAttribute('data-src') || '').replace(/&amp;/g, '&');
+            }
+        }
+    }
+    // Strategy 2: article-body divs
+    const bodySelectors = [
+        '[class*="article-body"]', '[class*="articleBody"]',
+        '[class*="article-content"]', '[class*="articleContent"]',
+        '[class*="story-body"]', '[class*="storyBody"]',
+        '[class*="content-body"]', '[class*="main-content"]',
+        '[itemprop="articleBody"]'
+    ];
+    for (const sel of bodySelectors) {
+        const container = document.querySelector(sel);
+        if (container) {
+            const imgs = container.querySelectorAll('img');
+            for (const img of imgs) {
+                if (isValidImage(img)) {
+                    return (img.src || img.getAttribute('data-src') || '').replace(/&amp;/g, '&');
+                }
+            }
+        }
+    }
+    // Strategy 3: figure elements
+    const figures = document.querySelectorAll('figure img, [class*="figure"] img');
+    for (const img of figures) {
+        if (isValidImage(img)) {
+            return (img.src || img.getAttribute('data-src') || '').replace(/&amp;/g, '&');
+        }
+    }
+    // Strategy 4: og:image fallback
+    const ogMeta = document.querySelector('meta[property="og:image"]');
+    if (ogMeta && ogMeta.content) {
+        return ogMeta.content.replace(/&amp;/g, '&');
+    }
+    return '';
+}
+"""
+
+
+def pw_batch_article_images(urls, timeout=15):
+    """Batch extract first body image from article pages using one browser session.
+    Returns {url: image_url} dict."""
+    if not urls:
+        return {}
+    import asyncio
+    from playwright.async_api import async_playwright
+
+    async def _batch():
+        results = {}
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True, channel="chrome")
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080},
+                extra_http_headers={
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                }
+            )
+            await context.add_init_script("""
+                Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+                Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
+                window.chrome = { runtime: {} };
+            """)
+            page = await context.new_page()
+            for url in urls:
+                try:
+                    resp = await page.goto(url, wait_until="domcontentloaded", timeout=timeout*1000)
+                    if not resp:
+                        results[url] = ""
+                        continue
+                    await page.wait_for_timeout(2500)
+                    img_url = await page.evaluate(_JS_EXTRACT_BODY_IMAGE)
+                    results[url] = img_url or ""
+                    if img_url:
+                        print(f"    ✓ article image: {url[-50:]} → {img_url[-50:]}")
+                except Exception as e:
+                    results[url] = ""
+            await browser.close()
+        return results
+
+    return asyncio.run(_batch())
+
+
+def extract_lead(cleaned_text):
+    """从清洗后的文本提取导语（第一段有意义的段落）和摘要正文。
+    跳过时间戳、作者、版权信息等元数据。
+    """
+    if not cleaned_text:
+        return "", ""
+    
+    # 清洗时间戳前缀
+    # autocli 格式: "Updated Jan. 28, 2025 12:44 pm ETDeepSeek has..."
+    # 或 " 2026年7月17日 16:52 CST中国领导人..."
+    tz_list = r'(?:ET|EST|EDT|CST|CDT|PST|PDT|MST|MDT|GMT|UTC|BST|CET|IST|HKT|JST|KST|SGT|AEST|ACST)'
+    cleaned = re.sub(r'^\s*Updated \w+\.? \d{1,2},? \d{4} \d{1,2}:\d{2} [ap]m ' + tz_list, '', cleaned_text)
+    cleaned = re.sub(r'^\s*\d{4}年\d{1,2}月\d{1,2}日\s+\d{1,2}:\d{2}\s+' + tz_list, '', cleaned)
+    cleaned = re.sub(r'^\s*\w+\.? \d{1,2},? \d{4} \d{1,2}:\d{2} [ap]m ' + tz_list, '', cleaned)
+    cleaned = re.sub(r'^\s*\d{1,2}:\d{2} [ap]m ' + tz_list, '', cleaned)
+    
+    # 按双换行或段落分割
+    paragraphs = re.split(r'\n\n+', cleaned)
+    paragraphs = [p.strip() for p in paragraphs if p.strip()]
+    
+    lead = ""
+    body = ""
+    found_lead = False
+    
+    for i, p in enumerate(paragraphs):
+        if len(p) < 50:
+            continue
+        
+        # Skip author bylines: [Name](https://.../author/...) or [Name](url) when short
+        if re.match(r'^\[.+?\]\(https?://', p) and len(p) < 200:
+            continue
+        
+        # Skip paragraphs that are mostly markdown links
+        plain = re.sub(r'\[.+?\]\(.+?\)', '', p).strip()
+        if len(plain) < len(p) * 0.4:
+            continue
+        
+        # Skip paragraphs containing author/news links
+        if '/author/' in p or 'news/author' in p:
+            continue
+        

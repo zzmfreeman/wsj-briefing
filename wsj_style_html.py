@@ -91,7 +91,7 @@ def _card(a, num):
     # Insight box
     insight_html = ''
     if insight:
-        insight_html = f'<div class="article-insight"><span class="insight-label">你的理解</span><p>{insight}</p></div>'
+        insight_html = f'<div class="article-insight"><span class="insight-label">洞察</span><p>{insight}</p></div>'
 
     # 原文链接
     link_html = f'<a href="{url}" target="_blank" class="article-cta">阅读原文 &rarr;</a>' if url else ''
