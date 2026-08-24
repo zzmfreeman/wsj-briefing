@@ -597,48 +597,52 @@ def scrape_cn_homepage(limit=30):
                 """
                 articles_data = await page.evaluate(JS_SCRAPE)
                 
-                # v37d: 用 CDP 逐个访问文章页提取 published_time
-                _has_cdp = 'connect_over_cdp' in str(type(browser))
-                if _has_cdp or True:
-                    time_count = 0
-                    for a in articles_data:
-                        if a.get('pub_time'):
+                # v37k: 用 CDP 逐个访问文章页提取 published_time + og:description
+                time_count = 0
+                lead_count = 0
+                for a in articles_data:
+                    url = a.get('url', '')
+                    if not url:
+                        continue
+                    try:
+                        await page.goto(url, wait_until="domcontentloaded", timeout=15000)
+                        await page.wait_for_timeout(1000)
+                        result = await page.evaluate("""
+                        (()=>{
+                            var pt='', od='';
+                            var metas=document.querySelectorAll('meta');
+                            for(var i=0;i<metas.length;i++){
+                                var p=metas[i].getAttribute('property')||'';
+                                var n=metas[i].getAttribute('name')||'';
+                                if(!pt && (p==='article:published_time'||n==='article:published_time'||n==='pubdate')){
+                                    pt=metas[i].getAttribute('content')||'';
+                                }
+                                if(!od && (p==='og:description'||n==='description')){
+                                    od=metas[i].getAttribute('content')||'';
+                                }
+                            }
+                            if(!pt){
+                                var ss=document.querySelectorAll('script[type="application/ld+json"]');
+                                for(var i=0;i<ss.length;i++){
+                                    try{var d=JSON.parse(ss[i].textContent);
+                                    if(d.datePublished){pt=d.datePublished;break;}
+                                    }catch(e){}
+                                }
+                            }
+                            return JSON.stringify({pt:pt, od:od});
+                        })()
+                        """)
+                        import json as _json
+                        data = _json.loads(result)
+                        if data.get('pt'):
+                            a['pub_time'] = data['pt']
                             time_count += 1
-                            continue
-                        url = a.get('url', '')
-                        if not url:
-                            continue
-                        try:
-                            await page.goto(url, wait_until="domcontentloaded", timeout=15000)
-                            await page.wait_for_timeout(1000)
-                            pt = await page.evaluate("""
-                            (()=>{
-                                var pt='';
-                                var metas=document.querySelectorAll('meta');
-                                for(var i=0;i<metas.length;i++){
-                                    var p=metas[i].getAttribute('property')||'';
-                                    var n=metas[i].getAttribute('name')||'';
-                                    if(p==='article:published_time'||n==='article:published_time'||n==='pubdate'){
-                                        pt=metas[i].getAttribute('content')||'';break;
-                                    }
-                                }
-                                if(!pt){
-                                    var ss=document.querySelectorAll('script[type="application/ld+json"]');
-                                    for(var i=0;i<ss.length;i++){
-                                        try{var d=JSON.parse(ss[i].textContent);
-                                        if(d.datePublished){pt=d.datePublished;break;}
-                                        }catch(e){}
-                                    }
-                                }
-                                return pt;
-                            })()
-                            """)
-                            if pt:
-                                a['pub_time'] = pt
-                                time_count += 1
-                        except:
-                            pass
-                    print(f"  时间提取: {time_count}/{len(articles_data)} 篇有时间")
+                        if data.get('od'):
+                            a['summary'] = data['od']
+                            lead_count += 1
+                    except:
+                        pass
+                    print(f"  时间提取: {time_count}/{len(articles_data)} 篇有时间, 导语提取: {lead_count} 篇有导语")
                 
                 await browser.close()
                 return articles_data[:limit]
@@ -1254,6 +1258,10 @@ def collect_all():
         a['source'] = 'cn_home'
         if a.get('pub_time') and not a.get('published'):
             a['published'] = a['pub_time']
+        # v37k: CDP 提取的 og:description 作为导语
+        if a.get('summary') and len(a.get('summary','')) > 10:
+            a['lead'] = a['summary']
+            a['lead_from'] = 'og_description'
     
     # 去重：过滤掉已发过的文章
     before = len(cn_articles)
