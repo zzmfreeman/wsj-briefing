@@ -34,6 +34,15 @@ def _parse_summary(summary):
         
         bullet_lines = bullet_part.replace("|||BULLETS|||", "").split("|||")
         bullets = [b.strip() for b in bullet_lines if b.strip()]
+        # 确保每条 bullet 有正确前缀
+        prefixes = ["核心事实：", "关键细节：", "影响："]
+        for i, b in enumerate(bullets):
+            if i < len(prefixes) and not b.startswith(prefixes[i]):
+                for p in prefixes:
+                    if b.startswith(p):
+                        b = b[len(p):]
+                        break
+                bullets[i] = prefixes[i] + b
     else:
         # Fallback: 纯文本摘要，按句号分拆为 bullets
         sentences = re.split(r'(?<=[。！？])\s*', summary)
