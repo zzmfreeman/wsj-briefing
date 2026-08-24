@@ -118,7 +118,7 @@ def translate_rss_description_as_lead(rss_summary, title):
 描述：
 {rss_summary}"""
     try:
-        result = llm_call(prompt, max_tokens=500, temperature=0.3,
+        result = llm_call(prompt, max_tokens=2000, temperature=0.3,
                          system_msg="你是一名专业的财经翻译，只负责忠实翻译，不添加任何原文没有的信息。")
         result = result.strip()
         # Clean up
@@ -167,7 +167,7 @@ def generate_lead_from_summary(summary, title):
 
 只输出导语文字，不要解释，不要加引号。"""
     try:
-        result = llm_call(prompt, max_tokens=500, temperature=0.5,
+        result = llm_call(prompt, max_tokens=2000, temperature=0.5,
                          system_msg="你是一名专业的新闻编辑，擅长撰写简洁有力的导语。")
         result = result.strip()
         # Clean up
@@ -218,7 +218,7 @@ Requirements:
 3. Pure text only, no formatting
 4. Write in Chinese"""
     try:
-        result = llm_call(prompt, max_tokens=500, temperature=0.6,
+        result = llm_call(prompt, max_tokens=2000, temperature=0.6,
                          system_msg="你是一名专业的新闻编辑，擅长撰写简洁有力的导语。")
         result = result.strip()
         # Strip any markdown that might have been added
@@ -340,7 +340,7 @@ def _process_one_summary(args):
     a, prompt = args
     for attempt in range(3):
         try:
-            result = llm_call(prompt, max_tokens=600)
+            result = llm_call(prompt, max_tokens=2000)
             result = result.strip()
             # 去除可能的 markdown json fence
             if result.startswith("```"):
@@ -545,7 +545,7 @@ def verify_image_title_match(articles):
     
     mismatch_ids = set()
     try:
-        result = llm_call(prompt, max_tokens=500, temperature=0.3,
+        result = llm_call(prompt, max_tokens=2000, temperature=0.3,
                          system_msg="你是一名图片匹配验证助手。判断图片描述与文章标题是否语义相关。")
         result = result.strip()
         
@@ -593,7 +593,7 @@ def verify_image_title_match(articles):
 {chr(10).join(match_pairs)}"""
             
             try:
-                result2 = llm_call(reassign_prompt, max_tokens=300, temperature=0.3,
+                result2 = llm_call(reassign_prompt, max_tokens=2000, temperature=0.3,
                                   system_msg="你是一名图片匹配助手。")
                 # 解析匹配结果
                 for m in re.finditer(r'(\d+)\s*->\s*(\d+|无)', result2):
@@ -642,7 +642,7 @@ def verify_image_title_match(articles):
 {chr(10).join(match_lines)}"""
         
         try:
-            result3 = llm_call(pool_prompt, max_tokens=300, temperature=0.3,
+            result3 = llm_call(pool_prompt, max_tokens=2000, temperature=0.3,
                               system_msg="你是一名图片匹配助手。")
             reassigned = 0
             for m in re.finditer(r'(\d+)\s*->\s*(\d+|无)', result3):
@@ -683,7 +683,7 @@ def verify_image_title_match(articles):
     
     mismatch_ids = set()
     try:
-        result = llm_call(prompt, max_tokens=500, temperature=0.3,
+        result = llm_call(prompt, max_tokens=2000, temperature=0.3,
                          system_msg="你是一名图片匹配验证助手。判断图片描述与文章标题是否语义相关。")
         result = result.strip()
         
@@ -731,7 +731,7 @@ def verify_image_title_match(articles):
 {chr(10).join(match_pairs)}"""
             
             try:
-                result2 = llm_call(reassign_prompt, max_tokens=300, temperature=0.3,
+                result2 = llm_call(reassign_prompt, max_tokens=2000, temperature=0.3,
                                   system_msg="你是一名图片匹配助手。")
                 # 解析匹配结果
                 for m in re.finditer(r'(\d+)\s*->\s*(\d+|无)', result2):
@@ -801,7 +801,7 @@ if __name__ == "__main__":
             prompt = f"将以下英文新闻标题和摘要翻译为简体中文。\\n\\n标题：{title}\\n摘要：{summary}\\n\\n输出格式：\\n中文标题：\\n中文摘要："
             for attempt in range(3):
                 try:
-                    result = llm_call(prompt, max_tokens=500, temperature=0.3, system_msg="你是一名专业财经翻译员")
+                    result = llm_call(prompt, max_tokens=2000, temperature=0.3, system_msg="你是一名专业财经翻译员")
                     lines = [l.strip() for l in result.split("\\n") if l.strip()]
                     if len(lines) >= 2:
                         title_cn = lines[0]
@@ -853,7 +853,7 @@ if __name__ == "__main__":
                 try:
                     result = llm_call(
                         f"任务：英文新闻标题翻译。\n输入：{title}\n输出要求：只输出简体中文翻译，不要解释，不要加引号，不要加前缀。\n参考风格：华尔街日报中文版标题风格，简洁专业。\n现在输出翻译：",
-                        max_tokens=500,
+                        max_tokens=2000,
                         temperature=0.3,
                     )
                     translated = result.strip()
@@ -938,7 +938,7 @@ if __name__ == "__main__":
                 try:
                     result = llm_call(
                         f"将以下英文新闻导语翻译为简体中文。只输出翻译后的文本，不要解释，不要加引号。\n\n{dek_en}",
-                        max_tokens=500,
+                        max_tokens=2000,
                         temperature=0.3,
                     )
                     translated = result.strip()
