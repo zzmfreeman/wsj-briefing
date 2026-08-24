@@ -12,7 +12,7 @@ SH_TZ = timezone(timedelta(hours=8))
 LITELLM_BASE = 'http://localhost:4000/v1'
 LITELLM_KEY = 'sk-litellm-master-zzm'
 LITELLM_MODEL = 'deepseek-v4-pro'
-LITELLM_FALLBACK_MODELS = ['claude-sonnet-4-6', 'gpt-4o', 'kimi-k3', 'glm-5.2', 'qwen3.7-max']
+LITELLM_FALLBACK_MODELS = ["kimi-k3", "glm-5.2", "qwen3.7-max"]
 
 
 def llm_call(prompt, system_msg="你是一名专业的财经信息分析师", max_tokens=2000, temperature=0.7):
@@ -32,7 +32,7 @@ def llm_call(prompt, system_msg="你是一名专业的财经信息分析师", ma
             "temperature": temperature,
         }
         # Claude/GPT models via Sophnet: use top-level system param
-        if model in ("ac-op-4-8-aws", "claude-sonnet-4-6", "gpt-4o"):
+        if model in ("ac-op-4-8-aws",):
             body["messages"] = [{"role": "user", "content": prompt}]
             body["system"] = system_msg
         req = urllib.request.Request(
