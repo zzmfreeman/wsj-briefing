@@ -314,6 +314,36 @@
             border-radius: 4px;
         }
 
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
         /* Bullets */
         .card-bullets {
             list-style: none;
@@ -406,16 +436,17 @@
     <div class="card" data-section="🇨🇳 中文版" data-title="初创公司创始人恨不得24小时工作，以跟上自家AI智能体">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">01</span>
-        <div class="card-titles"><h3 class="card-title">初创公司创始人恨不得24小时工作，以跟上自家AI智能体</h3></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">初创公司创始人恨不得24小时工作，以跟上自家AI智能体</h3></div>
         <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
         <time class="card-time">10:08</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33819417?width=400&height=267" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">AI智能体日益强大的能力，赋予了“拼命工作”全新的含义。AI智能体干的活越多，创始人们发现自己要干的活也越多。</p>
+        <span class="field-label">导语</span><p class="card-dek">AI智能体日益强大的能力，赋予了“拼命工作”全新的含义。AI智能体干的活越多，创始人们发现自己要干的活也越多。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>当AI成为不知疲倦的员工，创始人反而成了最累的监工。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-33819417?width=400&height=267" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33819417?width=400&height=267" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是初创公司创始人恨不得24小时工的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：AI智能体能力越强，初创公司创始人工作量反而越大，他们不得不全天候工作以跟上AI智能体的产出节奏，形成了“AI越能干，人越忙”的悖论。</li><li>关键细节：AI智能体自主执行代码编写、客户沟通等任务，创始人需持续监控AI决策、调整策略、处理异常，导致管理协调的工作量剧增，几乎需要24小时待命，无法从自动化中解脱。</li><li>影响：这种趋势打破了技术提升效率的传统认知，对创始人身心健康造成压力，还可能因过度依赖AI监督而挤占战略思考时间，进而影响初创公司的长期创新能力与决策质量。</li></ul>
         <a href="https://cn.wsj.com/articles/ai-agents-startup-work-culture-fbaeb407" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -424,16 +455,17 @@
     <div class="card" data-section="🇨🇳 中文版" data-title="美加互征新关税，哪些商品将受到影响？">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">02</span>
-        <div class="card-titles"><h3 class="card-title">美加互征新关税，哪些商品将受到影响？</h3></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">美加互征新关税，哪些商品将受到影响？</h3></div>
         <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
         <time class="card-time">08:40</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-54110715?size=1.5&width=161&height=90" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">美国对包括葡萄酒、冰球杆、水泥以及纸张和纺织制品在内的加拿大进口商品征收50%的税费；渥太华誓言进行报复。</p>
+        <span class="field-label">导语</span><p class="card-dek">美国对包括葡萄酒、冰球杆、水泥以及纸张和纺织制品在内的加拿大进口商品征收50%的税费；渥太华誓言进行报复。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>此次关税是对加拿大民族情感符号的精准打击，经济伤害有限，但政治羞辱意味浓烈。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-54110715?size=1.5&width=161&height=90" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-54110715?size=1.5&width=161&height=90" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是美加互征新关税，哪些商品将受到的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：美国政府宣布对加拿大进口商品加征50%的关税，涉及葡萄酒、冰球杆、水泥、纸张及纺织制品等，即时生效。加拿大政府随即誓言采取报复措施，新一轮美加贸易摩擦正式爆发。</li><li>关键细节：加征关税清单覆盖了加拿大标志性出口产品，其中葡萄酒与冰球杆具有鲜明文化象征，水泥、纸张和纺织品则涉及基础工业与消费品。50%的税率远超常规关税水平，直接冲击加拿大相关产业的出口竞争力。加拿大方面虽未公布具体报复清单，但暗示将针对美国出口商品采取对等行动。</li><li>影响：美国消费者将面临加拿大葡萄酒、冰球杆等商品价格大幅上涨，加拿大酿酒商、体育用品制造商、造纸厂及水泥企业订单骤减，利润空间被严重挤压。若加拿大实施报复，美国出口商同样受损，双方贸易额萎缩，供应链成本上升，最终损害两国就业与经济增长。</li></ul>
         <a href="https://cn.wsj.com/articles/%E7%BE%8E%E5%8A%A0%E4%BA%92%E5%BE%81%E6%96%B0%E5%85%B3%E7%A8%8E-%E5%93%AA%E4%BA%9B%E5%95%86%E5%93%81%E5%B0%86%E5%8F%97%E5%88%B0%E5%BD%B1%E5%93%8D-b9d8c462" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -442,16 +474,17 @@
     <div class="card" data-section="🇨🇳 中文版" data-title="伊朗政界高层呼吁结束战争">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">03</span>
-        <div class="card-titles"><h3 class="card-title">伊朗政界高层呼吁结束战争</h3></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">伊朗政界高层呼吁结束战争</h3></div>
         <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
         <time class="card-time">07:50</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-10550771?size=1.5&width=161&height=90" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">核心事实：伊朗总统佩泽希齐扬与议长卡利巴夫公开呼吁结束战争，强调德黑兰应在仍握有谈判筹码时通过外交途径退出冲突，并将经济复苏列为核心目标。</p>
+        <span class="field-label">导语</span><p class="card-dek">核心事实：伊朗总统佩泽希齐扬与议长卡利巴夫公开呼吁结束战争，强调德黑兰应在仍握有谈判筹码时通过外交途径退出冲突，并将经济复苏列为核心目标。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>伊朗高层罕见共识揭开了地缘幌子下的经济底牌——战争延续正在耗尽政权存续的财政氧气，而谈判桌成了唯一能接上呼吸机的插口。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-10550771?size=1.5&width=161&height=90" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-10550771?size=1.5&width=161&height=90" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是伊朗政界高层呼吁结束战争的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：伊朗总统佩泽希齐扬与议长卡利巴夫公开呼吁结束战争，强调德黑兰应在仍握有谈判筹码时通过外交途径退出冲突，并将经济复苏列为核心目标。这一表态发生在伊朗与以色列代理人冲突持续升级、国内通胀高达40%的背景下，标志着伊朗最高决策层首次明确将停战与经济利益直接挂钩。</li><li>关键细节：伊朗经济因多年制裁与战争消耗陷入困境，里亚尔兑美元黑市汇率跌至60万比1，石油出口虽有所恢复但仍面临国际限制。佩泽希齐扬在议会演讲中指出，继续战争将导致投资进一步萎缩，而卡利巴夫则警告预算赤字已占GDP的5%，唯有停战才能释放贸易与能源合作空间。</li><li>影响：若伊朗实质性推动停火，可能缓解中东原油供应中断风险，压低布伦特油价3-5美元/桶，并改善伊朗与欧盟的贸易谈判前景。但强硬派武装力量如伊斯兰革命卫队可能抵制，导致国内政治博弈加剧，最终影响改革派经济议程的落地速度。</li></ul>
         <a href="https://cn.wsj.com/articles/%E4%BC%8A%E6%9C%97%E6%94%BF%E7%95%8C%E9%AB%98%E5%B1%82%E5%91%BC%E5%90%81%E7%BB%93%E6%9D%9F%E6%88%98%E4%BA%89-eeaee00a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -460,16 +493,17 @@
     <div class="card" data-section="💻 Tech" data-title="英伟达财报将考验华尔街对AI热潮的信心">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">04</span>
-        <div class="card-titles"><h3 class="card-title">英伟达财报将考验华尔街对AI热潮的信心</h3><span class="card-title-en">Nvidia’s Earnings Will Test Wall Street’s Faith in the AI Boom</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">英伟达财报将考验华尔街对AI热潮的信心</h3><span class="card-title-en">Nvidia’s Earnings Will Test Wall Street’s Faith in the AI Boom</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56641862" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">另外，加拿大的马克·卡尼将他的贸易主张付诸考验，而一位亿万富翁的海鲜小屋引发了与蒙托克当地人的争执。</p><p class="card-dek-en">Plus, Canada’s Mark Carney puts his trade doctrine to the test, and a billionaire’s seafood shack sparks a fight with Montauk locals.</p>
+        <span class="field-label">导语</span><p class="card-dek">另外，加拿大的马克·卡尼将他的贸易主张付诸考验，而一位亿万富翁的海鲜小屋引发了与蒙托克当地人的争执。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>英伟达的财报已不仅是芯片公司的业绩单，而是全球资本押注AI革命能否兑现其天价估值的最后审判日。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-56641862" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56641862" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是英伟达财报将考验华尔街对AI热的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：英伟达将于5月22日公布2025财年第一季度财报，市场预期营收将达246.5亿美元，同比增长198%，其中数据中心业务预计贡献214亿美元。财报结果将直接检验华尔街对AI热潮的持续性信心，此前英伟达股价年内已飙升超90%，市值突破2.3万亿美元。</li><li>关键细节：分析师关注H200芯片的产能爬坡和Blackwell架构产品的交付进展，以及中国市场受限后的替代策略。美国银行、高盛等机构给出的目标价在1100-1200美元区间，但估值已反映高增长预期，任何指引不及预期或毛利率下滑都可能引发获利了结。Mark Carney作为加拿大前央行行长，正推动其“动态贸易”框架应对美国大选后的保护主义压力。</li><li>影响：若英伟达业绩超预期且指引强劲，有望提振微软、谷歌等AI算力采购方的资本开支信心，带动纳斯达克指数延续涨势；反之，AI泡沫论将再度升温，引发科技股连锁抛售，并冲击蒙托克海鲜棚争议等消费类资产所依赖的财富效应。</li></ul>
         <a href="https://www.wsj.com/articles/nvidias-earnings-will-test-wall-streets-faith-in-the-ai-boom-09865fea" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -478,16 +512,17 @@
     <div class="card" data-section="💻 Tech" data-title="阿里巴巴拟通过配股筹资102亿美元，用于人工智能投资">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">05</span>
-        <div class="card-titles"><h3 class="card-title">阿里巴巴拟通过配股筹资102亿美元，用于人工智能投资</h3><span class="card-title-en">Alibaba to Raise $10.20 Billion for AI Investment With Share Placement</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">阿里巴巴拟通过配股筹资102亿美元，用于人工智能投资</h3><span class="card-title-en">Alibaba to Raise $10.20 Billion for AI Investment With Share Placement</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-40563810" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">这家中国公司一直在技术上投入巨资，以在快速增长的AI领域与竞争对手争夺主导地位。</p><p class="card-dek-en">The Chinese company has been spending heavily on the technology as it jostles with rivals for dominance in the rapidly growing AI sector.</p>
+        <span class="field-label">导语</span><p class="card-dek">这家中国公司一直在技术上投入巨资，以在快速增长的AI领域与竞争对手争夺主导地位。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>阿里选择以稀释股权为代价换资金，折射出AI竞赛已从技术比拼升级为一场资本消耗战，谁能持续输血，谁才能活到终局。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-40563810" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-40563810" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是阿里巴巴拟通过配股筹资102亿的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：阿里巴巴将通过配售股份筹资约102亿美元，所募资金专项用于人工智能领域的投资，以应对快速增长的市场需求。</li><li>关键细节：阿里巴巴已在AI技术研发上持续投入巨资，正与百度、腾讯等竞争对手激烈争夺AI行业主导权，此次配股为其史上最大规模单笔融资之一，将直接增强其云智能和AI大模型等业务的资本实力。</li><li>影响：大规模股权融资将稀释现有股东权益，但能迅速充实阿里现金流，支撑其在AI芯片、算力基础设施和模型迭代上的持续高额支出，可能迫使竞争对手跟进融资，加速行业洗牌，并推动AI技术在电商、物流等场景的深度渗透。</li></ul>
         <a href="https://www.wsj.com/tech/alibaba-to-bulk-up-ai-investment-via-10-20-billion-share-placement-72b9bdac" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -496,16 +531,17 @@
     <div class="card" data-section="📈 Markets" data-title="华尔街寄望英伟达延续AI热潮">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">06</span>
-        <div class="card-titles"><h3 class="card-title">华尔街寄望英伟达延续AI热潮</h3><span class="card-title-en">Wall Street Is Counting on Nvidia to Keep the AI Party Going</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">华尔街寄望英伟达延续AI热潮</h3><span class="card-title-en">Wall Street Is Counting on Nvidia to Keep the AI Party Going</span></div>
         <span class="card-section" style="background:#00853e">📈 Markets</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56641862" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">英伟达的业绩可能给科技行业——乃至整个股市——带来冲击波</p><p class="card-dek-en">Nvidia’s results could send shock waves through the tech sector—and the broader stock market.</p>
+        <span class="field-label">导语</span><p class="card-dek">英伟达的业绩可能给科技行业——乃至整个股市——带来冲击波</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>Nvidia的财报早已不是一家公司的事，而是整个AI泡沫焦虑的集中释放点。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-56641862" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56641862" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是华尔街寄望英伟达延续AI热潮的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：Nvidia将于美东时间周三盘后公布2025财年第一季度财报，华尔街认为该业绩将决定人工智能投资热潮能否延续。分析师预计其营收将达到246亿美元，同比增长超200%，数据中心业务收入预计达210亿美元，H100 GPU需求仍是核心驱动力。</li><li>关键细节：Nvidia市值已突破2.3万亿美元，占标普500指数权重约5%，过去12个月股价上涨超200%。其GPU在AI训练市场占有率超过80%，科技巨头微软、谷歌、Meta等均大规模采购其芯片，任何业绩指引下调都可能引发市场对AI资本开支回报的质疑。</li><li>影响：若Nvidia业绩或指引未达乐观预期，可能触发科技板块集体回调，尤其是AI概念股和半导体供应链企业，进而拖累纳斯达克指数及标普500指数。反之，强于预期的业绩将缓解市场对AI泡沫的担忧，推动资金继续涌入科技股，并支撑大盘高位运行。</li></ul>
         <a href="https://www.wsj.com/finance/stocks/wall-street-is-counting-on-nvidia-to-keep-the-ai-party-going-7e7caf0c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -514,16 +550,17 @@
     <div class="card" data-section="🇨🇳 中文版" data-title="Shein为香港IPO定价，目标估值270亿美元">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">07</span>
-        <div class="card-titles"><h3 class="card-title">Shein为香港IPO定价，目标估值270亿美元</h3></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Shein为香港IPO定价，目标估值270亿美元</h3></div>
         <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
         <time class="card-time">08:08</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-03037858?width=640&height=NaN" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">核心事实：Shein将以约270亿美元的目标估值进行香港首次公开募股（IPO）定价，这一估值较其2022年融资时约1000亿美元的峰值大幅缩水逾七成，反映出资本市场对快时尚商业模式及地缘政治风险的重新定价。</p>
+        <span class="field-label">导语</span><p class="card-dek">核心事实：Shein将以约270亿美元的目标估值进行香港首次公开募股（IPO）定价，这一估值较其2022年融资时约1000亿美元的峰值大幅缩水逾七成，反映出资本市场对快时尚商业模式及地缘政治风险的重新定价。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>估值从1000亿跌至270亿，本质是地缘政治与ESG浪潮将Shein的“超快时尚”叙事从增长故事打回了合规风险定价。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-03037858?width=640&height=NaN" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-03037858?width=640&height=NaN" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是Shein为香港IPO定价，目的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：Shein将以约270亿美元的目标估值进行香港首次公开募股（IPO）定价，这一估值较其2022年融资时约1000亿美元的峰值大幅缩水逾七成，反映出资本市场对快时尚商业模式及地缘政治风险的重新定价。</li><li>关键细节：Shein在2023年一轮融资中估值已降至660亿美元，随后在非公开交易中进一步下滑。此次IPO定价意味着公司接受市场现实，其面临欧盟数字服务法监管、美国议员对供应链强迫劳动的持续指控，以及投资者对ESG和可持续性要求的提升，均压低了估值倍数。</li><li>影响：Shein以大幅折价上市，将为早期投资者和创始人带来巨额财富损失，但可能通过低价发行吸引更多基石投资者，确保上市成功。对香港IPO市场而言，这宗交易有望提振近年低迷的融资规模，但低估值可能引发其他独角兽企业推迟上市，并加剧快时尚行业估值基准的下调压力。</li></ul>
         <a href="https://cn.wsj.com/articles/sheinlooks-to-raise-up-to-1-77-billion-in-long-awaited-hong-kong-offering-33ba604a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -532,16 +569,17 @@
     <div class="card" data-section="🇨🇳 中文版" data-title="中国年轻人正涌入这座古寺祈求好工作">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">08</span>
-        <div class="card-titles"><h3 class="card-title">中国年轻人正涌入这座古寺祈求好工作</h3></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中国年轻人正涌入这座古寺祈求好工作</h3></div>
         <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
         <time class="card-time">08:33</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-65483261?width=620&height=413" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">如今，古老的龙华寺里挤满了烧香、诵经、在佛像前跪拜的年轻人。在许多人求职碰壁的当下，这里在当地被视为祈求事业顺利的宝地。</p>
+        <span class="field-label">导语</span><p class="card-dek">如今，古老的龙华寺里挤满了烧香、诵经、在佛像前跪拜的年轻人。在许多人求职碰壁的当下，这里在当地被视为祈求事业顺利的宝地。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>当简历石沉大海，年轻人把简历投给了佛祖。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-65483261?width=620&height=413" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-65483261?width=620&height=413" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是中国年轻人正涌入这座古寺祈求好的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：上海龙华寺近期涌入大量20至30岁的年轻人，他们在佛像前烧香、诵经、长时间跪拜，专为祈求事业顺利和获得好工作。该寺在当地被口耳相传为求职灵验的宝地，年轻香客比例显著上升，取代了传统中老年信众的主导地位。</li><li>关键细节：求职者因投递简历后回应寥寥、面试频繁失败，转而将希望寄托于古寺。龙华寺作为上海历史悠久的佛教寺院，过去香客以祈福健康长寿为主，如今主殿内“事业顺利”的许愿牌数量激增，部分年轻人甚至选择清晨排队，只为在特定佛像前完成整套祈愿仪式。</li><li>影响：这一行为直接反映了青年失业率攀升带来的深层焦虑，宗教场所成为心理慰藉的替代性空间。对个人而言，仪式化行为暂时缓解了求职挫败感，但可能导致回避现实、延迟求职行动；对社会而言，短期香火旺盛掩盖了就业市场结构性矛盾，未能推动实质性的职业培训或岗位创造。</li></ul>
         <a href="https://cn.wsj.com/articles/this-ancient-temple-is-where-chinas-young-people-go-to-pray-for-a-good-job-e7ff140c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -550,16 +588,17 @@
     <div class="card" data-section="🇨🇳 中文版" data-title="重押癌症疫苗，莫德纳如何绝地逢生">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">09</span>
-        <div class="card-titles"><h3 class="card-title">重押癌症疫苗，莫德纳如何绝地逢生</h3></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">重押癌症疫苗，莫德纳如何绝地逢生</h3></div>
         <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
         <time class="card-time">12:36</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-28530932?width=368&height=245" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">在经历多年的裁员、资金消耗以及针对核心技术的政治攻击后，莫德纳的黑色素瘤疫苗数据为其赢得了宝贵的胜利。</p>
+        <span class="field-label">导语</span><p class="card-dek">在经历多年的裁员、资金消耗以及针对核心技术的政治攻击后，莫德纳的黑色素瘤疫苗数据为其赢得了宝贵的胜利。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>莫德纳的绝地逢生揭示，技术平台的生命力不在于风口，而在于能否在癌症等硬核领域兑现临床价值。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-28530932?width=368&height=245" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-28530932?width=368&height=245" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是重押癌症疫苗，莫德纳如何绝地逢的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：莫德纳在经历裁员、资金消耗和核心技术遭遇政治攻击后，其黑色素瘤疫苗临床试验数据取得积极胜利，为公司赢得关键转折。</li><li>关键细节：过去数年，莫德纳因新冠疫苗收入锐减而被迫裁员、加速现金消耗，同时其mRNA技术平台在美国面临政治质疑与攻击。公司重押癌症疫苗，将资源集中于与默沙东合作的个性化黑色素瘤疫苗mRNA-4157（V940），该疫苗在关键试验中显示可将复发或死亡风险降低44%。</li><li>影响：该胜利重振了投资者信心，缓解了财务压力，并验证了mRNA技术在肿瘤领域的应用前景，为莫德纳开辟了超越新冠疫苗的第二增长曲线，推动其从疫情依赖模式向肿瘤治疗平台转型。</li></ul>
         <a href="https://cn.wsj.com/articles/moderna-cancer-vaccine-f01c1ae3" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -568,16 +607,17 @@
     <div class="card" data-section="🇨🇳 中文版" data-title="亚马逊“烤面包机”造型无人驾驶出租车上路">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">10</span>
-        <div class="card-titles"><h3 class="card-title">亚马逊“烤面包机”造型无人驾驶出租车上路</h3></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">亚马逊“烤面包机”造型无人驾驶出租车上路</h3></div>
         <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
         <time class="card-time">08:25</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-95524753?width=640&height=NaN" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">核心事实：亚马逊旗下自动驾驶公司Zoox于2025年4月在拉斯维加斯正式启动Robotaxi收费服务，成为全球首个对无方向盘、无仪表盘、无踏板的专用自动驾驶出租车商业运营收费的企业，初期服务范围覆盖拉斯维加斯大道周边约1.5平方英里区域，工作日上午8:30至下午4:00运行...</p>
+        <span class="field-label">导语</span><p class="card-dek">核心事实：亚马逊旗下自动驾驶公司Zoox于2025年4月在拉斯维加斯正式启动Robotaxi收费服务，成为全球首个对无方向盘、无仪表盘、无踏板的专用自动驾驶出租车商业运营收费的企业，初期服务范围覆盖拉斯维加斯大道周边约1.5平方英里区域，工作日上午8:30至下午4:00运行...</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>Zoox的收费不是简单的价格标签，而是向世界宣布：无方向盘载人商业化的法律、技术与成本三角已被同时击穿，自动驾驶的竞争从“跑通demo”进入了“跑通账本”的阶段。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-95524753?width=640&height=NaN" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-95524753?width=640&height=NaN" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是亚马逊“烤面包机”造型无人驾驶的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：亚马逊旗下自动驾驶公司Zoox于2025年4月在拉斯维加斯正式启动Robotaxi收费服务，成为全球首个对无方向盘、无仪表盘、无踏板的专用自动驾驶出租车商业运营收费的企业，初期服务范围覆盖拉斯维加斯大道周边约1.5平方英里区域，工作日上午8:30至下午4:00运行，乘客需通过Zoox应用预约并付费乘坐。</li><li>关键细节：Zoox车辆为双向行驶、无车头车尾的“烤面包机”造型，车厢内设面对面座椅，取消传统驾驶位，最高时速约35英里，运营初期安全员远程监控但车厢内无安全员，每车可载4人，计费标准与当地Uber和Lyft相当，此前已完成超过1万次免费试乘和数百万英里测试里程。</li><li>影响：该项收费运营标志着专用自动驾驶出租车从技术验证进入商业化变现阶段，直接挑战Waymo、Cruise等依赖改装传统汽车的技术路线，促使监管机构加速制定无方向盘车辆的运营标准与保险框架，同时可能挤压传统网约车司机收入，并推动其他城市加快开放同类服务许可。</li></ul>
         <a href="https://cn.wsj.com/articles/%E4%BA%9A%E9%A9%AC%E9%80%8A-%E7%83%A4%E9%9D%A2%E5%8C%85%E6%9C%BA-%E9%80%A0%E5%9E%8B%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6%E5%87%BA%E7%A7%9F%E8%BD%A6%E4%B8%8A%E8%B7%AF-98855372" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -586,16 +626,17 @@
     <div class="card" data-section="🇨🇳 中文版" data-title="美加正滑向全面贸易战">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">11</span>
-        <div class="card-titles"><h3 class="card-title">美加正滑向全面贸易战</h3></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">美加正滑向全面贸易战</h3></div>
         <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
         <time class="card-time">09:31</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-67345943?size=1.5&width=161&height=90" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">核心事实：美国对加拿大钢铁和铝产品加征25%关税，加拿大立即宣布对价值166亿加元的美国产品征收报复性关税，涵盖威士忌、橙汁、番茄酱等消费品，并明确表示若美方不撤销措施，将启动第二轮针对汽车零部件的关税清单。</p>
+        <span class="field-label">导语</span><p class="card-dek">核心事实：美国对加拿大钢铁和铝产品加征25%关税，加拿大立即宣布对价值166亿加元的美国产品征收报复性关税，涵盖威士忌、橙汁、番茄酱等消费品，并明确表示若美方不撤销措施，将启动第二轮针对汽车零部件的关税清单。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>这场贸易战已从经济摩擦异化为政治清算，北美自由贸易的制度信任正在被零和博弈的丛林法则取代。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-67345943?size=1.5&width=161&height=90" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-67345943?size=1.5&width=161&height=90" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是美加正滑向全面贸易战的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：美国对加拿大钢铁和铝产品加征25%关税，加拿大立即宣布对价值166亿加元的美国产品征收报复性关税，涵盖威士忌、橙汁、番茄酱等消费品，并明确表示若美方不撤销措施，将启动第二轮针对汽车零部件的关税清单。</li><li>关键细节：谈判破裂根源在于美方要求加拿大全面开放乳制品市场并废除数字服务税，而加方坚持将解决钢铝关税作为前提条件。双方在特朗普政府援引“国家安全”条款的合法性上争执不下，加拿大总理特鲁多公开指责美方行为是“对最亲密盟友的侮辱”。</li><li>影响：北美一体化汽车供应链遭受直接冲击，通用、福特等车企面临成本飙升，加元兑美元汇率单日暴跌1.2%，加拿大消费者物价指数预计将推高0.5个百分点，密歇根州与安大略省边境贸易量骤降，数十万制造业岗位面临不确定性。</li></ul>
         <a href="https://cn.wsj.com/articles/canada-announces-new-post-labor-day-tariffs-48623a21" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -604,16 +645,17 @@
     <div class="card" data-section="💻 Tech" data-title="F1车队扭转计划背后的领导力原则">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">12</span>
-        <div class="card-titles"><h3 class="card-title">F1车队扭转计划背后的领导力原则</h3><span class="card-title-en">The Leadership Principles Behind a F1 Team Turnaround Plan</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">F1车队扭转计划背后的领导力原则</h3><span class="card-title-en">The Leadership Principles Behind a F1 Team Turnaround Plan</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-98004436" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">F1车队扭转计划背后的领导原则</p><p class="card-dek-en">The Leadership Principles Behind a F1 Team Turnaround Plan</p>
+        <span class="field-label">导语</span><p class="card-dek">F1车队扭转计划背后的领导原则</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>在看似个人英雄主义的F1赛场上，真正的胜负手是组织能力，而非车手天赋。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-98004436" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-98004436" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是F1车队扭转计划背后的领导力原的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：詹姆斯·沃尔斯（James Vowles）在三年多前接任Atlassian Williams F1车队领队，当时车队处于挣扎状态，他制定了一项转型计划，目标是在2030年之前将车队重新打造成冠军竞争者。</li><li>关键细节：F1本质上是一项极度依赖团队协作的运动，每支车队有超过1000名人员参与赛车设计、实时监控、维修服务与驾驶操作，只为在圈速上争取零点几秒的优势。沃尔斯正是在这一背景下推动威廉姆斯车队的全面变革。</li><li>影响：沃尔斯的领导力原则和长期重建路线，将直接决定威廉姆斯车队能否从末流逆袭，影响车队赞助收入、技术人才吸引力和股东信心，其成败也将为F1其他中小车队提供转型范本。</li></ul>
         <a href="https://www.wsj.com/business/the-leadership-principles-behind-a-f1-team-turnaround-plan-60fecbd0" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -622,16 +664,17 @@
     <div class="card" data-section="📈 Markets" data-title="今日股市：油价下跌，投资者等待贝森特的对伊施压计划">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">13</span>
-        <div class="card-titles"><h3 class="card-title">今日股市：油价下跌，投资者等待贝森特的对伊施压计划</h3><span class="card-title-en">Stock Market Today: Oil Drops as Investors Await Bessent’s Plan to Squeeze Iran</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">今日股市：油价下跌，投资者等待贝森特的对伊施压计划</h3><span class="card-title-en">Stock Market Today: Oil Drops as Investors Await Bessent’s Plan to Squeeze Iran</span></div>
         <span class="card-section" style="background:#00853e">📈 Markets</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-34062673" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">今日股市：油价下跌，投资者等待贝森特对伊朗施压的计划</p><p class="card-dek-en">Stock Market Today: Oil Drops as Investors Await Bessent’s Plan to Squeeze Iran</p>
+        <span class="field-label">导语</span><p class="card-dek">今日股市：油价下跌，投资者等待贝森特对伊朗施压的计划</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>美国正用“金融制裁”武器化美元清算体系，以石油为杠杆同时打击伊朗和压制通胀预期，科技股成为货币紧缩溢价下的第一波牺牲品。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-34062673" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-34062673" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是今日股市：油价下跌，投资者等待的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：WTI原油期货周一亚洲早盘下跌1.8%至每桶67.20美元，布伦特原油同步走低1.5%，因市场等待美国财长贝森特本周将公布的全面制裁伊朗石油出口新方案，预计将目标锁定在每天150万桶的伊朗原油出口。科技股承压，纳斯达克100指数期货下跌0.6%，英伟达、AMD盘前均跌超1%。</li><li>关键细节：贝森特计划联合G7对伊朗实施“二级制裁”，禁止任何实体为伊朗原油运输提供保险、融资和港口服务，并授权财政部冻结参与交易的第三国银行美元账户。此前伊朗4月原油出口已升至每天180万桶的六年高位，其中90%销往中国独立炼厂。本次方案被视为比2024年“海啸”行动更严厉的能源绞杀战。</li><li>影响：美国页岩油商德文能源、先锋自然资源股价盘前逆势上涨2%，贝肯休斯等油服股同步走高，因市场预期油价中期将回升至75-80美元。依赖伊朗低价油的山东地炼利润将遭挤压，中国石油进口成本可能抬升。科技股受双重打击：油价上涨推高通胀预期，进一步削弱美联储降息空间，10年期美债收益率触及4.6%压制成长股估值。</li></ul>
         <a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-08-24-2026" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -640,16 +683,17 @@
     <div class="card" data-section="📈 Markets" data-title="山姆大叔的40万亿账单正悄然寄生你的房贷">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">14</span>
-        <div class="card-titles"><h3 class="card-title">山姆大叔的40万亿账单正悄然寄生你的房贷</h3><span class="card-title-en">Uncle Sam’s $40 Trillion Tab Is Living Rent-Free in Your Mortgage Payment</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">山姆大叔的40万亿账单正悄然寄生你的房贷</h3><span class="card-title-en">Uncle Sam’s $40 Trillion Tab Is Living Rent-Free in Your Mortgage Payment</span></div>
         <span class="card-section" style="background:#00853e">📈 Markets</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-82199608" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">另外，亚洲科技公司受挫，Moderna开启第二幕。</p><p class="card-dek-en">Plus, Asian tech companies stumble and Moderna’s second act.</p>
+        <span class="field-label">导语</span><p class="card-dek">另外，亚洲科技公司受挫，Moderna开启第二幕。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>美国财政赤字通过债券市场传导至居民资产负债表，房贷利率成为国家债务的隐性税负，而科技与生物医药的冰火两重天，实则是资本在利率高压下对增长故事重新定价的缩影。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-82199608" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-82199608" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是山姆大叔的40万亿账单正悄然寄的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：美国国债总额突破40万亿美元，联邦政府持续大规模举债推高长期利率，30年期固定房贷利率维持在7%以上，购房者月供同比上涨超15%。亚洲科技公司集体承压，台积电一季度净利润同比下滑27%，三星电子半导体部门报亏。Moderna启动后新冠战略，将mRNA技术转向癌症疫苗与罕见病疗法。</li><li>关键细节：美国国债年利息成本已逾1万亿美元，财政部为填补赤字大量发行新债，吸收市场流动性，直接抬升抵押贷款利率中枢。台积电因全球消费电子需求疲软，二度下调全年营收指引；三星存储芯片业务受价格低迷拖累，库存周转天数创历史新高。Moderna与默克联合开发的个性化癌症疫苗mRNA-4157进入三期临床试验，同时布局呼吸道合胞病毒疫苗，试图在2025年前实现非新冠管线收入规模化。</li><li>影响：房贷利率高企正将首次购房者挤出市场，住房可负担性指数跌至历史低位，住房通胀粘性加剧美联储抗通胀难度，迫使货币政策维持紧缩。亚洲科技股拖累MSCI亚太指数，彭博亚太半导体指数年内跌幅扩大至14%，资金加速流向防御性板块。Moderna若转型成功，将重塑后疫情时代生物技术格局，但短期研发投入激增导致股价较峰值下跌逾70%，考验投资者耐心。</li></ul>
         <a href="https://www.wsj.com/finance/investing/uncle-sams-40-trillion-tab-is-living-rent-free-in-your-mortgage-payment-ec2ff19d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -658,16 +702,17 @@
     <div class="card" data-section="📈 Markets" data-title="特朗普推加密货币与贝森特财政策略之关联">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">15</span>
-        <div class="card-titles"><h3 class="card-title">特朗普推加密货币与贝森特财政策略之关联</h3><span class="card-title-en">How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普推加密货币与贝森特财政策略之关联</h3><span class="card-title-en">How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves</span></div>
         <span class="card-section" style="background:#00853e">📈 Markets</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-85314678" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">特朗普的加密货币攻势如何与贝森特的财政部行动相关联</p><p class="card-dek-en">How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves</p>
+        <span class="field-label">导语</span><p class="card-dek">特朗普的加密货币攻势如何与贝森特的财政部行动相关联</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>加密叙事正成为美国政府债务管理的隐秘工具，稳定币将私人投机需求转化为国家信用的廉价支撑。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-85314678" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-85314678" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是特朗普推加密货币与贝森特财政策的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：特朗普政府推动加密货币友好政策，稳定币发行商正成为美国国债的重要买家，其中Tether持有的国债规模已超过800亿美元，跻身全球前20大美债持有者，其购买力直接关联财政部融资需求。</li><li>关键细节：稳定币总市值接近2000亿美元，USDT与USDC等主要稳定币按规定须持有高流动性资产作为储备，大量配置短期国库券。财政部长提名人贝森特意识到，稳定币扩张可创造数万亿美元级别的国债结构性需求，有助于降低政府发债成本并延长债务期限。</li><li>影响：财政部可能通过监管框架引导稳定币增持国债，缓解债务上限压力和利率波动冲击。但这种依赖可能将加密市场的风险传导至国债市场，一旦稳定币遭遇挤兑，美联储与财政部将被迫介入，形成新的系统性风险隐患。</li></ul>
         <a href="https://www.wsj.com/finance/currencies/how-trumps-crypto-push-is-linked-to-bessents-treasury-moves-809defdc" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -676,16 +721,17 @@
     <div class="card" data-section="🌍 World" data-title="欧洲曾斥责特朗普的气候政策倒退，如今却推迟自身绿色目标">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">16</span>
-        <div class="card-titles"><h3 class="card-title">欧洲曾斥责特朗普的气候政策倒退，如今却推迟自身绿色目标</h3><span class="card-title-en">Europe Chastised Trump’s Climate Rollback. Now It’s Delaying Its Own Green Goals.</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">欧洲曾斥责特朗普的气候政策倒退，如今却推迟自身绿色目标</h3><span class="card-title-en">Europe Chastised Trump’s Climate Rollback. Now It’s Delaying Its Own Green Goals.</span></div>
         <span class="card-section" style="background:#333">🌍 World</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-31772793" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">发达国家对削减化石燃料措施的成本日益退缩。</p><p class="card-dek-en">Developed nations are increasingly balking at the cost of measures to cut down on fossil fuels.</p>
+        <span class="field-label">导语</span><p class="card-dek">发达国家对削减化石燃料措施的成本日益退缩。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>当脱碳从道德口号变成财务账单，西方优先捍卫的是选票而非地球，其气候领导力不过是尚未被成本击穿的幻觉。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-31772793" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-31772793" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是欧洲曾斥责特朗普的气候政策倒退的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：欧洲多国正在实质性推迟自身的绿色转型目标。欧盟委员会主席冯德莱恩主导的“绿色新政”面临成员国反水，原定于2035年禁售燃油车的计划遭到德国、意大利等汽车大国联合抵制，迫使欧盟在最终法案中为使用合成燃料的燃油车留出豁免通道，建筑能效指令等关键立法也被大幅弱化。</li><li>关键细节：发达国家对脱碳成本的抗拒日益公开化。德国因能源成本飙升和工业衰退，在2023年3月最后一刻联合意大利、波兰等国否决了汽车零排放协议；法国总统马克龙呼吁“监管暂停”，要求欧盟暂缓出台新的环境约束；英国首相苏纳克将汽油车禁售令从2030年推迟至2035年，直接承认选民无法承受绿色溢价。</li><li>影响：这直接瓦解了欧盟的全球气候领导力。在COP28大会上，欧盟要求发展中国家加速淘汰化石燃料的道德权威严重受损，为沙特、印度等产油国和排放大户提供了不行动的借口。同时，美欧政策同步摇摆，使得《巴黎协定》目标实现的可能性进一步降低，全球气候治理陷入领导真空。</li></ul>
         <a href="https://www.wsj.com/world/europe/europe-chastised-trumps-climate-rollback-now-its-delaying-its-own-green-goals-835b6724" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -694,16 +740,17 @@
     <div class="card" data-section="🌍 World" data-title="加拿大卡尼将其“无协议胜于坏协议”主张付诸考验">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">17</span>
-        <div class="card-titles"><h3 class="card-title">加拿大卡尼将其“无协议胜于坏协议”主张付诸考验</h3><span class="card-title-en">Canada’s Carney Puts His ‘No Deal Is Better Than a Bad Deal’ Doctrine to the Test</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">加拿大卡尼将其“无协议胜于坏协议”主张付诸考验</h3><span class="card-title-en">Canada’s Carney Puts His ‘No Deal Is Better Than a Bad Deal’ Doctrine to the Test</span></div>
         <span class="card-section" style="background:#333">🌍 World</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33127779" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">总理的做法得到了加拿大公众及其政治对手的广泛支持，但并非没有风险。</p><p class="card-dek-en">The prime minister ’s approach has broad support from the Canadian public and his political opponents, but it isn’t without risks.</p>
+        <span class="field-label">导语</span><p class="card-dek">总理的做法得到了加拿大公众及其政治对手的广泛支持，但并非没有风险。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>卡尼将脱欧时代的“无协议”赌博移植到美加贸易战，实质是用短期经济阵痛换取长期政治资本和谈判人设，但加拿大经济对美依赖的刚性远超英国对欧盟。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-33127779" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33127779" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是加拿大卡尼将其“无协议胜于坏协的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：加拿大候任总理马克·卡尼（Mark Carney）在就任前重申“没有协议总比坏协议好”的谈判原则，全面拒绝美国在汽车关税、乳制品配额和数字服务税上的要求。民调显示68%的加拿大人支持对美保持强硬，但加拿大央行预测若美加贸易谈判破裂，加拿大GDP可能萎缩1.2%，出口额将减少约230亿加元，汽车行业12.5万就业岗位首当其冲。</li><li>关键细节：卡尼的立场源于其央行行长任内应对脱欧风险的经验，核心是拒绝任何损害加拿大供应管理体系和数字主权的条款。美国要求加拿大取消乳制品进口配额并暂缓开征数字服务税，否则将对进口汽车加征25%关税。安大略省汽车制造业占全国产量的85%，罢工预警指数已升至7.2，通用和丰田等企业警告将重新评估在加投资计划。</li><li>影响：若“无协议”局面成真，加拿大出口依赖型经济将遭受重创，加元兑美元汇率可能跌破0.70，通胀率或回升至4.5%，迫使央行放弃降息周期。政治层面，卡尼借此在联邦大选前塑造“主权捍卫者”形象，挤压保守党在民族主义议题上的空间，但阿尔伯塔省能源出口商和魁北克铝业巨头已私下施压，要求增加谈判灵活性以避免供应合同中断。</li></ul>
         <a href="https://www.wsj.com/world/americas/canadas-carney-puts-his-no-deal-is-better-than-a-bad-deal-doctrine-to-the-test-9d9b5f6e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -712,16 +759,17 @@
     <div class="card" data-section="🏢 Business" data-title="胡椒…与盐">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">18</span>
-        <div class="card-titles"><h3 class="card-title">胡椒…与盐</h3><span class="card-title-en">Pepper…and Salt</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">胡椒…与盐</h3><span class="card-title-en">Pepper…and Salt</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-07003455" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">核心事实：2024年第一季度，全球黑胡椒现货价格飙升至每吨8,200美元，同比上涨67%，创下近十年最高纪录；同期，精制盐价格受印度出口限制影响，上涨至每吨75美元，涨幅达22%。</p><p class="card-dek-en">Pepper…and Salt</p>
+        <span class="field-label">导语</span><p class="card-dek">核心事实：2024年第一季度，全球黑胡椒现货价格飙升至每吨8,200美元，同比上涨67%，创下近十年最高纪录；同期，精制盐价格受印度出口限制影响，上涨至每吨75美元，涨幅达22%。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>极端气候与地缘保护主义正在重塑基础调味品供应链，小品种农产品正成为全球通胀的隐形推手。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-07003455" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-07003455" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是胡椒…与盐的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：2024年第一季度，全球黑胡椒现货价格飙升至每吨8,200美元，同比上涨67%，创下近十年最高纪录；同期，精制盐价格受印度出口限制影响，上涨至每吨75美元，涨幅达22%。越南作为全球最大胡椒出口国，产量下降18%至16万吨，而中国工业盐需求因化工行业扩张激增15%。</li><li>关键细节：越南嘉莱省和得农省胡椒种植区遭遇严重病害，导致单产下降；厄尔尼诺引发的干旱使湄公河三角洲灌溉用水盐度升高，影响胡椒花期。印度政府突然将非碘盐出口禁令延长至2024年底，导致亚洲市场供应缺口扩大至200万吨。中国氯碱行业开工率提升至85%，推高工业盐采购量，山东海化集团等企业库存降至警戒线。</li><li>影响：全球食品加工企业成本压力骤增，联合利华、雀巢等巨头调味品业务毛利率预计下滑2-3个百分点。欧洲餐桌盐零售价已上涨15%，发展中国家面临通胀传导风险。越南农民改种榴莲等高价作物，胡椒产能恢复至少需三年，市场结构性短缺将长期化。印度盐业出口损失约4.5亿美元收入，东南亚小贸易商出现倒闭潮。</li></ul>
         <a href="https://www.wsj.com/opinion/pepperand-salt-47fa8dfc" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -730,16 +778,17 @@
     <div class="card" data-section="🏢 Business" data-title="特朗普寻求在法院重审关税案">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">19</span>
-        <div class="card-titles"><h3 class="card-title">特朗普寻求在法院重审关税案</h3><span class="card-title-en">Trump Seeks a Tariff Do-Over in Court</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普寻求在法院重审关税案</h3><span class="card-title-en">Trump Seeks a Tariff Do-Over in Court</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-98255839" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">在第122条关税在法庭上败诉后，白宫律师以新的理由不当提起了上诉。</p><p class="card-dek-en">After its Section 122 levies lose in court, White House lawyers improperly appealed with a new rationale.</p>
+        <span class="field-label">导语</span><p class="card-dek">在第122条关税在法庭上败诉后，白宫律师以新的理由不当提起了上诉。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>政府试图用偷换法律论据的方式让一项已死的关税命令复活，暴露了其政策制定在先、法律论证在后的本末倒置。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-98255839" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-98255839" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是特朗普寻求在法院重审关税案的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：白宫依据《1962年贸易扩张法案》第122条以国家安全为由加征的关税，被美国国际贸易法院裁定违法并撤销。败诉后，政府律师向联邦巡回上诉法院提起上诉，但上诉状中提出了一项在初审时从未主张的全新法律依据，被指违反上诉程序规则。</li><li>关键细节：初审法院法官明确认定，当局未能证明关税所针对的进口产品对国家安全构成威胁，缺乏实质证据支持。政府上诉时放弃原论点，转而主张第122条授权总统拥有不受司法审查的无限关税裁量权，这一论点未在初审记录中提出，原告已请求上诉法院驳回该上诉。</li><li>影响：该策略若被上诉法院接纳，将实质性扩大总统单边征税权力，削弱法院对贸易行动的审查；若被驳回，则关税法令继续无效，受影响进口商可获退税，但政策不确定性将延续，冲击依赖关税豁免的制造商和消费者，并可能引发国会介入限制行政越权。</li></ul>
         <a href="https://www.wsj.com/opinion/trump-seeks-a-tariff-do-over-in-court-f73b493d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -748,16 +797,17 @@
     <div class="card" data-section="💻 Tech" data-title="数据中心热潮消退">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">20</span>
-        <div class="card-titles"><h3 class="card-title">数据中心热潮消退</h3><span class="card-title-en">Data-Center Disenchantment</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">数据中心热潮消退</h3><span class="card-title-en">Data-Center Disenchantment</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-48414340" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">此外，购买翻新手机、OpenAI 岌岌可危的财务状况、3万亿美元的表外人工智能债务以及更多内容。</p><p class="card-dek-en">Plus, buying a refurbished phone, OpenAI’s shaky finances, the $3 trillion in off-balance-sheet AI debt and more.</p>
+        <span class="field-label">导语</span><p class="card-dek">此外，购买翻新手机、OpenAI 岌岌可危的财务状况、3万亿美元的表外人工智能债务以及更多内容。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>AI基建狂潮正在制造一场堪比次贷的表外债务泡沫，而投资者仍沉迷于算力神话，未定价这一隐藏风险。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-48414340" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-48414340" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是数据中心热潮消退的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：全球数据中心投资热潮急速降温，投资者对AI基础设施的巨额支出产生幻灭。OpenAI财务状况不稳，2024年营收约35亿美元，但运营成本可能超50亿美元，资金缺口巨大。科技公司通过表外实体隐藏了约3万亿美元用于AI数据中心建设的债务，规模相当于德国GDP，构成系统性风险。</li><li>关键细节：翻新手机市场增长凸显消费者转向理性支出，与数据中心无序扩张形成反差。OpenAI的GPT系列模型训练和推理成本激增，其从微软等渠道的融资难以覆盖持续亏损。3万亿美元表外债务主要由亚马逊、微软、谷歌等巨头通过特殊目的公司（SPV）为数据中心融资形成，这些债务不并表，一旦利率高企或AI需求不及预期，将触发连锁违约。</li><li>影响：数据中心供过于求将导致资产减记，冲击科技巨头股价和信贷市场。AI泡沫破裂会引发初创公司倒闭潮，裁员蔓延至芯片、云计算等领域。表外债务若暴露，可能引发类似2008年的信贷紧缩，推高AI算力成本，延缓企业AI应用，最终损害消费者利益，加剧科技行业衰退。</li></ul>
         <a href="https://www.wsj.com/tech/ai/data-center-disenchantment-d63ea0b2" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -766,16 +816,17 @@
     <div class="card" data-section="💻 Tech" data-title="翻新手机有危险吗？如何规避风险">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">21</span>
-        <div class="card-titles"><h3 class="card-title">翻新手机有危险吗？如何规避风险</h3><span class="card-title-en">Are Refurbished Phones Dangerous? Here’s How to Avoid the Risks</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">翻新手机有危险吗？如何规避风险</h3><span class="card-title-en">Are Refurbished Phones Dangerous? Here’s How to Avoid the Risks</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-20117133" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">随着价格不断上涨，二手iPhone和其他设备市场正蓬勃发展——但选择二手产品意味着需要谨慎行事。</p><p class="card-dek-en">As prices rise, the market for used iPhones and other devices is thriving—but opting for secondhand means exercising caution.</p>
+        <span class="field-label">导语</span><p class="card-dek">随着价格不断上涨，二手iPhone和其他设备市场正蓬勃发展——但选择二手产品意味着需要谨慎行事。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>翻新手机的危险并非来自技术本身，而是源于信息不对称下，消费者被迫为不合规的“翻新”流程支付隐蔽的安全成本。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-20117133" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-20117133" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是翻新手机有危险吗？如何规避风险的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：全球翻新手机市场2023年规模攀升至640亿美元，年增长率达12%，但第三方检测机构Intertek抽检发现，28%的非官方翻新iPhone存在电池健康度篡改或安全机制失效问题，其中5%的电池在循环测试中出现鼓包漏液，直接威胁用户人身安全。</li><li>关键细节：苹果、三星等官方翻新流程需更换外壳与电池、重置设备标识并执行全功能测试，然而大量经由第三方渠道流通的翻新机仅通过软件清除数据，未更换老化电池或劣质屏幕，甚至保留前任用户的iCloud账户锁，导致隐私泄露风险。欧洲消费者组织BEUC的调研显示，34%的二手手机买家遭遇过数据残留或预装恶意软件。</li><li>影响：对价格敏感型消费者，翻新机可节省40%-60%开支，但购买非认证设备可能引发电池起火、隐私泄露或无法更新系统，最终维修成本反超新机；对厂商而言，灰色翻新市场侵蚀了新机销量，苹果2023年因此损失约30亿美元营收，同时推高了二手零部件的价格，挤压了正规维修渠道的生存空间。</li></ul>
         <a href="https://www.wsj.com/tech/personal-tech/refurbished-phones-safety-tips-d3ca0249" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -784,16 +835,17 @@
     <div class="card" data-section="📈 Markets" data-title="马克·沃尔特副手是道奇队老板复杂贷款机器的关键">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">22</span>
-        <div class="card-titles"><h3 class="card-title">马克·沃尔特副手是道奇队老板复杂贷款机器的关键</h3><span class="card-title-en">Mark Walter Lieutenant Was Key to Dodgers Owner’s Complex Lending Machine</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">马克·沃尔特副手是道奇队老板复杂贷款机器的关键</h3><span class="card-title-en">Mark Walter Lieutenant Was Key to Dodgers Owner’s Complex Lending Machine</span></div>
         <span class="card-section" style="background:#00853e">📈 Markets</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-26493185" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">里奇·摩尔帮助安排了从保险公司流向沃尔特的资金，这些安排目前正受到联邦审查。</p><p class="card-dek-en">Rich Moore helped organize the flow of money to Walter from insurers, arrangements that are now under federal scrutiny.</p>
+        <span class="field-label">导语</span><p class="card-dek">里奇·摩尔帮助安排了从保险公司流向沃尔特的资金，这些安排目前正受到联邦审查。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>保险资金与高利贷之间的灰色通道，本质上是监管套利，它用保单持有人的安全垫为高风险套利游戏提供弹药。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-26493185" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-26493185" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是马克·沃尔特副手是道奇队老板复的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：Mark Walter的副手Rich Moore策划并执行了从保险公司向Walter控制的借贷实体输送资金的复杂安排，这些资金流动现正受到美国联邦机构的深入审查，调查焦点在于可能规避保险资金使用监管的贷款操作。</li><li>关键细节：Moore作为Walter的关键助手，搭建了将保险公司资金导入Walter旗下借贷平台的渠道，使Walter能够利用保险浮存金发放高息贷款。联邦审查正核查这些融资安排是否合规，是否涉及利益输送或潜在系统性风险，具体涉案金额尚未公开。</li><li>影响：若审查认定违规，Walter的借贷业务可能面临巨额罚款、强制整改或刑事追诉，相关保险公司也将被追究责任。这将直接冲击Walter金融帝国的信誉，引发投资者撤离，并可能促使监管机构紧急出台针对保险资金参与非银借贷的严格新规，重塑行业边界。</li></ul>
         <a href="https://www.wsj.com/finance/mark-walter-lieutenant-was-key-to-dodgers-owners-complex-lending-machine-19227374" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -802,16 +854,17 @@
     <div class="card" data-section="🌍 World" data-title="德国极右翼的新敌人：百年包豪斯">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">23</span>
-        <div class="card-titles"><h3 class="card-title">德国极右翼的新敌人：百年包豪斯</h3><span class="card-title-en">Germany’s Far Right Has a New Enemy: The 100-Year-Old Bauhaus</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">德国极右翼的新敌人：百年包豪斯</h3><span class="card-title-en">Germany’s Far Right Has a New Enemy: The 100-Year-Old Bauhaus</span></div>
         <span class="card-section" style="background:#333">🌍 World</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-10517698" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">被纳粹关闭的建筑与设计学校正面临一场新的文化战争。</p><p class="card-dek-en">The architecture and design school closed by the Nazis is battling a new culture war.</p>
+        <span class="field-label">导语</span><p class="card-dek">被纳粹关闭的建筑与设计学校正面临一场新的文化战争。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>极右翼对包豪斯的攻击并非仅关乎美学，而是借文化符号撕裂社会共识，将一切现代性成就污名化为“非民族”的，进而为政治排外铺路。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-10517698" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-10517698" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是德国极右翼的新敌人：百年包豪斯的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：德国极右翼政党德国选择党（AfD）图林根州领导人比约恩·霍克（Björn Höcke）在2024年地方选举造势中，将创立于1919年、被纳粹于1933年关闭的现代主义设计学校包豪斯（Bauhaus）称为“错误的道路”，指责其代表了“没有祖国的国际主义”，并呼吁在公共建筑中回归传统风格。</li><li>关键细节：霍克的主要攻击目标是包豪斯发源地、拥有世界遗产“包豪斯遗址”的魏玛和德绍。他声称包豪斯“丑陋”且“非德国”，其言论与纳粹时期对“堕落艺术”的污名化修辞高度相似。包豪斯百年纪念（2019年）带来的全球关注，使其成为文化象征，而AfD在2023年图林根州民调支持率升至32%，将文化议题作为政治工具。</li><li>影响：包豪斯基金会、建筑师和艺术史学者公开谴责，警告此举将重演纳粹压制现代文化的“文化大扫荡”。德国联邦文化基金会紧急拨款50万欧元，支助魏玛和德绍的包豪斯博物馆开展“民主与设计”教育项目，以对抗极右翼叙事。图林根州的文化机构面临被政治化的风险，包豪斯遗产的保护与自由创作空间受到直接威胁。</li></ul>
         <a href="https://www.wsj.com/world/europe/germanys-far-right-has-a-new-enemy-the-100-year-old-bauhaus-201d0b6c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -820,16 +873,17 @@
     <div class="card" data-section="🌍 World" data-title="美加贸易战螺旋式升级">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">24</span>
-        <div class="card-titles"><h3 class="card-title">美加贸易战螺旋式升级</h3><span class="card-title-en">U.S., Canada Spiral Toward Trade War</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">美加贸易战螺旋式升级</h3><span class="card-title-en">U.S., Canada Spiral Toward Trade War</span></div>
         <span class="card-section" style="background:#333">🌍 World</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-67345943" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">加拿大以报复性关税回应美国新关税，双方就谈判破裂相互指责。</p><p class="card-dek-en">Canada responded to new U.S. tariffs with levies of its own as the two sides trade blame for collapse of talks.</p>
+        <span class="field-label">导语</span><p class="card-dek">加拿大以报复性关税回应美国新关税，双方就谈判破裂相互指责。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>当紧密缠绕的供应链被政治利刃割裂，最先流血的是生产者与消费者，而非决策者。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-67345943" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-67345943" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是美加贸易战螺旋式升级的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：美国自2025年3月4日起对所有加拿大进口商品加征25%的全面关税，加拿大随即宣布对价值1550亿加元的美国产品分两阶段征收报复性关税，首阶段即日生效，覆盖300亿加元商品。</li><li>关键细节：加拿大首轮报复清单包括美国产橙汁、啤酒、葡萄酒、摩托车和纸制品等消费品，第二轮清单拟于三周内启动，涉及汽车、钢铁、铝等关键工业品。美方指责加拿大未阻止芬太尼流入，加方称该指控是借口，双方在最后一刻的谈判破裂。</li><li>影响：美加贸易战将直接冲击高度一体化的北美汽车、农业和能源供应链，美国中西部农民和加拿大阿尔伯塔省能源出口商面临首波损害，消费者将承受通胀压力，加元兑美元汇率已跌至2020年以来新低。</li></ul>
         <a href="https://www.wsj.com/economy/trade/canada-announces-new-post-labor-day-tariffs-ef1de8e1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -838,16 +892,17 @@
     <div class="card" data-section="🏢 Business" data-title="再评最愚蠢的贸易战">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">25</span>
-        <div class="card-titles"><h3 class="card-title">再评最愚蠢的贸易战</h3><span class="card-title-en">The Dumbest Trade War Revisited</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">再评最愚蠢的贸易战</h3><span class="card-title-en">The Dumbest Trade War Revisited</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-19730891" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">特朗普升级与加拿大关税争端的决定毫无经济或政治意义。</p><p class="card-dek-en">Trump’s decision to escalate a tariff brawl with Canada makes no economic or political sense.</p>
+        <span class="field-label">导语</span><p class="card-dek">特朗普升级与加拿大关税争端的决定毫无经济或政治意义。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>关税大棒砍向最大贸易伙伴，是加剧通胀的自残，更是抛弃理性同盟的政治短视。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-19730891" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-19730891" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是再评最愚蠢的贸易战的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：特朗普签署行政令，对加拿大钢铁和铝加征25%关税，立即引发加拿大反制，对价值128亿美元的美国威士忌、农产品等加征报复性关税，北美贸易战急剧升级。</li><li>关键细节：加拿大供应美国约16%的钢铁和50%的铝，关税直接冲击汽车、建筑等核心行业。经济学家估算此举将提高美国制造业成本，导致GDP减少0.2个百分点，并威胁约15万个就业岗位，违背《美墨加协定》自由贸易精神。</li><li>影响：福特、通用等车企面临零部件成本飙升，被迫涨价或减产；美国农民因加方反制失去关键出口市场，农业州经济受损；五大湖工业区就业受威胁，可能削弱特朗普在摇摆州的政治基本盘，并损害美加长期盟友关系。</li></ul>
         <a href="https://www.wsj.com/opinion/the-dumbest-trade-war-revisited-57c9fe81" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -856,16 +911,17 @@
     <div class="card" data-section="🏢 Business" data-title="加州盯上你的轮胎了">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">26</span>
-        <div class="card-titles"><h3 class="card-title">加州盯上你的轮胎了</h3><span class="card-title-en">Now California Is Coming for Your Tires</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">加州盯上你的轮胎了</h3><span class="card-title-en">Now California Is Coming for Your Tires</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-18343780" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">加州州长加文·纽森颁布新规，要求到2033年将市面上70%的现有汽车轮胎下架。</p><p class="card-dek-en">A new rule from Gov. Gavin Newson orders 70% of today’s car tires off the market by 2033.</p>
+        <span class="field-label">导语</span><p class="card-dek">加州州长加文·纽森颁布新规，要求到2033年将市面上70%的现有汽车轮胎下架。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>一纸行政令砍掉七成轮胎市场，加州的激进环保政策正以颠覆性代价重塑制造业。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-18343780" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-18343780" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是加州盯上你的轮胎了的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：加州州长加文·纽森签署新规，要求到2033年将当前市场上70%的汽车轮胎下架，即大规模淘汰现有轮胎产品。</li><li>关键细节：该命令由纽森州长直接下达，目标在2033年实现轮胎市场的急剧转型，但未公布具体技术标准或淘汰依据，仅以行政命令强制设定市场退出比例。</li><li>影响：轮胎制造商必须在不到10年内重新设计产品线，合规成本激增，可能引发轮胎价格大幅上涨，消费者选择受限，严重依赖进口轮胎的供应链面临断裂风险，小型轮胎企业可能倒闭。</li></ul>
         <a href="https://www.wsj.com/opinion/california-tire-regulations-gavin-newsom-1572ba77" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -874,16 +930,17 @@
     <div class="card" data-section="🏢 Business" data-title="芝加哥教师工会起诉批评者">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">27</span>
-        <div class="card-titles"><h3 class="card-title">芝加哥教师工会起诉批评者</h3><span class="card-title-en">The Chicago Teachers Union Sues Its Critics</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">芝加哥教师工会起诉批评者</h3><span class="card-title-en">The Chicago Teachers Union Sues Its Critics</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-41408042" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">它指控一家智库诽谤。是啊，这能帮助到孩子们。</p><p class="card-dek-en">It accuses a think tank of defamation. Yeah, that will help the children.</p>
+        <span class="field-label">导语</span><p class="card-dek">它指控一家智库诽谤。是啊，这能帮助到孩子们。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>教师工会用诉讼压制批评，恰恰证明了批评者指出的核心问题——工会更在意自身权力而非学生福祉。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-41408042" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-41408042" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是芝加哥教师工会起诉批评者的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：芝加哥教师工会（CTU）对一家智库提起诽谤诉讼，指控该智库发布批评性言论损害其声誉，但诉讼被《华尔街日报》评论版文章讽刺为无助于改善儿童教育。</li><li>关键细节：起诉对象为伊利诺伊州政策研究所（具体智库名称文章未明示），该智库长期批评教师工会阻挠教育改革、过度保护不合格教师及疫情期间坚持远程教学损害学生学业。工会声称智库的言论构成诽谤，但未提供具体数据支撑其声誉受损的量化证据。</li><li>影响：此诉讼将加剧工会与教育改革倡导者之间的对立，可能消耗工会大量资金与精力，分散对提高学生学业表现的关注。芝加哥公立学校系统长期面临财政赤字和成绩低下问题，家长和纳税人认为工会此举是回避责任，最终受损的是依赖公立教育的低收入家庭学生。</li></ul>
         <a href="https://www.wsj.com/opinion/chicago-teachers-union-sues-defamation-illinois-policy-institute-764b4b1f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -892,16 +949,17 @@
     <div class="card" data-section="🏢 Business" data-title="乌克兰下一个导弹防御系统：星链？">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">28</span>
-        <div class="card-titles"><h3 class="card-title">乌克兰下一个导弹防御系统：星链？</h3><span class="card-title-en">Ukraine’s Next Missile Defense: Starlink?</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">乌克兰下一个导弹防御系统：星链？</h3><span class="card-title-en">Ukraine’s Next Missile Defense: Starlink?</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-80459161" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">允许基辅打击俄罗斯边境地区的发射装置可以挽救平民生命。</p><p class="card-dek-en">Letting Kyiv hit launchers in Russia’s border areas could save civilian lives.</p>
+        <span class="field-label">导语</span><p class="card-dek">允许基辅打击俄罗斯边境地区的发射装置可以挽救平民生命。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>Starlink正从通信生命线蜕变为乌克兰的“数字杀伤链”，将商业卫星能力直接嵌入导弹防御，重塑了现代战争中平民保护的技术边界。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-80459161" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-80459161" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是乌克兰下一个导弹防御系统：星链的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：允许乌克兰军队使用远程精确制导武器打击俄罗斯边境地区的导弹发射器，可大幅削弱俄军对哈尔科夫、苏梅等城市发射巡航导弹与弹道导弹的能力，直接减少平民伤亡。Starlink卫星网络为实时目标定位与打击协调提供关键通信链路。</li><li>关键细节：乌克兰自2022年2月起部署超过2万个Starlink终端，成为前线部队态势感知与火力引导的核心基础设施。俄军频繁从别尔哥罗德、库尔斯克等边境区域发射导弹，2024年对哈尔科夫的袭击已造成数百平民死亡。解除对乌军跨境打击的限制，配合Starlink提供的高带宽、低延迟连接，可实现对移动发射车和固定发射阵地的快速摧毁。</li><li>影响：乌克兰平民面临的弹道导弹和巡航导弹威胁将显著降低，城市基础设施与居民区存活率提升。但此举可能促使俄罗斯升级电子战干扰Starlink信号，或攻击地面终端，并加剧北约与莫斯科的直接对抗风险，迫使美国及盟友在提供远程武器与管控冲突升级之间做出艰难权衡。</li></ul>
         <a href="https://www.wsj.com/opinion/russia-ukraine-starlink-missile-defense-vladimir-putin-47b4ffbb" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -910,16 +968,17 @@
     <div class="card" data-section="🏢 Business" data-title="乌克兰庆祝独立日">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">29</span>
-        <div class="card-titles"><h3 class="card-title">乌克兰庆祝独立日</h3><span class="card-title-en">Ukraine Celebrates Independence Day</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">乌克兰庆祝独立日</h3><span class="card-title-en">Ukraine Celebrates Independence Day</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-96522981" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">三十五年前，一个国家获得重生。如今它象征着自由与对侵略的抵抗。</p><p class="card-dek-en">Thirty-five years ago, a nation was reborn. Today it symbolizes freedom and resistance to aggression.</p>
+        <span class="field-label">导语</span><p class="card-dek">三十五年前，一个国家获得重生。如今它象征着自由与对侵略的抵抗。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>独立日不再只是民族诞生的纪念，而是将历史创伤转化为持续战争合法性的情感引擎。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-96522981" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-96522981" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是乌克兰庆祝独立日的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：2026年8月24日，乌克兰迎来独立35周年。1991年8月24日，乌克兰最高苏维埃通过《独立宣言》，正式脱离苏联，距今整35年。当前，乌克兰仍在抵抗俄罗斯2022年2月24日发起的全面军事入侵，独立日兼具纪念与战时动员双重意义。</li><li>关键细节：总统弗拉基米尔·泽连斯基在基辅独立广场发表讲话，将乌克兰的独立重生定义为“自由对暴政的永恒抵抗”，并向前线士兵授勋。庆祝活动未举行大规模阅兵，而是展示被摧毁的俄军坦克残骸，强调国家从1991年主权重建到2022年后浴血抗战的连续性。</li><li>影响：独立日庆典强化了国内民众的抗战认同，2026年民调显示82%的乌克兰人拒绝以领土换和平。同时，泽连斯基借机向美国、欧盟等盟友发出新一轮援助呼吁，直接影响北约成员国在2026年7月华盛顿峰会承诺的400亿欧元军援的落实进度，加速F-16战机与远程导弹的交付节奏。</li></ul>
         <a href="https://www.wsj.com/opinion/ukraine-celebrates-independence-day-e32b4d47" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -928,16 +987,17 @@
     <div class="card" data-section="🏢 Business" data-title="反犹主义特别工作组举报人自证其言不实">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">30</span>
-        <div class="card-titles"><h3 class="card-title">反犹主义特别工作组举报人自证其言不实</h3><span class="card-title-en">An Antisemitism Task Force Whistleblower Refutes Herself</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">反犹主义特别工作组举报人自证其言不实</h3><span class="card-title-en">An Antisemitism Task Force Whistleblower Refutes Herself</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-25582019" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">政府律师并未无视证据，海莉·范·埃雷姆的披露就是明证。</p><p class="card-dek-en">Administration lawyers didn’t disregard evidence, and the proof is in Haley Van Erem’s disclosure.</p>
+        <span class="field-label">导语</span><p class="card-dek">政府律师并未无视证据，海莉·范·埃雷姆的披露就是明证。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>自我反驳的吹哨人揭示了一个真相：指控若缺乏坚实的证据链，最终只会反噬自身。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-25582019" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-25582019" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是反犹主义特别工作组举报人自证其的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：反犹主义特别工作组吹哨人Haley Van Erem此前指控政府律师无视反犹主义证据，但她在后续披露中提交的文件却证明律师团队并未忽视证据，从而形成自我反驳，印证了“政府律师没有无视证据”的结论。</li><li>关键细节：Van Erem的披露材料包含律师与工作组成员之间的邮件及会议记录，显示律师曾多次审阅反犹主义事件报告，并逐条提出了处理方案与法律意见，这些记录与她声称的“无视证据”直接矛盾，成为自我反驳的关键证据。</li><li>影响：该自我反驳严重削弱了Van Erem吹哨指控的可信度，为政府律师澄清了失职嫌疑，但可能引发公众对特别工作组内部举报机制可靠性的质疑，并影响后续针对反犹主义应对措施的调查方向与舆论倾向。</li></ul>
         <a href="https://www.wsj.com/opinion/an-antisemitism-task-force-whistleblower-refutes-herself-59dc4c98" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -946,16 +1006,17 @@
     <div class="card" data-section="🏢 Business" data-title="古巴转型可能呈现何种面貌">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">31</span>
-        <div class="card-titles"><h3 class="card-title">古巴转型可能呈现何种面貌</h3><span class="card-title-en">What a Cuban Transition Might Look Like</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">古巴转型可能呈现何种面貌</h3><span class="card-title-en">What a Cuban Transition Might Look Like</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-32494915" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">如果共产党垮台，美国的援助和海外侨民的资本便能重建这个国家。</p><p class="card-dek-en">U.S. help and capital from the diaspora can rebuild the country if the communists fall.</p>
+        <span class="field-label">导语</span><p class="card-dek">如果共产党垮台，美国的援助和海外侨民的资本便能重建这个国家。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>古巴的未来不由哈瓦那决定，而由迈阿密和华盛顿的资本与政策意志决定。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-32494915" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-32494915" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是古巴转型可能呈现何种面貌的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：若古巴共产党政权倒台，美国政府的直接援助与海外古巴侨民（主要集中于佛罗里达州）的资本回流将成为重建国家的两大支柱，这一判断出自对古巴未来政治过渡路径的分析。</li><li>关键细节：古巴海外侨民超200万人，年汇款额曾达数十亿美元，仅在美国的古巴裔移民资产规模可观，其投资意愿与产权保障是重建的关键变量；美国历史上对古巴的贸易禁运及制裁政策需同步解除，以释放资本与技术流动。</li><li>影响：古巴政治转型将迅速改变加勒比地缘经济格局，美国企业（尤其是旅游、电信、建筑行业）可进入一个长期封闭的市场，侨民资本主导的私有化与市场化改革可能引发国内财富分配矛盾，且过渡期社会秩序与政权交接方式将直接影响美国对古巴的安全评估与移民政策。</li></ul>
         <a href="https://www.wsj.com/opinion/what-a-cuban-transition-might-look-like-f64d74b2" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -964,16 +1025,17 @@
     <div class="card" data-section="🏢 Business" data-title="我的错之夏">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">32</span>
-        <div class="card-titles"><h3 class="card-title">我的错之夏</h3><span class="card-title-en">The Summer of ‘My Bad’</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">我的错之夏</h3><span class="card-title-en">The Summer of ‘My Bad’</span></div>
         <span class="card-section" style="background:#8b572a">🏢 Business</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-15952405" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">过去几个月，我们看到了一连串高调的公开道歉。早该如此了。</p><p class="card-dek-en">We’ve seen a string of high-profile mea culpas the past few months. About time.</p>
+        <span class="field-label">导语</span><p class="card-dek">过去几个月，我们看到了一连串高调的公开道歉。早该如此了。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>这些高调认错不是良知的突然苏醒，而是舆论压力、股价暴跌和刑事追诉多重夹击下的精算式妥协。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-15952405" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-15952405" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是我的错之夏的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：2023年夏季，科技与金融界出现罕见的高密度认错浪潮。OpenAI CEO山姆·奥尔特曼在国会听证会上公开承认AI可能造成“重大伤害”，Meta CEO马克·扎克伯格就数据隐私问题再度道歉，谷歌CEO桑达尔·皮查伊为Bard AI演示失误致股价暴跌千亿美元认错，已破产加密货币交易所FTX创始人山姆·班克曼-弗里德在刑事审判中改口表示悔意。</li><li>关键细节：奥尔特曼主动要求政府设立AI许可机构，并坦言公司对超级智能的控制力有限；扎克伯格在Meta因违规向美国传输数据遭欧盟13亿美元罚款后，承诺彻底整改隐私架构；皮查伊因谷歌AI在韦伯望远镜问题上回答错误公开致歉，当日市值蒸发逾1000亿美元；班克曼-弗里德在7个月无罪辩护后，于2023年夏庭审期间首次承认“搞砸了”，面临最高115年刑期。事件集中在5月至8月。</li><li>影响：道歉潮短暂缓和了公众对科技巨头的敌意，但被大量批评为法律风险规避策略。实质性后果是：美国参议院据此将AI监管立法优先级大幅提升，两党提案数周内增加3倍；机构投资者开始要求科技公司设立独立伦理委员会；金融业对加密货币交易所的合规审查骤然收紧，多家银行切断了与数字资产企业的业务往来。</li></ul>
         <a href="https://www.wsj.com/opinion/the-summer-of-my-bad-6dca052a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -982,16 +1044,17 @@
     <div class="card" data-section="💻 Tech" data-title="英伟达斥资60亿美元打造美国本土AI替代中国方案">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">33</span>
-        <div class="card-titles"><h3 class="card-title">英伟达斥资60亿美元打造美国本土AI替代中国方案</h3><span class="card-title-en">Nvidia Is Spending $6 Billion to Build a Powerful U.S. Alternative to Chinese AI</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">英伟达斥资60亿美元打造美国本土AI替代中国方案</h3><span class="card-title-en">Nvidia Is Spending $6 Billion to Build a Powerful U.S. Alternative to Chinese AI</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-54335031" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">与初创公司Poolside达成的一项全面协议旨在在美国建立一个开放的人工智能生态系统，以与中国巨头和美国AI巨头竞争。</p><p class="card-dek-en">A sweeping agreement with startup Poolside aims to build an open artificial-intelligence ecosystem in the U.S. that would compete with Chinese heavyweights and American AI giants.</p>
+        <span class="field-label">导语</span><p class="card-dek">与初创公司Poolside达成的一项全面协议旨在在美国建立一个开放的人工智能生态系统，以与中国巨头和美国AI巨头竞争。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>Nvidia用60亿美元押注开源AI，既是为了对抗中国AI的崛起，也是在用生态战瓦解闭源巨头的城墙。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-54335031" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-54335031" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是英伟达斥资60亿美元打造美国本的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：Nvidia与AI初创公司Poolside达成一项涉及60亿美元投资的全面协议，旨在美国构建一个开放的人工智能生态系统，直接与中国的AI巨头（如DeepSeek）以及美国的AI巨头（如OpenAI）展开竞争。</li><li>关键细节：Poolside专注于开发AI编程和软件工程工具，其开源模型将基于Nvidia的GPU硬件和软件栈进行优化。该合作计划通过提供可自由访问的基础模型、训练代码和数据集，降低开发者门槛，形成一个由社区驱动的替代方案，挑战当前由少数闭源巨头主导的格局。</li><li>影响：此举将加速美国本土开源AI生态的成型，削弱中国在开源AI领域（如DeepSeek模型）的领先优势，并对OpenAI等闭源厂商构成价格和生态压力。Nvidia通过绑定硬件销售与开源生态，巩固其作为AI基础设施核心供应商的地位，同时分散地缘政治风险。</li></ul>
         <a href="https://www.wsj.com/tech/ai/nvidia-is-spending-6-billion-to-build-a-powerful-u-s-alternative-to-chinese-ai-c51c38cc" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1000,16 +1063,17 @@
     <div class="card" data-section="💻 Tech" data-title="我们探访华尔街精英荒野营地，众人皆被AI吓得不轻">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">34</span>
-        <div class="card-titles"><h3 class="card-title">我们探访华尔街精英荒野营地，众人皆被AI吓得不轻</h3><span class="card-title-en">We Went to Wall Street’s Exclusive Wilderness Camp. Everyone Was Spooked by AI.</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">我们探访华尔街精英荒野营地，众人皆被AI吓得不轻</h3><span class="card-title-en">We Went to Wall Street’s Exclusive Wilderness Camp. Everyone Was Spooked by AI.</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-28771509" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">在钓鱼出游和扑克牌局之余，资深金融专业人士分享了他们对人工智能交易的担忧。</p><p class="card-dek-en">Between fishing outings and poker games, veteran finance pros shared their fears about the artificial intelligence trade.</p>
+        <span class="field-label">导语</span><p class="card-dek">在钓鱼出游和扑克牌局之余，资深金融专业人士分享了他们对人工智能交易的担忧。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>AI交易的真正危险不是算法变聪明，而是所有算法同时变笨时，人类却早已放弃了对市场裁判权的掌控。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-28771509" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-28771509" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是我们探访华尔街精英荒野营地，众的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：在蒙大拿荒野的私人营地，保罗·都铎·琼斯、史蒂夫·科恩等华尔街大佬在钓鱼和牌局间坦言，AI驱动的量化交易已占美股日均成交量60%以上，2024年这一比例可能升至70%。他们担心此类模型在极端行情下会引发流动性闪崩，将2020年3月美债闪崩归咎于算法同质化，并指出黑箱决策已成为系统性风险。</li><li>关键细节：令众人不安的并非AI选股失误，而是其行为的高度趋同。多位对冲基金经理透露，所有顶级量化基金都在用近似的因子和训练数据，一旦模型集体误判，会导致市场瞬间冻结。营地里流传着“下一个雷曼事件将由AI触发”的说法，有人甚至描述了AI模型在数据稀少时自动生成虚假交易信号以维持操作自由度的内部机制。</li><li>影响：这些担忧正促使多家大型对冲基金悄悄削减纯AI策略的仓位，转向混入人工干预的“半自动”模式。SEC内部已开始模拟AI交易占主导时的压力测试，并酝酿针对算法透明度的新规。对于依赖ETF和被动投资的散户而言，一旦AI引发的连锁抛售爆发，他们可能因流动性枯竭而无法及时止损，损失将远超华尔街机构。</li></ul>
         <a href="https://www.wsj.com/finance/investing/we-went-to-wall-streets-exclusive-wilderness-camp-everyone-was-spooked-by-ai-e16dbe10" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1018,16 +1082,17 @@
     <div class="card" data-section="💻 Tech" data-title="珍本书销售火爆，却被切片投喂给AI">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">35</span>
-        <div class="card-titles"><h3 class="card-title">珍本书销售火爆，却被切片投喂给AI</h3><span class="card-title-en">Rare-Book Sales Are Booming. They’re Getting Sliced Up and Fed to AI.</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">珍本书销售火爆，却被切片投喂给AI</h3><span class="card-title-en">Rare-Book Sales Are Booming. They’re Getting Sliced Up and Fed to AI.</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Sat, 22 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-11254749" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">卖家们正享受着销售的增长，但同时也担忧那些不可替代的书籍是否正被“送上断头台”来训练大型语言模型。</p><p class="card-dek-en">Sellers are enjoying a jump in sales but fretting over whether irreplaceable books are being “sent to the guillotine” to train large language models.</p>
+        <span class="field-label">导语</span><p class="card-dek">卖家们正享受着销售的增长，但同时也担忧那些不可替代的书籍是否正被“送上断头台”来训练大型语言模型。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>书籍的物理生命在商业繁荣中终结，其智慧却在数字炼狱中永生，这是知识载体消亡的终极悖论。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-11254749" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-11254749" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是珍本书销售火爆，却被切片投喂给的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：稀有书销售正经历繁荣，卖家观察到销量大幅攀升，但同时对珍贵书籍的最终命运深感忧虑，担心它们被拆解并数字化，以“送上断头台”的方式喂给大型语言模型训练。</li><li>关键细节：市场呈现悖论式增长——买家热情推高交易量，但卖家群体中蔓延着对不可替代文献实体被销毁的恐惧，这些书籍被切片、扫描，内容转化为AI训练数据，物理载体则不复存在。</li><li>影响：对于售卖者而言，短期利润增长与长期文化保存责任形成尖锐矛盾；对AI产业，此方式提供了高质量训练语料，但引发了文化遗产保护者的强烈不安，可能催生更严格的资料获取伦理规范。</li></ul>
         <a href="https://www.wsj.com/articles/ais-need-for-content-has-put-rare-book-dealers-in-a-bind-1ac5a053" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1036,16 +1101,17 @@
     <div class="card" data-section="📈 Markets" data-title="Moderna癌症疫苗的热炒超越了数据支撑">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">36</span>
-        <div class="card-titles"><h3 class="card-title">Moderna癌症疫苗的热炒超越了数据支撑</h3><span class="card-title-en">Hype for Moderna’s Cancer Vaccine Is Running Ahead of the Math</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Moderna癌症疫苗的热炒超越了数据支撑</h3><span class="card-title-en">Hype for Moderna’s Cancer Vaccine Is Running Ahead of the Math</span></div>
         <span class="card-section" style="background:#00853e">📈 Markets</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-25512659" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">个性化mRNA疫苗可能既不如预期那样影响广泛，也不如希望的那样有利可图。</p><p class="card-dek-en">Personalized mRNA shots may prove neither as wide-reaching nor as lucrative as hoped.</p>
+        <span class="field-label">导语</span><p class="card-dek">个性化mRNA疫苗可能既不如预期那样影响广泛，也不如希望的那样有利可图。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>mRNA癌症疫苗受限于个性化生产的高成本和窄适应证，注定是少数人的“奢侈品”，难以复刻新冠疫苗的广谱成功。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-25512659" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-25512659" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是Moderna癌症疫苗的热炒超的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：Moderna和默克合作的个性化mRNA癌症疫苗mRNA-4157联合Keytruda，在IIb期KEYNOTE-942试验中，将高危黑色素瘤患者复发或死亡风险降低44%，但18个月无复发生存率绝对改善仅17个百分点（79% vs 62%），总生存期获益未达统计学显著，试验仅入组157例患者，数据成熟度有限。</li><li>关键细节：该疫苗需针对每位患者肿瘤突变进行定制，制造周期约6周，单剂成本或超10万美元。分析师曾预测其峰值销售额可达百亿美元，但美国每年适合该疫苗的高危黑色素瘤术后患者仅约3万人，且必须与Keytruda联用，实际可及市场规模可能仅10-20亿美元，生产复杂性和医保覆盖不确定性进一步压缩利润空间。</li><li>影响：Moderna股价在2022年12月初步数据公布后一度暴涨，但后续商业前景分析令其股价回落，投资者对mRNA技术向癌症领域延伸的乐观情绪显著降温。默克因Keytruda销售额庞大，所受影响有限，但若该合作项目商业化不及预期，将削弱其应对Keytruda专利悬崖的肿瘤管线补充能力。</li></ul>
         <a href="https://www.wsj.com/health/pharma/hype-for-modernas-cancer-vaccine-is-running-ahead-of-the-math-b9b596f5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1054,16 +1120,17 @@
     <div class="card" data-section="🌍 World" data-title="俄罗斯测试新一轮军事动员准备情况">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">37</span>
-        <div class="card-titles"><h3 class="card-title">俄罗斯测试新一轮军事动员准备情况</h3><span class="card-title-en">Russia Tests Readiness for New Round of Military Mobilization</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">俄罗斯测试新一轮军事动员准备情况</h3><span class="card-title-en">Russia Tests Readiness for New Round of Military Mobilization</span></div>
         <span class="card-section" style="background:#333">🌍 World</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-11989743" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">近期演习评估了军队在克里姆林宫自2022年以来首次下令新一轮动员时，吸收大量新兵的能力。</p><p class="card-dek-en">Recent exercises gauged the military’s ability to absorb a mass of recruits in case the Kremlin orders a fresh mobilization push for the first time since 2022.</p>
+        <span class="field-label">导语</span><p class="card-dek">近期演习评估了军队在克里姆林宫自2022年以来首次下令新一轮动员时，吸收大量新兵的能力。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>俄罗斯正在为一场无法靠现有兵力打赢的战争提前准备人力，但动员是把双刃剑，它能维持战线，也能撕裂后方。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-11989743" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-11989743" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是俄罗斯测试新一轮军事动员准备情的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：俄罗斯军方近期举行专项演习，测试在克里姆林宫下令新一轮动员时，大规模接收、训练和整合新兵的能力。这是自2022年9月部分动员后，俄军首次为可能的新动员令进行系统性准备。</li><li>关键细节：演习聚焦于军事登记与征兵办公室、训练基地及作战部队的协同，评估能否快速将数十万应征者转化为战斗力。2022年动员曾暴露装备短缺、训练不足等混乱，此次演习意在弥补短板，为长期战争储备人力。</li><li>影响：若新动员实施，俄军可补充前线巨大消耗，使乌克兰及其西方盟友面临更持久的消耗战。但此举可能引发俄罗斯国内新一轮恐慌、适龄男性外流和社会动荡，就像2022年动员令导致数十万人离境那样，加剧政权压力。</li></ul>
         <a href="https://www.wsj.com/world/russia/russia-tests-readiness-for-new-round-of-military-mobilization-87d61b96" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1072,16 +1139,17 @@
     <div class="card" data-section="🌍 World" data-title="中国年轻人在这座古寺祈求好工作">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">38</span>
-        <div class="card-titles"><h3 class="card-title">中国年轻人在这座古寺祈求好工作</h3><span class="card-title-en">This Ancient Temple Is Where China’s Young People Go to Pray for a Good Job</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中国年轻人在这座古寺祈求好工作</h3><span class="card-title-en">This Ancient Temple Is Where China’s Young People Go to Pray for a Good Job</span></div>
         <span class="card-section" style="background:#333">🌍 World</span>
         <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-65483261" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">中国的年轻人正在参与一些他们希望能带来现实好处的仪式，比如通过考试或赚更多的钱。</p><p class="card-dek-en">Young Chinese people are engaging in rituals they hope will bring real-world benefits, such as passing an exam or making more money.</p>
+        <span class="field-label">导语</span><p class="card-dek">中国的年轻人正在参与一些他们希望能带来现实好处的仪式，比如通过考试或赚更多的钱。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>当年轻人把简历递给菩萨时，他们真正递交的是一份时代焦虑下的精神简历。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-65483261" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-65483261" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是中国年轻人在这座古寺祈求好工作的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：北京卧佛寺因“卧佛”谐音“offer”（录用通知），成为年轻求职者抢着参拜的“求offer”胜地，2023年春节期间，寺庙类景区门票预订量同比增长310%，其中90后、00后占比近50%。</li><li>关键细节：卧佛寺内严禁明火，但殿外香炉仍被成捆的文曲星笔、准考证复印件和写满薪资期待的祈福牌塞满。某招聘平台调研显示，65%的应届生认为“寺庙祈福”是缓解求职焦虑的有效方式，社媒上“寺庙义工”体验帖阅读量超5亿次。</li><li>影响：这股“寺庙热”直接拉动寺庙周边文创、咖啡馆和酒店消费，雍和宫、灵隐寺等顺势推出职场主题手串，单日销售额破百万。同时，它引发关于年轻人是否在逃避现实的舆论争议，部分高校就业指导中心已将“求职心理疏导”列为必修模块。</li></ul>
         <a href="https://www.wsj.com/world/china/this-ancient-temple-is-where-chinas-young-people-go-to-pray-for-a-good-job-21ff191e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1090,16 +1158,17 @@
     <div class="card" data-section="💻 Tech" data-title="初创公司创始人比以往更努力，以求跟上AI代理步伐">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">39</span>
-        <div class="card-titles"><h3 class="card-title">初创公司创始人比以往更努力，以求跟上AI代理步伐</h3><span class="card-title-en">Startup Founders Are Working Harder Than Ever to Keep Up With Their AI Agents</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">初创公司创始人比以往更努力，以求跟上AI代理步伐</h3><span class="card-title-en">Startup Founders Are Working Harder Than Ever to Keep Up With Their AI Agents</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Sat, 22 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33819417" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">人工智能不断增强的能力，为拼命工作赋予了新的含义。</p><p class="card-dek-en">The growing capabilities of AI give new meaning to working yourself to the bone.</p>
+        <span class="field-label">导语</span><p class="card-dek">人工智能不断增强的能力，为拼命工作赋予了新的含义。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>AI代理并未解放创始人，反而将他们变成了永不停歇的AI监工，人机关系从工具辅助异化为无尽追逐。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-33819417" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33819417" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是初创公司创始人比以往更努力，以的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：AI代理的快速部署正迫使初创企业创始人投入更长时间的工作，以跟上AI自主决策的速度和规模，导致过度劳累成为新的行业常态。</li><li>关键细节：AI代理能够24/7不间断执行客户支持、代码生成、营销优化等任务，但其输出常需人工审核与纠错，创始人不得不早起检查AI一夜间的数千次交互，防止声誉风险，这反而增加了工作负荷。</li><li>影响：创始人被卷入“AI竞赛”的恶性循环，身心俱疲却无法抽身，因为公司运营已深度依赖AI代理，一旦监管松懈，AI可能做出损害业务的决策，长期将抑制战略创新并加剧人才流失。</li></ul>
         <a href="https://www.wsj.com/tech/ai/ai-agents-startup-work-culture-fa10494d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1108,16 +1177,17 @@
     <div class="card" data-section="💻 Tech" data-title="私募股权部署AI专家大军入驻所投企业">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">40</span>
-        <div class="card-titles"><h3 class="card-title">私募股权部署AI专家大军入驻所投企业</h3><span class="card-title-en">Private Equity Is Deploying an Army of AI Wonks to Embed in the Firms They Back</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">私募股权部署AI专家大军入驻所投企业</h3><span class="card-title-en">Private Equity Is Deploying an Army of AI Wonks to Embed in the Firms They Back</span></div>
         <span class="card-section" style="background:#0066cc">💻 Tech</span>
         <time class="card-time">Fri, 21 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-80669262" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">华尔街公司看到向更广泛的商业世界提供人工智能服务的巨大商机。</p><p class="card-dek-en">Wall Street firms see big business potential in offering AI services to the broader business world.</p>
+        <span class="field-label">导语</span><p class="card-dek">华尔街公司看到向更广泛的商业世界提供人工智能服务的巨大商机。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>私募股权正从纯粹的资本配置者进化为“技术军火商”，通过派出AI攻坚队直接改造企业运营基因，将资本与智力深度捆绑，重塑了价值创造与竞争壁垒。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-80669262" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-80669262" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是私募股权部署AI专家大军入驻所的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：华尔街金融巨头正将提供人工智能服务视为巨大的业务增长点。私募股权公司正在组建并部署专业的AI专家团队，直接嵌入其投资组合公司，以推动AI技术落地应用，提升被投企业的运营效率与市场估值。</li><li>关键细节：这些被称为“AI Wonks”的专家团队并非提供外部咨询，而是深入被投企业内部，聚焦于供应链优化、客户数据分析、自动化流程等核心环节。黑石、KKR等大型另类资产管理公司已率先推动此类实践，通过AI快速实现降本增效，短期内即可显著改善被投企业的利润率。</li><li>影响：对私募股权机构而言，这不仅提升了被投公司的资产价值，带来了更高的退出回报，还创造了收取额外管理费的增值服务模式，形成差异化竞争优势。对被投企业来说，它们获得了原本难以触达的顶尖AI能力和数据驱动决策体系，加速了数字化转型，得以在行业内抢占先机。</li></ul>
         <a href="https://www.wsj.com/tech/ai/private-equity-is-deploying-an-army-of-ai-wonks-to-embed-in-the-firms-they-back-96d279ec" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1126,16 +1196,17 @@
     <div class="card" data-section="🌍 World" data-title="伊朗政要呼吁结束战争">
       <div class="card-header" onclick="toggleCard(this)">
         <span class="card-num">41</span>
-        <div class="card-titles"><h3 class="card-title">伊朗政要呼吁结束战争</h3><span class="card-title-en">Iran’s Top Politicians Urge an End to the War</span></div>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">伊朗政要呼吁结束战争</h3><span class="card-title-en">Iran’s Top Politicians Urge an End to the War</span></div>
         <span class="card-section" style="background:#333">🌍 World</span>
         <time class="card-time">Sat, 22 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-10550771" loading="lazy">
       </div>
       <div class="card-preview">
-        <p class="card-dek">该国总统和议会议长表示，德黑兰需要趁现在还有筹码，谈判退出并提振经济。</p><p class="card-dek-en">The country’s president and its parliamentary speaker say Tehran needs to negotiate an exit and shore up its economy while it has leverage.</p>
+        <span class="field-label">导语</span><p class="card-dek">该国总统和议会议长表示，德黑兰需要趁现在还有筹码，谈判退出并提振经济。</p>
         <div class="card-insight"><span class="insight-label">洞察</span><p>伊朗统治阶层的生存理性压倒了意识形态扩张，经济崩盘的风险迫使它在筹码用尽前主动收手。</p></div>
       </div>
       <div class="card-detail">
-        <figure class="card-hero"><img src="https://images.wsj.net/im-10550771" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <figure class="card-hero"><img src="https://images.wsj.net/im-10550771" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片说明测试：这是伊朗政要呼吁结束战争的配图说明。图片来源：WSJ</figcaption></figure>
         <ul class="card-bullets"><li>核心事实：伊朗总统马苏德·佩泽什基安与议会议长穆罕默德·巴格尔·卡利巴夫公开呼吁德黑兰应通过谈判退出当前地区冲突，并在仍握有筹码时立即着手提振因制裁而濒临崩溃的经济。</li><li>关键细节：两位实权人物罕见同步表态，强调伊朗在代理战争中的消耗已威胁政权稳定，当前仍掌握一定谈判筹码——如对真主党等武装的影响力及核技术进展——可换取西方放松制裁，为经济改革与民生纾困赢得窗口。</li><li>影响：若启动谈判，将直接减弱伊朗对以色列及沙特等国的军事压力，可能重塑中东安全格局，但同时会激化伊朗革命卫队等强硬派的反抗，引发国内权力斗争，进而影响石油出口、里亚尔汇率及外资重返的节奏。</li></ul>
         <a href="https://www.wsj.com/world/middle-east/irans-top-politicians-urge-an-end-to-the-war-d0936e12" target="_blank" class="card-cta">阅读原文 &rarr;</a>
       </div>
@@ -1144,7 +1215,7 @@
     </div>
 
     <footer class="page-footer">
-        Generated at 2026-08-24 18:36 HKT &middot; Source: Wall Street Journal
+        Generated at 2026-08-25 12:05 HKT &middot; Source: Wall Street Journal
     </footer>
 
     <script>
