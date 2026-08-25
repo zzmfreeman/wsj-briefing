@@ -629,7 +629,13 @@ def scrape_cn_homepage(limit=30):
                                     }catch(e){}
                                 }
                             }
-                            return JSON.stringify({pt:pt, od:od});
+                            // v37o: 也提取 figure img + figcaption
+                            var fi='', fc='';
+                            var fig=document.querySelector('figure img');
+                            if(fig) fi=fig.src||'';
+                            var fce=document.querySelector('figcaption');
+                            if(fce) fc=(fce.textContent||'').trim();
+                            return JSON.stringify({pt:pt, od:od, fi:fi, fc:fc});
                         })()
                         """)
                         import json as _json
@@ -640,6 +646,10 @@ def scrape_cn_homepage(limit=30):
                         if data.get('od'):
                             a['summary'] = data['od']
                             lead_count += 1
+                        if data.get('fi'):
+                            a['image'] = data['fi']
+                        if data.get('fc'):
+                            a['image_caption'] = data['fc']
                     except:
                         pass
                     print(f"  时间提取: {time_count}/{len(articles_data)} 篇有时间, 导语提取: {lead_count} 篇有导语")
@@ -691,7 +701,7 @@ def _pw_fetch_fulltext_batch(url_pairs, cookies=None, timeout=30):
     from playwright.async_api import async_playwright
     
     async def _batch():
-        results = [("", "", "", "", "")] * len(url_pairs)
+        results = [("", "", "", "", "", "", "")] * len(url_pairs)
         
         async def _fetch_one(idx, url, context):
             try:
@@ -717,11 +727,20 @@ def _pw_fetch_fulltext_batch(url_pairs, cookies=None, timeout=30):
                     if len(p_text) > 200 and "dd=" not in p_text[:100]:
                         text = p_text
                 
-                # 提取 og:image
+                # v37o: 同时采集 og:image(缩略图) + figure img(高清图) + figcaption
+                # og:image — 用于首页缩略图（小，省流量）
                 og_m = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
                 if not og_m:
                     og_m = re.search(r'content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']', html, re.I)
                 og_image = og_m.group(1) if og_m else ""
+                # figure img — 用于展开后的高清大图
+                figure_m = re.search(r'<figure[^>]*>.*?<img[^>]*src=["\']([^"\']+)["\']', html, re.S | re.I)
+                image_hd = figure_m.group(1).replace('&amp;', '&') if figure_m else ""
+                # figcaption — 图片说明
+                figcap_m = re.search(r'<figcaption[^>]*>(.*?)</figcaption>', html, re.S | re.I)
+                image_caption = ""
+                if figcap_m:
+                    image_caption = re.sub(r'<[^>]+>', '', figcap_m.group(1)).strip()
                 
                 # 提取 dek（文章自带的副标题/导语）
                 dek = ""
@@ -755,7 +774,7 @@ def _pw_fetch_fulltext_batch(url_pairs, cookies=None, timeout=30):
                     pub_time = pt_m.group(1).strip()
                 
                 await page.close()
-                results[idx] = (text, html, og_image, dek, pub_time)
+                results[idx] = (text, html, og_image, image_hd, dek, pub_time, image_caption)
                 print(f"    [{status}] {url[-50:]}: {len(text)} chars og={'Y' if og_image else 'N'} dek={'Y' if dek else 'N'}")
             except Exception as e:
                 print(f"    ERROR {url[-50:]}: {e}")
@@ -847,7 +866,7 @@ def fetch_fulltext_batch(articles, timeout=30):
             [(art, art.get("url") or art.get("link", "")) for art in pw_needed],
             cookies=wsj_cookies, timeout=timeout
         )
-        for art, (text, html, og_image, dek, pub_time) in zip(pw_needed, pw_results):
+        for art, (text, html, og_image, image_hd, dek, pub_time, image_caption) in zip(pw_needed, pw_results):
             if text and len(text) > 200:
                 art["fulltext"] = text[:4000]
                 # 优先使用文章自带的 dek 作为导语
@@ -874,9 +893,15 @@ def fetch_fulltext_batch(articles, timeout=30):
                     art["fulltext"] = title
                     art["lead"] = title
                 ok += 1
-            # 用 og:image 补图
-            if og_image and not art.get("image"):
-                art["image"] = og_image
+            # v37o: og:image→缩略图, figure img→高清图, figcaption→说明
+            if og_image:
+                art["image_thumb"] = og_image  # 首页缩略图（小）
+            if image_hd:
+                art["image"] = image_hd  # 展开大图（高清）
+            elif og_image and not art.get("image"):
+                art["image"] = og_image  # fallback
+            if image_caption:
+                art["image_caption"] = image_caption
             # 用提取的发布时间补全（cn.wsj.com 首页文章无 published 字段）
             if pub_time and not art.get("published"):
                 art["published"] = pub_time
