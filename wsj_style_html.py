@@ -57,6 +57,11 @@ def _card(a, num):
     title_en = a.get('title_en', '')
     url = a.get('url') or a.get('link', '')
     img = a.get('image', '')
+    img_thumb = a.get('image_thumb', '')  # 首页缩略图（小图）
+    if not img_thumb and img:
+        # 从高清图URL生成缩略图URL（WSJ im-XXX 格式）
+        img_thumb = re.sub(r'width=\d+', 'width=80', img) if 'width=' in img else img + ('&' if '?' in img else '?') + 'width=80'
+    img_caption = a.get('image_caption', '')
     lead = a.get('lead', '') or ''
     lead_en = a.get('lead_en', '')
     summary = a.get('ai_summary', '') or a.get('summary', '') or ''
@@ -69,14 +74,14 @@ def _card(a, num):
 
     # 标题：中文主标题 + 英文副标题
     if is_rss and title_en and title_en != title:
-        title_html = f'<h3 class="card-title">{title}</h3><span class="card-title-en">{title_en}</span>'
+        title_html = f'<span class="field-label">标题</span><h3 class="card-title">{title}</h3><span class="card-title-en">{title_en}</span>'
     else:
-        title_html = f'<h3 class="card-title">{title}</h3>'
+        title_html = f'<span class="field-label">标题</span><h3 class="card-title">{title}</h3>'
 
     # 导语：完整显示（首页可见）
     lead_html = ''
     if lead:
-        lead_html = f'<p class="card-dek">{lead}</p>'
+        lead_html = f'<span class="field-label">导语</span><p class="card-dek">{lead}</p>'
     if is_rss and lead_en and lead_en != lead:
         lead_html += f'<p class="card-dek-en">{lead_en}</p>'
 
@@ -86,7 +91,8 @@ def _card(a, num):
     # 图片（展开时显示）
     img_html = ''
     if img:
-        img_html = f'<figure class="card-hero"><img src="{img}" alt="" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></figure>'
+        cap_html = f'<figcaption>{img_caption}</figcaption>' if img_caption else ''
+        img_html = f'<figure class="card-hero"><img src="{img}" alt="" loading="lazy" onerror="this.parentElement.style.display=\'none\'">{cap_html}</figure>'
 
     # bullets（展开时显示）
     bullets_html = ''
@@ -120,6 +126,7 @@ def _card(a, num):
         <div class="card-titles">{title_html}</div>
         <span class="card-section" style="background:{sec_color}">{section}</span>
         {f'<time class="card-time">{time_str}</time>' if time_str else ''}
+        {f'<img class="card-thumb" src="{img_thumb}" loading="lazy">' if img_thumb else ''}
       </div>
       <div class="card-preview">
         {lead_html}
@@ -481,6 +488,36 @@ def generate_html(articles, date_str, generated_at):
             height: auto;
             display: block;
             border-radius: 4px;
+        }}
+
+        /* 字段标注 */
+        .field-label {{
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }}
+
+        /* 首页缩略图 */
+        .card-thumb {{
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }}
+
+        /* 图片说明 */
+        .card-hero figcaption {{
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
         }}
 
         /* Bullets */
