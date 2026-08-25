@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSJ日报 — 2026年08月25日</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-header h1 span {
+            color: var(--text);
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+        .stat-pill strong {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* 饼图 */
+        .pie-chart {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient(#c41e3a 0deg 68.93617021276596deg #0066cc 68.93617021276596deg 145.53191489361703deg #00853e 145.53191489361703deg 214.468085106383deg #333 214.468085106383deg 283.40425531914894deg #8b572a 283.40425531914894deg 360.0deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .search-box {
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── 主布局 ── */
+        .dashboard-body {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 左侧筛选栏 */
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }
+        .filter-btn:hover {
+            background: var(--bg);
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .filter-btn.active .filter-count {
+            color: rgba(255,255,255,0.8);
+        }
+        .filter-count {
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+        .filter-btn.active .filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ── 卡片流 ── */
+        .card-stream {
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card.hidden {
+            display: none;
+        }
+
+        /* 卡片头部（可点击展开） */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #fafafa;
+        }
+        .card-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .card-titles {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .card-title-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
+        .card-section {
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card-time {
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {
+            padding: 0 16px 10px;
+        }
+
+        /* 导语 */
+        .card-dek {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }
+        .card-dek-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        /* 洞察 */
+        .card-insight {
+            padding: 8px 12px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-insight p {
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+        .card.expanded .card-detail {
+            max-height: 1000px;
+            padding: 0 16px 12px;
+        }
+
+        /* 图片 */
+        .card-hero {
+            margin: 0 0 10px;
+        }
+        .card-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets */
+        .card-bullets {
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+        .card-bullets li {
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .card-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .card-body-text {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* CTA */
+        .card-cta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* ── 页脚 ── */
+        .page-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .dashboard-body {
+                padding: 8px;
+            }
+            .card-stream {
+                padding: 0;
+            }
+            .search-box {
+                width: 140px;
+            }
+            .card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>47</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
+    </header>
+
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            <button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="🇨🇳 中文版">🇨🇳 中文版 <span class="filter-count">9</span></button><button class="filter-btn" data-filter="💻 Tech">💻 Tech <span class="filter-count">10</span></button><button class="filter-btn" data-filter="📈 Markets">📈 Markets <span class="filter-count">9</span></button><button class="filter-btn" data-filter="🌍 World">🌍 World <span class="filter-count">9</span></button><button class="filter-btn" data-filter="🏢 Business">🏢 Business <span class="filter-count">10</span></button>
+        </aside>
+        <div class="card-stream">
+            
+    <div class="card" data-section="🇨🇳 中文版" data-title="全球最疯狂股市崩盘，从AI全民狂欢到血洗散户">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">01</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">全球最疯狂股市崩盘，从AI全民狂欢到血洗散户</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:58</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-69319207?width=80&height=245" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">在AI热潮的推动下，过去一年的大部分时间里，韩国股市在全球独领风骚。随后，这轮行情轰然崩盘。韩国综合指数六周内的崩盘，瞬间蒸发了约2.5万亿美元市值。</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-69319207?width=368&height=245" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>上个月，韩国综合指数下跌期间，首尔韩亚银行的交易员们正在工作。 图片来源：JEON HEON-KYUN/EPA/SHUTTERSTOCK</figcaption></figure>
+        <ul class="card-bullets"><li>在AI热潮的推动下，过去一年的大部分时间里，韩国股市在全球独领风骚。</li><li>随后，这轮行情轰然崩盘。</li><li>韩国综合指数六周内的崩盘，瞬间蒸发了约2.5万亿美元市值。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E5%85%A8%E7%90%83%E6%9C%80%E7%96%AF%E7%8B%82%E8%82%A1%E5%B8%82%E5%B4%A9%E7%9B%98-%E4%BB%8Eai%E5%85%A8%E6%B0%91%E7%8B%82%E6%AC%A2%E5%88%B0%E8%A1%80%E6%B4%97%E6%95%A3%E6%88%B7-1c4d84e3" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="探访华尔街精英荒野营：人人皆对AI热潮心生寒意">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">02</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">探访华尔街精英荒野营：人人皆对AI热潮心生寒意</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:39</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-28771509?width=80&height=245" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">探访华尔街精英荒野营：人人皆对AI热潮心生寒意</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-28771509?width=368&height=245" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>在垂钓和打牌的间隙，资深金融从业者们吐露了对AI交易的担忧。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E6%8E%A2%E8%AE%BF%E5%8D%8E%E5%B0%94%E8%A1%97%E7%B2%BE%E8%8B%B1%E8%8D%92%E9%87%8E%E8%90%A5-%E4%BA%BA%E4%BA%BA%E7%9A%86%E5%AF%B9ai%E7%83%AD%E6%BD%AE%E5%BF%83%E7%94%9F%E5%AF%92%E6%84%8F-40890e6f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="小鹏汽车推进物理AI之际净亏损扩大">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">03</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">小鹏汽车推进物理AI之际净亏损扩大</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:09</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56409288?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">小鹏汽车推进物理AI之际净亏损扩大</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56409288?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>除汽车业务外，小鹏汽车一直在投资自动驾驶和人形机器人，致力于转型为一家物理AI公司。 图片来源：Florence Lo/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>该公司寄望于其面向大众市场的新款L03能在下半年提振销量。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E5%B0%8F%E9%B9%8F%E6%B1%BD%E8%BD%A6%E6%8E%A8%E8%BF%9B%E7%89%A9%E7%90%86ai%E4%B9%8B%E9%99%85%E5%87%80%E4%BA%8F%E6%8D%9F%E6%89%A9%E5%A4%A7-32e7182f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="珍本书大卖背后：先拆解扫描，再“喂给”AI">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">04</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">珍本书大卖背后：先拆解扫描，再“喂给”AI</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:23</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-11254749?width=80&height=267" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">珍本书大卖背后：先拆解扫描，再“喂给”AI</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-11254749?width=400&height=267" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>卖家正因销量大增而欣喜，但同时也在担忧，那些珍本书籍是否正被“送上断头台”，用于训练大语言模型。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E7%8F%8D%E6%9C%AC%E4%B9%A6%E5%A4%A7%E5%8D%96%E8%83%8C%E5%90%8E-%E8%A2%AB%E6%8B%86%E8%A7%A3%E6%89%AB%E6%8F%8F-%E7%84%B6%E5%90%8E-%E5%96%82%E7%BB%99-ai-bc2ef0e6" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Why Your Boss Wants to Make Sure AI Can Read Your Slack Messages">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">05</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Why Your Boss Wants to Make Sure AI Can Read Your Slack Messages</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-46192940?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Some executives want human employees to share their Slack notes with AI agent co-workers.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-46192940" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Some executives want human employees to share their Slack notes with AI agent co-workers.</li></ul>
+        <a href="https://www.wsj.com/tech/ai/why-your-boss-wants-to-make-sure-ai-can-read-your-slack-messages-b6c149c1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="AI Jitters and Geopolitical Threats Mark Start of Busy Week in Markets">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">06</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI Jitters and Geopolitical Threats Mark Start of Busy Week in Markets</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56613172?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Chip makers and other tech stocks weighed on major U.S. indexes.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56613172" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Chip makers and other tech stocks weighed on major U.S. indexes.</li></ul>
+        <a href="https://www.wsj.com/finance/investing/ai-jitters-and-geopolitical-threats-mark-start-of-busy-week-in-markets-a192c22a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="为了一家海鲜小店，亿万富豪CEO与汉普顿小镇的无休止纷争">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">07</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">为了一家海鲜小店，亿万富豪CEO与汉普顿小镇的无休止纷争</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:54</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-79168384/social" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Apollo首席执行官马克·罗文在蒙托克海滨开设的餐厅吸引了众多名人和网红。邻居们却认为这家餐厅未经过审批，根本不应该开在那里。</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-79168384?width=640&height=NaN" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        
+        <a href="https://cn.wsj.com/articles/marc-rowan-apollo-montauk-restaurant-6b4ab475" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="图解中国如何经受住伊朗战争带来的石油冲击">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">08</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">图解中国如何经受住伊朗战争带来的石油冲击</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">13:02</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-17126561?size=1.5&width=80&height=90" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">图解中国如何经受住伊朗战争带来的石油冲击</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-17126561?size=1.5&width=161&height=90" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>中国政府如何成功大幅削减原油进口，从而压低全球价格，并安然无恙？</li><li>本文以图表揭开这一谜团。</li></ul>
+        <a href="https://cn.wsj.com/articles/see-how-china-weathered-the-iran-oil-shock-32b55438" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Oura and Dunkin’ Get Ready to Join IPO Bonanza">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">09</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Oura and Dunkin’ Get Ready to Join IPO Bonanza</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-03572672?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Investors are sizing up the parade of new offerings expected in coming months.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-03572672" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Investors are sizing up the parade of new offerings expected in coming months.</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/oura-and-dunkin-get-ready-to-join-ipo-bonanza-a6ff0633" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Taiwan Charges Nine in Connection With Smuggling of AI Servers to China">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">10</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Taiwan Charges Nine in Connection With Smuggling of AI Servers to China</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-02639317?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">U.S. export controls have pushed Chinese companies to seek Nvidia chips through backdoor routes, as Taiwan tries to find ways to clamp down.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-02639317" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>U.S. export controls have pushed Chinese companies to seek Nvidia chips through backdoor routes, as Taiwan tries to find ways to clamp down.</li></ul>
+        <a href="https://www.wsj.com/tech/taiwan-charges-nine-in-connection-with-smuggling-of-ai-servers-to-china-d1f72f47" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Introducing the AI Model ‘Harness’">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">11</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Introducing the AI Model ‘Harness’</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-65276158?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Companies are deciding whether to invest in custom software that controls AI model tasks and token cost.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-65276158" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Companies are deciding whether to invest in custom software that controls AI model tasks and token cost.</li></ul>
+        <a href="https://www.wsj.com/cio-journal/introducing-the-ai-model-harness-a638c65b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Flock Cameras Are Spreading Across America. The Backlash Is Growing Just as Fast.">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">12</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Flock Cameras Are Spreading Across America. The Backlash Is Growing Just as Fast.</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-95485429?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The AI surveillance company is running into the same bipartisan anger that engulfed data centers, as worries about artificial intelligence rise.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-95485429" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>The AI surveillance company is running into the same bipartisan anger that engulfed data centers, as worries about artificial intelligence rise.</li></ul>
+        <a href="https://www.wsj.com/tech/flock-cameras-are-spreading-across-america-the-backlash-is-growing-just-as-fast-fff74ed2" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Zohran Mamdani Is Turning His Fire on Amazon">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">13</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Zohran Mamdani Is Turning His Fire on Amazon</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-80890973?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The socialist mayor has taken the retail giant to task over the status of delivery workers, the sale of illegal e-bikes and fines for idling vehicles.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-80890973" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>The socialist mayor has taken the retail giant to task over the status of delivery workers, the sale of illegal e-bikes and fines for idling vehicles.</li></ul>
+        <a href="https://www.wsj.com/business/retail/zohran-mamdani-is-turning-his-fire-on-amazon-aa206cce" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="The World’s Craziest Stock Market Has Turned Into a Fright Ride">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">14</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The World’s Craziest Stock Market Has Turned Into a Fright Ride</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-69319207?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">A slow-motion collapse in South Korea’s Kospi index erased $2.5 trillion in value, burning investors who bet on the AI boom.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-69319207" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>A slow-motion collapse in South Korea’s Kospi index erased $2.5 trillion in value, burning investors who bet on the AI boom.</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/stock-market-crash-south-korea-ai-ccb00cba" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Former Forbes Editor Got $6 Million for Helping Magazine’s Partner With Sale">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">15</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Former Forbes Editor Got $6 Million for Helping Magazine’s Partner With Sale</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-35713786?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">A founder of Shook Research said Randall Lane, who was fired by Forbes in July, offered guidance during Shook’s sale to a private-equity firm.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-35713786" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>A founder of Shook Research said Randall Lane, who was fired by Forbes in July, offered guidance during Shook’s sale to a private-equity firm.</li></ul>
+        <a href="https://www.wsj.com/business/media/former-forbes-editor-got-6-million-for-helping-magazines-partner-with-sale-e892131a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Canada Tariffs, Again">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">16</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Canada Tariffs, Again</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-29594939?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Canada Tariffs, Again</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-29594939" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Plus, a new Iran sanctions campaign.</li></ul>
+        <a href="https://www.wsj.com/finance/investing/canada-tariffs-again-6bc52ff1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Supreme Court Rules on Trump’s Mail-In Ballot Order">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">17</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Supreme Court Rules on Trump’s Mail-In Ballot Order</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-74976992?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Plus, the latest in a tit-for-tat trade conflict with Canada, and a trick to get your résumé a second look by recruiters.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-74976992" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Plus, the latest in a tit-for-tat trade conflict with Canada, and a trick to get your résumé a second look by recruiters.</li></ul>
+        <a href="https://www.wsj.com/world/asia/supreme-court-rules-on-trumps-mail-in-ballot-order-9fd77f1a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Prodigal Prince Harry’s Return to U.K. Poses Dilemma for William">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">18</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Prodigal Prince Harry’s Return to U.K. Poses Dilemma for William</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-41990172?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">His estranged brother’s decision to move back puts the heir to the throne under pressure to extend an olive branch.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-41990172" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>His estranged brother’s decision to move back puts the heir to the throne under pressure to extend an olive branch.</li></ul>
+        <a href="https://www.wsj.com/world/uk/prodigal-prince-harrys-return-to-u-k-poses-dilemma-for-william-41eb9e7b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Bessent Launches ‘Operation Economic Outcast’ to Isolate and Squeeze Iran">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">19</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Bessent Launches ‘Operation Economic Outcast’ to Isolate and Squeeze Iran</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-22803249?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The Treasury secretary announced new sanctions meant to target Tehran’s enablers and devastate the regime economically.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-22803249" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>The Treasury secretary announced new sanctions meant to target Tehran’s enablers and devastate the regime economically.</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/bessent-launches-operation-economic-outcast-to-isolate-iran-0e4db091" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="The Warnings That Came Before a War Now Reaching the Six-Month Mark">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">20</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The Warnings That Came Before a War Now Reaching the Six-Month Mark</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-23887692?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">After military and diplomatic efforts, President Trump is pinning his hopes on economic warfare.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-23887692" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>After military and diplomatic efforts, President Trump is pinning his hopes on economic warfare.</li></ul>
+        <a href="https://www.wsj.com/politics/national-security/iran-war-warnings-9d7f289a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Pepper…and Salt">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">21</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Pepper…and Salt</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-09770381?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Pepper…and Salt</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-09770381" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        
+        <a href="https://www.wsj.com/opinion/pepperand-salt-a72f64e2" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Trump Unleashes Scott Bessent on Iran">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">22</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Trump Unleashes Scott Bessent on Iran</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-46954218?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The President redoubles the economic pressure on the regime amid signs it’s working.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-46954218" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>The President redoubles the economic pressure on the regime amid signs it’s working.</li></ul>
+        <a href="https://www.wsj.com/opinion/donald-trump-scott-bessent-sanctions-iran-oil-economy-96362772" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="South Carolina vs. the 26th Amendment">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">23</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">South Carolina vs. the 26th Amendment</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-58400392?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Voting laws can’t favor seniors, a court says. Will the Justices agree?</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-58400392" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Voting laws can’t favor seniors, a court says. Will the Justices agree?</li></ul>
+        <a href="https://www.wsj.com/opinion/south-carolina-absentee-voting-law-fourth-circuit-roger-gregory-mail-ballots-9e7b7f6f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Trump to Ford Motor: Drop Dead">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">24</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Trump to Ford Motor: Drop Dead</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-66332279?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">A 50% tariff on autos and parts from Canada would punish U.S. companies.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-66332279" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>A 50% tariff on autos and parts from Canada would punish U.S. companies.</li></ul>
+        <a href="https://www.wsj.com/opinion/donald-trump-auto-tariffs-50-percent-canada-ford-motors-7111dadb" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Trump Escalates His Trade War With Canada and His Sanctions War with Iran">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">25</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Trump Escalates His Trade War With Canada and His Sanctions War with Iran</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The President threatens a 50% tariff on cars and parts from Canada, while the U.S. Treasury launches 'Operation Economic Outcast' against Iran.</p>
+        
+      </div>
+      <div class="card-detail">
+        
+        <ul class="card-bullets"><li>The President threatens a 50% tariff on cars and parts from Canada, while the U.S. Treasury launches 'Operation Economic Outcast' against Iran.</li></ul>
+        <a href="https://www.wsj.com/podcasts/opinion-potomac-watch/trump-escalates-his-trade-war-with-canada-and-his-sanctions-war-with-iran/04E80234-CF18-47B8-987A-E5249375EFB9" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Make American Magnesium Again">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">26</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Make American Magnesium Again</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-42575534?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">China has taken over the industry, but we know how to extract the vital metal from seawater.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-42575534" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>China has taken over the industry, but we know how to extract the vital metal from seawater.</li></ul>
+        <a href="https://www.wsj.com/opinion/make-american-magnesium-again-48a5eb5b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Let the Bond Market Speak">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">27</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Let the Bond Market Speak</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-95257402?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Rising interest rates are a signal of trouble ahead. Artificially suppressing it heightens the danger.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-95257402" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Rising interest rates are a signal of trouble ahead. Artificially suppressing it heightens the danger.</li></ul>
+        <a href="https://www.wsj.com/opinion/let-the-bond-market-speak-81529d74" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="El-Sayed Abandons the Middle">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">28</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">El-Sayed Abandons the Middle</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-06952245?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Republican Mike Rogers has a chance to win Democratic votes in Michigan.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-06952245" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Republican Mike Rogers has a chance to win Democratic votes in Michigan.</li></ul>
+        <a href="https://www.wsj.com/opinion/el-sayed-abandons-the-middle-9988f792" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="May the Post-Trump Era Begin ASAP">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">29</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">May the Post-Trump Era Begin ASAP</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-97237859?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">I don’t wish to see him impeached or humiliated, just gone.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-97237859" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>I don’t wish to see him impeached or humiliated, just gone.</li></ul>
+        <a href="https://www.wsj.com/opinion/may-the-post-trump-era-begin-asap-bbef233e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="America Faces the Constraints of Democracy">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">30</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">America Faces the Constraints of Democracy</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-39683987?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Domestic spending crowded out defense, and the world is more dangerous as a result.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-39683987" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Domestic spending crowded out defense, and the world is more dangerous as a result.</li></ul>
+        <a href="https://www.wsj.com/opinion/america-faces-the-constraints-of-democracy-738a6af5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="华尔街押注英伟达让AI盛宴继续下去">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">31</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">华尔街押注英伟达让AI盛宴继续下去</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:45</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56641862?width=80&height=468" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">华尔街押注英伟达让AI盛宴继续下去</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56641862?width=700&height=468" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>英伟达CEO黄仁勋在7月东京举行的一次活动上. 图片来源：Manami Yamada/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>英伟达业绩或在科技板块乃至整个股市引发震荡。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E5%8D%8E%E5%B0%94%E8%A1%97%E6%8A%BC%E6%B3%A8%E8%8B%B1%E4%BC%9F%E8%BE%BE%E8%AE%A9ai%E7%9B%9B%E5%AE%B4%E7%BB%A7%E7%BB%AD%E4%B8%8B%E5%8E%BB-24503f51" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="TikTok to Pay $400 Million to Settle Children’s Privacy Case">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">32</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">TikTok to Pay $400 Million to Settle Children’s Privacy Case</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-11690232?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Plus: CISA readiness in question and Marriott hires news CISO.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-11690232" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Plus: CISA readiness in question and Marriott hires news CISO.</li></ul>
+        <a href="https://www.wsj.com/pro/cybersecurity/tiktok-to-pay-400-million-to-settle-childrens-privacy-case-0115c1db" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Stock Market News, Aug. 24, 2026: Oil Maintains Declines After Bessent Outlines Plan to Squeeze Iran">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">33</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Stock Market News, Aug. 24, 2026: Oil Maintains Declines After Bessent Outlines Plan to Squeeze Iran</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-34062673?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Nasdaq falls as chip stocks start the week under pressure</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-34062673" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Nasdaq falls as chip stocks start the week under pressure</li></ul>
+        <a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-08-24-2026" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Uncle Sam’s $40 Trillion Tab Is Living Rent-Free in Your Mortgage Payment">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">34</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Uncle Sam’s $40 Trillion Tab Is Living Rent-Free in Your Mortgage Payment</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-82199608?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Plus, Asian tech companies stumble and Moderna’s second act.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-82199608" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Plus, Asian tech companies stumble and Moderna’s second act.</li></ul>
+        <a href="https://www.wsj.com/finance/investing/uncle-sams-40-trillion-tab-is-living-rent-free-in-your-mortgage-payment-ec2ff19d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">35</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-85314678?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-85314678" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Stablecoins could drive demand for Treasury bills.</li></ul>
+        <a href="https://www.wsj.com/finance/currencies/how-trumps-crypto-push-is-linked-to-bessents-treasury-moves-809defdc" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="U.K. to Share Classified Missile Technology With Ukraine">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">36</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">U.K. to Share Classified Missile Technology With Ukraine</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-46040321?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">It is the latest move in a growing trend of Western countries helping Ukraine to build the weapons it needs to fight Russia’s invasion.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-46040321" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>It is the latest move in a growing trend of Western countries helping Ukraine to build the weapons it needs to fight Russia’s invasion.</li></ul>
+        <a href="https://www.wsj.com/world/europe/u-k-to-share-classified-missile-technology-with-ukraine-be201553" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="U.S. Cancels Marines Drills With South Korea">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">37</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">U.S. Cancels Marines Drills With South Korea</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-38103003?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The canceled training is the latest U.S. pullback in Asia owing to bigger demands from wars in the Middle East</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-38103003" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>The canceled training is the latest U.S. pullback in Asia owing to bigger demands from wars in the Middle East</li></ul>
+        <a href="https://www.wsj.com/world/asia/u-s-cancels-marines-drills-with-south-korea-b592bbb7" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="U.S. Says Oil Is Pouring Through Hormuz. Trackers Can’t Find It.">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">38</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">U.S. Says Oil Is Pouring Through Hormuz. Trackers Can’t Find It.</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-26516493?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Firms that count ships, oil output and imports aren’t able to verify U.S. claims about the volume of oil getting through Iran’s chokehold.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-26516493" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Firms that count ships, oil output and imports aren’t able to verify U.S. claims about the volume of oil getting through Iran’s chokehold.</li></ul>
+        <a href="https://www.wsj.com/business/energy-oil/u-s-says-oil-is-pouring-through-hormuz-trackers-cant-find-it-306faebd" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Alibaba to Raise $10.20 Billion for AI Investment With Share Placement">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">39</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Alibaba to Raise $10.20 Billion for AI Investment With Share Placement</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-40563810?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The Chinese company has been spending heavily on the technology as it jostles with rivals for dominance in the rapidly growing AI sector.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-40563810" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>The Chinese company has been spending heavily on the technology as it jostles with rivals for dominance in the rapidly growing AI sector.</li></ul>
+        <a href="https://www.wsj.com/tech/alibaba-to-bulk-up-ai-investment-via-10-20-billion-share-placement-72b9bdac" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="中国年轻人正涌入这座古寺祈求好工作">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">40</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中国年轻人正涌入这座古寺祈求好工作</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:33</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-65483261?width=80&height=245" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">如今，古老的龙华寺里挤满了烧香、诵经、在佛像前跪拜的年轻人。在许多人求职碰壁的当下，这里在当地被视为祈求事业顺利的宝地。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>当简历石沉大海，年轻人把简历投给了佛祖。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-65483261?width=368&height=245" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：上海龙华寺近期涌入大量20至30岁的年轻人，他们在佛像前烧香、诵经、长时间跪拜，专为祈求事业顺利和获得好工作。该寺在当地被口耳相传为求职灵验的宝地，年轻香客比例显著上升，取代了传统中老年信众的主导地位。</li><li>关键细节：求职者因投递简历后回应寥寥、面试频繁失败，转而将希望寄托于古寺。龙华寺作为上海历史悠久的佛教寺院，过去香客以祈福健康长寿为主，如今主殿内“事业顺利”的许愿牌数量激增，部分年轻人甚至选择清晨排队，只为在特定佛像前完成整套祈愿仪式。</li><li>影响：这一行为直接反映了青年失业率攀升带来的深层焦虑，宗教场所成为心理慰藉的替代性空间。对个人而言，仪式化行为暂时缓解了求职挫败感，但可能导致回避现实、延迟求职行动；对社会而言，短期香火旺盛掩盖了就业市场结构性矛盾，未能推动实质性的职业培训或岗位创造。</li></ul>
+        <a href="https://cn.wsj.com/articles/this-ancient-temple-is-where-chinas-young-people-go-to-pray-for-a-good-job-e7ff140c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="美加正滑向全面贸易战">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">41</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">美加正滑向全面贸易战</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:31</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-52357747?width=80&size=0.5625" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美加正滑向全面贸易战</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>这场贸易战已从经济摩擦异化为政治清算，北美自由贸易的制度信任正在被零和博弈的丛林法则取代。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-52357747?width=350&size=0.5625" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国对加拿大钢铁和铝产品加征25%关税，加拿大立即宣布对价值166亿加元的美国产品征收报复性关税，涵盖威士忌、橙汁、番茄酱等消费品，并明确表示若美方不撤销措施，将启动第二轮针对汽车零部件的关税清单。</li><li>关键细节：谈判破裂根源在于美方要求加拿大全面开放乳制品市场并废除数字服务税，而加方坚持将解决钢铝关税作为前提条件。双方在特朗普政府援引“国家安全”条款的合法性上争执不下，加拿大总理特鲁多公开指责美方行为是“对最亲密盟友的侮辱”。</li><li>影响：北美一体化汽车供应链遭受直接冲击，通用、福特等车企面临成本飙升，加元兑美元汇率单日暴跌1.2%，加拿大消费者物价指数预计将推高0.5个百分点，密歇根州与安大略省边境贸易量骤降，数十万制造业岗位面临不确定性。</li></ul>
+        <a href="https://cn.wsj.com/articles/canada-announces-new-post-labor-day-tariffs-48623a21" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Data-Center Disenchantment">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">42</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Data-Center Disenchantment</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-48414340?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Plus, buying a refurbished phone, OpenAI’s shaky finances, the $3 trillion in off-balance-sheet AI debt and more.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-48414340" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Plus, buying a refurbished phone, OpenAI’s shaky finances, the $3 trillion in off-balance-sheet AI debt and more.</li></ul>
+        <a href="https://www.wsj.com/tech/ai/data-center-disenchantment-d63ea0b2" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Hype for Moderna’s Cancer Vaccine Is Running Ahead of the Math">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">43</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Hype for Moderna’s Cancer Vaccine Is Running Ahead of the Math</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-25512659?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Personalized mRNA shots may prove neither as wide-reaching nor as lucrative as hoped.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-25512659" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Personalized mRNA shots may prove neither as wide-reaching nor as lucrative as hoped.</li></ul>
+        <a href="https://www.wsj.com/health/pharma/hype-for-modernas-cancer-vaccine-is-running-ahead-of-the-math-b9b596f5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Europe Chastised Trump’s Climate Rollback. Now It’s Delaying Its Own Green Goals.">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">44</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Europe Chastised Trump’s Climate Rollback. Now It’s Delaying Its Own Green Goals.</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-31772793?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Developed nations are increasingly balking at the cost of measures to cut down on fossil fuels.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-31772793" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Developed nations are increasingly balking at the cost of measures to cut down on fossil fuels.</li></ul>
+        <a href="https://www.wsj.com/world/europe/europe-chastised-trumps-climate-rollback-now-its-delaying-its-own-green-goals-835b6724" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="We Went to Wall Street’s Exclusive Wilderness Camp. Everyone Was Spooked by AI.">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">45</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">We Went to Wall Street’s Exclusive Wilderness Camp. Everyone Was Spooked by AI.</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-28771509?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Between fishing outings and poker games, veteran finance pros shared their fears about the artificial intelligence trade.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-28771509" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>Between fishing outings and poker games, veteran finance pros shared their fears about the artificial intelligence trade.</li></ul>
+        <a href="https://www.wsj.com/finance/investing/we-went-to-wall-streets-exclusive-wilderness-camp-everyone-was-spooked-by-ai-e16dbe10" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Nvidia Is Spending $6 Billion to Build a Powerful U.S. Alternative to Chinese AI">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">46</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Nvidia Is Spending $6 Billion to Build a Powerful U.S. Alternative to Chinese AI</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Sun, 23 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-54335031?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">A sweeping agreement with startup Poolside aims to build an open artificial-intelligence ecosystem in the U.S. that would compete with Chinese heavyweights and American AI giants.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-54335031" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>A sweeping agreement with startup Poolside aims to build an open artificial-intelligence ecosystem in the U.S. that would compete with Chinese heavyweights and American AI giants.</li></ul>
+        <a href="https://www.wsj.com/tech/ai/nvidia-is-spending-6-billion-to-build-a-powerful-u-s-alternative-to-chinese-ai-c51c38cc" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Iran’s Top Politicians Urge an End to the War">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">47</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Iran’s Top Politicians Urge an End to the War</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Sat, 22 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-10550771?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The country’s president and its parliamentary speaker say Tehran needs to negotiate an exit and shore up its economy while it has leverage.</p>
+        
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-10550771" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>The country’s president and its parliamentary speaker say Tehran needs to negotiate an exit and shore up its economy while it has leverage.</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/irans-top-politicians-urge-an-end-to-the-war-d0936e12" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        Generated at 2026-08-25 13:00 HKT &middot; Source: Wall Street Journal
+    </footer>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {
+                    if (filter === 'all' || c.dataset.section === filter) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            };
+        });
+
+        // 搜索
+        function filterSearch(q) {
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
