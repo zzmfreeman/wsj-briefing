@@ -89,8 +89,8 @@ def refresh_wsj_cookies():
         json.dump(cookies, f)
     print(f"  WSJ cookies: {ok}/{len(rows)} decrypted and saved")
     return ok
-IMAGE_CACHE_FILE = Path.home() / ".openclaw/workspace/wsj-briefing/image_cache.json"
-SEEN_URLS_FILE = Path.home() / ".openclaw/workspace/wsj-briefing/seen_urls.json"
+IMAGE_CACHE_FILE = Path.home() / "wsj-briefing/image_cache.json"
+SEEN_URLS_FILE = Path.home() / "wsj-briefing/seen_urls.json"
 # 过去 N 天已发过的文章不再重复收录
 DEDUP_DAYS = 7
 MAX_ARTICLE_AGE_DAYS = 3  # 只保留3天内发布的文章
@@ -489,6 +489,17 @@ def scrape_cn_homepage(limit=30):
             # v37d: CDP 连接已运行 Chrome（--remote-debugging-port=9222 + 独立 user-data-dir）
             try:
                 browser = await p.chromium.connect_over_cdp("http://127.0.0.1:9222")
+                # v37o-fix3: 清理多余CDP tab，防止内存压力导致超时
+                try:
+                    ctx = browser.contexts[0] if browser.contexts else await browser.new_context()
+                    tabs = ctx.pages
+                    if len(tabs) > 5:
+                        print(f"  CDP tab清理: {len(tabs)} → 保留最新2个")
+                        for t in tabs[:-2]:
+                            try: await t.close()
+                            except: pass
+                except Exception as e:
+                    print(f"  CDP tab清理跳过: {e}")
                 context = browser.contexts[0] if browser.contexts else await browser.new_context()
             except Exception as e:
                 print(f"  CDP 连接失败，回退到 headless: {e}")

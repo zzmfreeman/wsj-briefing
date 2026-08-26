@@ -1103,7 +1103,7 @@ if __name__ == "__main__":
 
     # 推到GitHub仓库
     print("\n=== 发布到GitHub Pages ===")
-    wsj_repo = os.path.expanduser('~/.openclaw/workspace/wsj-briefing')
+    wsj_repo = os.path.expanduser('~/wsj-briefing')
     docs_in_repo = f'{wsj_repo}/docs'
     os.makedirs(docs_in_repo, exist_ok=True)
     
@@ -1117,6 +1117,8 @@ if __name__ == "__main__":
             ['git', '-C', wsj_repo, 'commit', '-m', f'update briefing {today_str}'],
             capture_output=True, text=True
         )
+        # v37o-fix3: push前先pull --rebase，防止多repo冲突
+        subprocess.run(['git', '-C', wsj_repo, 'pull', '--rebase', 'origin', 'main'], capture_output=True, text=True, timeout=30)
         r2 = subprocess.run(['git', '-C', wsj_repo, 'push'], capture_output=True, text=True)
         if r2.returncode == 0:
             print("✓ 推送成功")
@@ -1129,7 +1131,7 @@ if __name__ == "__main__":
     import json as _json
     from pathlib import Path as _Path
     from datetime import datetime as _dt, timedelta as _td
-    _seen_file = _Path.home() / '.openclaw/workspace/wsj-briefing/seen_urls.json'
+    _seen_file = _Path.home() / 'wsj-briefing/seen_urls.json'
     _data = {}
     if _seen_file.exists():
         try:
