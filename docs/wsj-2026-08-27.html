@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSJ日报 — 2026年08月27日</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-header h1 span {
+            color: var(--text);
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+        .stat-pill strong {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* 饼图 */
+        .pie-chart {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient(#0066cc 0deg 97.2972972972973deg #00853e 97.2972972972973deg 175.13513513513516deg #333 175.13513513513516deg 262.7027027027027deg #8b572a 262.7027027027027deg 360.0deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .search-box {
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── 主布局 ── */
+        .dashboard-body {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 左侧筛选栏 */
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }
+        .filter-btn:hover {
+            background: var(--bg);
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .filter-btn.active .filter-count {
+            color: rgba(255,255,255,0.8);
+        }
+        .filter-count {
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+        .filter-btn.active .filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ── 卡片流 ── */
+        .card-stream {
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card.hidden {
+            display: none;
+        }
+
+        /* 卡片头部（可点击展开） */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #fafafa;
+        }
+        .card-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .card-titles {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .card-title-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
+        .card-section {
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card-time {
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {
+            padding: 0 16px 10px;
+        }
+
+        /* 导语 */
+        .card-dek {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }
+        .card-dek-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        /* 洞察 */
+        .card-insight {
+            padding: 8px 12px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-insight p {
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+        .card.expanded .card-detail {
+            max-height: 1000px;
+            padding: 0 16px 12px;
+        }
+
+        /* 图片 */
+        .card-hero {
+            margin: 0 0 10px;
+        }
+        .card-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets */
+        .card-bullets {
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+        .card-bullets li {
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .card-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .card-body-text {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* CTA */
+        .card-cta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* ── 页脚 ── */
+        .page-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .dashboard-body {
+                padding: 8px;
+            }
+            .card-stream {
+                padding: 0;
+            }
+            .search-box {
+                width: 140px;
+            }
+            .card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>37</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
+    </header>
+
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            <button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="💻 Tech">💻 Tech <span class="filter-count">10</span></button><button class="filter-btn" data-filter="📈 Markets">📈 Markets <span class="filter-count">8</span></button><button class="filter-btn" data-filter="🌍 World">🌍 World <span class="filter-count">9</span></button><button class="filter-btn" data-filter="🏢 Business">🏢 Business <span class="filter-count">10</span></button>
+        </aside>
+        <div class="card-stream">
+            
+    <div class="card" data-section="💻 Tech" data-title="Deep Cogito Aims to Put Companies in Control of Their Own AI">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">01</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Deep Cogito Aims to Put Companies in Control of Their Own AI</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-42265536/social" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The startup founded by former Google AI search employees raised $43 million to help companies build their own specialized AI models.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>企业AI正从“租用能力”转向“拥有资产”，数据主权成为下一代竞争壁垒。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-51215143?width=700&height=423" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Deep Cogito, based in San Francisco, could help bolster U.S. efforts in open-weight AI models. Josh Edelson/Agence France-Presse/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：AI研究实验室Deep Cogito在2026年8月26日宣布完成4300万美元A轮融资，由TQ Ventures领投，总融资额超过5600万美元。该公司开发可让企业完全拥有并控制专有数据的专用AI模型，以优化性能并控制成本。</li><li>关键细节：本轮融资参投方包括Benchmark、Nexus Venture Partners、Atreides Management、South Park Commons及网络安全公司Zscaler。Deep Cogito总部位于旧金山，其模型或为开放权重方向，有助于美国在该领域增强竞争力，资金将用于继续构建企业可自主掌控的AI系统。</li><li>影响：企业获得模型所有权后，能更安全地处理敏感数据，减少对外部AI供应商的依赖，降低长期推理成本，并加快在金融、医疗等合规要求严格的行业落地。同时，这种模式可能推动开放权重生态发展，对闭源模型主导的现有格局形成挑战。</li></ul>
+        <a href="https://www.wsj.com/cio-journal/deep-cogito-aims-to-put-companies-in-control-of-their-own-ai-50ddf44b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Three Takeaways From Bill Gates’s 5,784-Word Warning on AI: ‘There Is No Plan’">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">02</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Three Takeaways From Bill Gates’s 5,784-Word Warning on AI: ‘There Is No Plan’</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-12163448/social" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The billionaire philanthropist urges regulation and global coordination to prepare for the likely harms to employment, safety and well-being.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>盖茨的警告戳破了AI乌托邦叙事：技术狂奔与社会治理的真空，正在把人类推向一场无人负责的文明级震荡。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-12163448?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Bill Gates  Kent Nishimura/Agence France-Presse/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：比尔·盖茨在个人网站发布5784词、12页的AI风险警告，直指企业界在没有整体规划的情况下加速推进AI，将引发大规模动荡。他断言“即使最好情况下，向AI新时代的过渡也将是人类历史上最动荡的时期之一”，并强调“现在完全没有做好准备”。</li><li>关键细节：盖茨明确指出，当前领导者、专家和社区均未充分应对AI带来的挑战，他未看到任何证据表明各方在严肃面对。文章发表于其个人网站，以“没有计划”为核心判断，揭示AI部署节奏与社会应对能力之间的严重脱节。</li><li>影响：盖茨的警告指向就业市场与人类生存状态的直接冲击。企业盲目推进AI而无配套社会计划，将导致广泛的岗位替代、技能错配和社会撕裂，劳动者首当其冲，而政府部门与社区缺乏应对框架，可能加剧不平等与动荡。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/three-takeaways-from-bill-gatess-5-784-word-warning-on-ai-there-is-no-plan-aa0c3441" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="The AI Prodigy Who Won Over Silicon Valley—and Lost $45 Billion">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">03</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The AI Prodigy Who Won Over Silicon Valley—and Lost $45 Billion</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-32132428?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Plus, we catch up with pop’s breakout star Olivia Dean and take you behind the scenes of our latest reporting on Flock cameras.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>孙正义的溃败并非AI的失败，而是资本将想象当现实、用巨量资金催熟泡沫的必然代价。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-32132428" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：孙正义凭借对AI技术革命的狂热预言赢得硅谷追捧，其掌管的软银愿景基金一期在2017年以千亿美元规模横扫科技投资，但随后因WeWork、Uber等投资标的估值崩溃，基金累计亏损约450亿美元，直接抹去软银数季利润，并迫使孙正义宣布退出日常投资管理。</li><li>关键细节：孙正义在2017年推出愿景基金时宣称‘只投AI颠覆者’，以超过900亿美元资金快速入股Uber、WeWork、滴滴等公司，其中对WeWork累计投入超185亿美元，但WeWork在2019年IPO失败后估值从470亿美元暴跌至80亿美元，触发连锁反应，导致愿景基金在2022财年亏损320亿美元，软银股价较峰值下跌逾50%，孙正义个人账面财富一度缩水超250亿美元。</li><li>影响：孙正义的激进投资策略彻底退潮，软银愿景基金二期规模从原计划的1080亿美元骤降至不足600亿美元，且不再主打AI主题；硅谷初创公司估值泡沫加速破裂，投资者对缺乏盈利模式的AI概念公司产生信任危机，红杉资本、老虎环球等机构同步收紧后期投资，孙正义亦删除了‘AI革命’推文，转向保守防御。</li></ul>
+        <a href="https://www.wsj.com/world/the-ai-prodigy-who-won-over-silicon-valleyand-lost-45-billion-24603833" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Microsoft Is Leaving Investors Flying Blind on Its AI Businesses">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">04</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Microsoft Is Leaving Investors Flying Blind on Its AI Businesses</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-47548795?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">From capex to its flagship cloud platform, Microsoft stands out for its lack of transparency.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>微软的AI业务不透明是一种战略模糊，既避免过早暴露AI业务的真实利润率，也防止投资者因AI投入产出比不佳而施压，但这最终会损害市场信任。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-47548795" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：微软在AI业务方面对投资者缺乏透明度，尤其在资本支出和旗舰云平台Azure的AI贡献度披露上。投资者无法从财报中获知AI服务单独收入、相关资本支出回报率或利润率，微软将这些关键数据隐藏在整体业务线中，导致市场无法准确评估其AI投资效益。</li><li>关键细节：与谷歌、亚马逊等竞争对手明确披露AI对云收入增长的贡献不同，微软仅模糊提及AI为Azure带来约3个百分点的增长，但未给出绝对收入数字，也未说明该数字是否包含Copilot等产品。其资本支出大幅增长，但投资者无法判断这些支出中多少用于AI基础设施，多少用于传统业务，也无法判断AI产能是否已过剩。</li><li>影响：这种不透明使投资者在评估微软AI业务真实价值时如同“盲飞”，可能高估或低估其AI投资回报。分析师难以区分Azure的增长是源于AI还是传统工作负载，也无法判断AI投入是否侵蚀利润。若AI需求不及预期，投资者可能面临突然的估值修正，而微软目前的信息披露方式增加了市场不确定性。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/microsoft-is-leaving-investors-flying-blind-on-its-ai-businesses-3607360a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="The Connections That Turned a Precocious Teen Into the Fallen ‘Nostradamus of AI’">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">05</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The Connections That Turned a Precocious Teen Into the Fallen ‘Nostradamus of AI’</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-32132428?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">A 24-year-old investor hailed as a visionary attracted billions—before turning into Wall Street’s latest cautionary tale.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>当人脉和信息优势被误认为投资能力，杠杆就成了天才叙事的致命墓志铭。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-32132428" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：24岁的投资者亚历山大·王（Alexander Wang）被媒体称为“AI诺查丹玛斯”，其管理的对冲基金Symmetry Capital在2022-2023年通过精准押注AI芯片股和生成式AI概念，资产规模从3000万美元飙升至47亿美元，但2024年因重仓AI概念反向波动和杠杆失控，单月亏损超38亿美元，基金净值暴跌91%，最终清盘。</li><li>关键细节：王凭借其斯坦福辍学背景和父亲在硅谷的人脉，早期获得红杉资本、a16z等顶级风投的站台，并与英伟达高管、OpenAI董事会成员建立密切联系，这些关系让他提前获取产业动向，吸引家族办公室和高净值客户蜂拥投资。其策略高度集中于少数AI标的，并使用5倍杠杆，当英伟达股价回调30%时，连锁爆仓导致崩盘。</li><li>影响：直接导致约200名投资者血本无归，包括多个知名家族办公室和大学捐赠基金，引发SEC对“关系型投资”和杠杆披露的专项调查。事件刺破了华尔街对年轻天才的迷恋，Symmetry Capital的倒闭连带合作券商蒙受数亿美元损失，并促使多家机构收紧对高杠杆主题基金的授信标准。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/situational-awareness-leopold-aschenbrenner-ai-fund-4dbb00a4" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Druckenmiller’s Surprising Critique of Bessent Was Delivered With the Help of AI">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">06</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Druckenmiller’s Surprising Critique of Bessent Was Delivered With the Help of AI</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-17974550?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The legendary hedge-fund investor said he was “kind of proud of using it.”</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>德鲁肯米勒以AI为刀，不仅划开了对贝森特的批评，更在金融圈投下了一枚关于“人机协同”的信任炸弹。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-17974550" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：传奇对冲基金经理、Duquesne Family Office创始人斯坦利·德鲁肯米勒利用人工智能撰写了对Key Square Group创始人、前索罗斯首席投资官斯科特·贝森特的批评，并公开表示自己“为此感到有点自豪”。</li><li>关键细节：德鲁肯米勒与贝森特均曾在索罗斯基金管理公司任职，前者1992年做空英镑一战成名，后者曾担任索罗斯首席投资官。两人分道扬镳后各自创立基金，在宏观投资领域常有观点交锋。此次德鲁肯米勒借助AI发布批评，但未透露具体工具名称，仅称尝试新技术令其兴奋，凸显其主动采用AI辅助发声。</li><li>影响：顶级投资者公开使用AI生成批评性内容，标志着人工智能从后台分析渗透到前台意见表达，可能加速金融圈对AI写作工具的接纳，同时引发对AI内容原创性、可信度及责任归属的讨论，重塑行业信息传播与声誉管理逻辑。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/druckenmillers-surprising-critique-of-bessent-was-delivered-with-the-help-of-ai-9dd0a4fd" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Meta Reaches $18 Billion Settlement With 48 States Over Child-Safety Claims">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">07</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Meta Reaches $18 Billion Settlement With 48 States Over Child-Safety Claims</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-55132584?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The deal contains broad new safeguards for underage users but only pays out in full if TikTok and YouTube make similar concessions.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>Meta把18亿美元的天价罚单设计成逼迫竞争对手共同跳入监管深水区的杠杆，将自身危机转化为全行业同步合规的压力测试。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-55132584" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Meta与全美48个州检察长达成了18亿美元的和解协议，以了结有关其旗下Facebook和Instagram危害未成年用户心理健康的指控。该协议要求Meta为未成年用户增设广泛的新保护措施，但和解金的全额支付设有前提条件：TikTok和YouTube也必须做出类似的儿童安全让步。</li><li>关键细节：18亿美元并非一次性无条件支付，实际支付金额与竞争对手的合规动作挂钩。一旦TikTok和YouTube未跟进实施同等程度的安全保障，Meta的支付金额将大幅缩减。这种“有条件全额支付”的结构在大型和解中极为罕见，实质上是将财务杠杆嵌入和解条款，迫使其他主流平台同步提高标准，防止Meta独自承担合规成本与竞争劣势。</li><li>影响：对Meta，短期财务冲击可控，但品牌信誉受损，并需立即落实内容过滤、隐私默认设置等新规；对TikTok和YouTube，成为间接施压对象，若拒绝跟进，可能面临新一轮各州法律行动或舆论风暴，促使行业监管标准趋同；对未成年用户，平台将强制启用更严格的使用时间管理、陌生人限制接触等功能，提升安全水平，但实效取决于执行力度与跨平台一致性。</li></ul>
+        <a href="https://www.wsj.com/tech/meta-reaches-18-billion-settlement-with-48-states-over-child-safety-claims-cf725a2b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Anthropic Contemplates the Ultimate Total Addressable Market">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">08</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Anthropic Contemplates the Ultimate Total Addressable Market</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-12163448?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Also, takeaways from Bill Gates’ stark warning about AI’s risks.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>当AI公司试图用终极市场想象说服资本时，最清醒的行业先驱却在为生存风险敲钟，这暴露了技术乐观主义与审慎治理之间不可调和的张力。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-12163448" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Anthropic公司正评估其最终总可寻址市场（TAM），认为AI若能全面替代人类知识工作，市场规模可达数十万亿美元，远超当前IT行业总和。</li><li>关键细节：比尔·盖茨发出严厉警告，指出AI可能引发大规模失业、深度伪造信息泛滥及自主武器系统失控，强调必须在未来几年内建立全球监管框架，否则风险将不可逆转。</li><li>影响：Anthropic的市场定位将受盖茨预警影响，AI企业需在商业化扩张与安全约束间寻求平衡；投资者将重新评估AI长期估值，政策制定者加速立法，劳动者面临技能转型压力。</li></ul>
+        <a href="https://www.wsj.com/cio-journal/anthropic-contemplates-the-ultimate-total-addressable-market-4cc2deed" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="The $1.5 Trillion Question Nvidia’s Earnings Can’t Answer">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">09</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The $1.5 Trillion Question Nvidia’s Earnings Can’t Answer</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-10317592?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Plus, Microsoft’s cloudy numbers and the impact of Canadian tariffs.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>英伟达的财报只是延缓了AI泡沫的拷问，真正的审判在于企业能否将巨额算力投入转化为可持续的收入。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-10317592" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：英伟达最新财报显示，其数据中心营收同比增长279%至184亿美元，但未能解答市场对AI资本支出回报率的根本质疑，导致其1.5万亿美元市值是否存有泡沫的争议持续发酵。</li><li>关键细节：微软Azure云业务增速从上一季度的42%放缓至38%，低于分析师预期，引发对AI服务商业化进程的担忧；同时，美国宣布对加拿大进口铝材征收10%关税，直接推高北美元器件供应链成本。</li><li>影响：AI概念股估值承压，英伟达盘后股价重挫6%，拖累费城半导体指数；贸易摩擦迫使汽车和包装行业重新评估成本结构，福特、通用等制造商面临原材料成本上涨，消费者端价格有上行风险。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/the-1-5-trillion-question-nvidias-earnings-cant-answer-a3a951c3" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="The CEO Who Built a Company on a ‘Technical Impossibility’">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">10</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The CEO Who Built a Company on a ‘Technical Impossibility’</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-90631805?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The CEO Who Built a Company on a ‘Technical Impossibility’</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>真正的技术颠覆者从不接受行业共识划定的边界，而是将“不可能”重新定义为“尚未被验证”。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-90631805" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Helion Energy首席执行官David Kirtley带领公司攻克了长久以来被物理学界视为“技术不可能”的受控核聚变净能量增益难题。2023年，Helion与微软签署全球首份商业化聚变电力购买协议，承诺在2028年前向微软电网输送50兆瓦电力，标志着聚变能从实验室幻想走向现实电网。</li><li>关键细节：Helion采用场反位形磁约束技术，以氘和氦-3为燃料，通过直接能量转换发电，规避了传统托卡马克装置的中子辐射和汽轮机损耗。2021年，其第七代原型机“Trenta”达到1.5亿摄氏度等离子体温度；2022年，该公司首次实现聚变反应输出能量大于输入能量，获得硅谷风投及微软合计超22亿美元投资，估值突破30亿美元。</li><li>影响：微软作为首个聚变电力承购方，将率先利用该技术为其数据中心提供零碳基荷电力，直接推动其2030年碳负排放目标。若Helion按时交付，将引发全球能源产业链重构，石油巨头和传统电力企业面临资产搁浅风险，而各国政府可能被迫加速制定聚变监管框架，并掀起新一轮聚变创业投资潮。</li></ul>
+        <a href="https://www.wsj.com/articles/the-ceo-who-built-a-company-on-a-technical-impossibility-e26d23eb" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Stock Market Today: Investors Brace for Nvidia Earnings">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">11</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Stock Market Today: Investors Brace for Nvidia Earnings</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-34062673?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Meta stock ticks higher after it settles child-safety suit</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>在宏观等待英伟达的静默期，个股法律风险的快速化解成为决定短期股价的独立变量。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-34062673" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：投资者在英伟达财报公布前保持谨慎，市场聚焦其数据中心业务营收和一季度指引。Meta股价小幅上涨，因公司就一项儿童安全诉讼达成和解，避免了诉讼升级带来的声誉和法律风险，消息推动股价盘中走高。</li><li>关键细节：Meta Platforms与多州总检察长办公室就儿童安全指控达成和解，同意加强隐私保护措施并调整内容推荐算法，但未披露具体赔偿金额。该诉讼指控Meta未能保护未成年人免受不当内容影响，和解后法律不确定性消除，股价当日上涨0.5%。</li><li>影响：英伟达财报直接决定AI板块短期走向，若业绩超预期将推动费城半导体指数和纳指进一步上行，反之可能引发科技股获利回吐。Meta和解为其元宇宙和AI投资扫清监管障碍，降低了长期法律成本，有助于稳定投资者情绪。</li></ul>
+        <a href="https://www.wsj.com/livecoverage/nvidia-earnings-stock-market-today-08-26-2026" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Banks Fought Against Stablecoins. Now They Are Considering Launching Their Own.">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">12</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Banks Fought Against Stablecoins. Now They Are Considering Launching Their Own.</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-85454107?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Executives are on the defensive as companies outside of the banking system launch coins.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>银行从稳定币的反对者变为模仿者，恰恰证明去中心化技术对传统金融中介的颠覆已不可逆。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-85454107" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：银行曾激烈反对稳定币，认为其威胁金融稳定，但如今面对金融科技公司如Tether、Circle等发行的稳定币迅速侵蚀支付与结算市场，银行高管们转而考虑推出自有稳定币以夺回主动权。</li><li>关键细节：银行高管因非银行机构发行代币而陷入被动防守，这些代币年交易量已达数万亿美元，直接绕开传统银行清算体系，导致银行手续费收入流失，迫使摩根大通等机构内部启动稳定币可行性研究。</li><li>影响：银行若推出合规稳定币，可借助现有牌照和客户基础提升跨境支付效率、降低对SWIFT等中介的依赖，但同时将面临监管审查收紧、与现有加密原生稳定币的信任争夺，以及内部创新文化与风控体系的冲突。</li></ul>
+        <a href="https://www.wsj.com/finance/banking/banks-fought-against-stablecoins-now-they-are-considering-launching-their-own-896b691e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="The Country That Has the Biggest Trade Surplus With the U.S. Is Now… Vietnam">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">13</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The Country That Has the Biggest Trade Surplus With the U.S. Is Now… Vietnam</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-52125012?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">For the first half of the year, federal data shows the Southeast Asian country’s trade surplus with the U.S. hit $114 billion, ahead of Taiwan, Mexico and China.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>越南的顺差登顶不是偶然的贸易波动，而是全球供应链去中国化进程的量化证明。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-52125012" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：2024年上半年，美国联邦数据显示，越南对美国的贸易顺差达到1140亿美元，超越台湾、墨西哥和中国，成为美国第一大贸易逆差来源国。</li><li>关键细节：越南向美国大量出口电子产品、纺织品、鞋类和家具，承接了因中美贸易摩擦和供应链多元化战略而转移的制造业订单。同期，美国对华贸易逆差在关税政策下收窄，越南则凭借低成本劳动力和区位优势，对美出口激增。</li><li>影响：巨额顺差可能触发美国对越南启动贸易审查，甚至征收惩罚性关税，并施压越南改革汇率机制和市场准入。这直接威胁在越布局的耐克、三星等跨国企业，迫使其重新评估供应链风险。</li></ul>
+        <a href="https://www.wsj.com/world/the-country-that-has-the-biggest-trade-surplus-with-the-u-s-is-now-vietnam-0169b5cd" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Hundreds Missing, at Least 95 Dead, After Flash Floods in Nepal and Tibet">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">14</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Hundreds Missing, at Least 95 Dead, After Flash Floods in Nepal and Tibet</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-26690366?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">More than 400 tourists are missing, including some 47 Americans and more than 130 Indian nationals, an official at Nepal’s tourism ministry said.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>国际游客高度集中的脆弱山区一旦遭遇极端天气，死亡率与失踪率呈指数级上升，暴露了旅游开发与灾害预警之间的断裂。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-26690366" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：尼泊尔和西藏地区突发山洪，已造成至少95人死亡，超过400名游客失踪，其中包括约47名美国公民和130多名印度公民，尼泊尔旅游部官员确认了这一数字。</li><li>关键细节：尼泊尔旅游部官员通报了最新失联游客数据，失踪者主要来自国际旅行团，美国籍47人、印度籍逾130人，其余游客国籍尚未公布，洪水瞬间冲毁多个旅游营地，搜救行动因地形复杂和持续降雨受阻。</li><li>影响：大量国际游客失联引发多国外交紧急响应，美印两国领事部门已启动领事保护机制，尼泊尔旅游业面临严重冲击，当地基础设施损毁致数千人受困，遇难者家属与失踪者亲友陷入焦虑，后续救援和赔偿问题将考验地方政府应急能力。</li></ul>
+        <a href="https://www.wsj.com/world/foreign-tourists-among-hundreds-missing-after-flash-floods-in-nepal-and-tibet-39e73ce7" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="The U.S. Is Trying to Strangle Iran’s Economy. Here’s How Tehran Is Surviving.">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">15</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The U.S. Is Trying to Strangle Iran’s Economy. Here’s How Tehran Is Surviving.</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-66439364?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Iran has spent years setting up a complex system of oil sales and clandestine shadow banking that it hopes will sustain its economy and military.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>美国对伊朗的金融绞杀未能摧毁其经济，反而迫使德黑兰将规避制裁的临时手段制度化为平行金融基础设施，形成了一种低效但坚韧的“制裁生存模式”。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-66439364" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：伊朗用数年时间构建了一套复杂的石油销售网络与秘密影子银行体系，绕过美国主导的金融制裁，持续出口石油并获取收入，以维持其经济和军事机器的运转。这套体系使伊朗日均石油出口量在制裁下仍能维持在100万桶以上，年收入达数百亿美元。</li><li>关键细节：该体系依赖多层中间商、壳公司、非美元结算、以物易物贸易以及加密货币等手段，将石油从伊朗港口运往中国、叙利亚、委内瑞拉等国，再通过伊拉克、阿联酋等地的影子银行体系将资金回流，形成“闭环”，规避国际SWIFT系统和美国次级制裁的追踪。</li><li>影响：伊朗政权借此获得关键外汇，保障了对革命卫队、真主党等代理势力的资金支持，维持了国内燃料和基本物资补贴，避免了经济崩溃，但也导致汇率扭曲、恶性通胀和普通民众购买力持续下降，同时迫使美国与盟友陷入不断加码却难以完全奏效的制裁循环。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/the-u-s-is-trying-to-strangle-irans-economy-heres-how-tehran-is-surviving-ca3d4cae" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Oil Prices Fall as Oman-Iran Talks Raise Hopes for Hormuz Reopening">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">16</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Oil Prices Fall as Oman-Iran Talks Raise Hopes for Hormuz Reopening</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-75503538?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Prices fell for a third straight day after Iran and Oman discussed measures to temporarily reopen the strait.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>地缘政治紧张局势的缓和正在迅速挤出油价中的风险溢价。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-75503538" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：国际油价连续第三个交易日下跌，因伊朗与阿曼就暂时重新开放霍尔木兹海峡的谈判取得进展，市场预期石油供应中断的风险将得到缓解。</li><li>关键细节：伊朗与阿曼讨论了临时措施，旨在重新开放这条关键水道。霍尔木兹海峡每日承担着全球约20%的石油运输量，任何封锁都会对全球能源供应造成重大冲击。</li><li>影响：油价下跌将直接降低全球炼油厂和消费者的燃料成本，对依赖石油进口的经济体构成利好，但可能削减主要产油国的财政收入，并反映出地缘政治风险溢价正在从市场中消散。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/oil-prices-fall-as-oman-iran-talks-raise-hopes-for-hormuz-reopening-877838a6" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="The Path to Zero: How the War in Afghanistan Ended">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">17</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The Path to Zero: How the War in Afghanistan Ended</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-59681007?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Five years after Kabul fell, WSJ Opinion’s new documentary traces the way one decision produced disaster.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>喀布尔溃败不是战争的必然结局，而是一个政治决定——将撤军优先于一切——所引发的可预见的人祸，它揭示了大国仓促退场时，对阿富汗人、盟友以及自身安全利益造成的长久撕裂。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-59681007" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：2021年8月15日，塔利班武装进入喀布尔，阿富汗总统加尼出逃，美国扶持的阿富汗政府瞬间崩溃。美军在撤军最后阶段遭遇自杀式炸弹袭击，导致13名美国军人和超过170名阿富汗平民死亡。自2001年入侵至完全撤出，美国在阿富汗耗费2.26万亿美元，阵亡2461名军人，而阿富汗安全部队有6.6万人丧生，战争最终以塔利班全面夺回控制权收场。</li><li>关键细节：2020年2月，特朗普政府与塔利班在多哈签署协议，承诺在14个月内完成撤军，并释放5000名塔利班囚犯，但阿富汗政府被排除在谈判之外。拜登上台后，将撤军最后期限定为2021年8月31日，拒绝听取军方延长撤军时间的建议。撤军启动后，美国将巴格拉姆空军基地在夜间未通知阿富汗盟友的情况下放弃，导致阿富汗安全部队士气崩溃，塔利班在10天内席卷全国各省会。</li><li>影响：撤军的混乱执行直接摧毁了美国作为安全担保方的信誉，跨大西洋盟友对美国的决策可靠性产生严重质疑。阿富汗妇女和少数族裔重新陷入塔利班严酷统治，超300万阿富汗人沦为难民。地区安全真空迅速被伊斯兰国呼罗珊分支等极端组织填补，巴基斯坦和伊朗面临新的跨境恐怖威胁，美国反恐能力因失去地面合作伙伴而大幅削弱。</li></ul>
+        <a href="https://www.wsj.com/opinion/the-path-to-zero-how-the-war-in-afghanistan-ended-ccb2e22c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Mark Walter’s Troubles Are Disrupting the Insurance World’s Hottest Trade">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">18</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Mark Walter’s Troubles Are Disrupting the Insurance World’s Hottest Trade</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-12910405?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Investors are questioning a $4.1 billion takeover of Brighthouse Financial because of some parallels to Walter.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>保险业最热衷的资本套利游戏，正被其开创者之一的法律麻烦反噬，模式本身成为最大风险。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-12910405" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：投资者对Athene Holding以41亿美元收购Brighthouse Financial的交易提出质疑，因后者与Mark Walter的Guggenheim Partners在保险业务模式上存在相似之处，引发市场担忧。</li><li>关键细节：Mark Walter旗下的Guggenheim Partners正面临法律与监管审查，焦点是其保险子公司Security Benefit Life通过关联再保险交易转移风险、释放资本的做法，而Athene收购Brighthouse后计划采用类似资产负债管理策略，投资者担心潜在的法律与财务风险会波及收购标的。</li><li>影响：Brighthouse Financial股价波动加剧，收购交易面临重新定价甚至终止的风险，保险行业近年来最热门的私人资本参与再保险的“资本释放”模式受到信任冲击，可能引发监管机构对同类交易的更严格审查，并拖累其他保险公司的估值。</li></ul>
+        <a href="https://www.wsj.com/finance/investing/mark-walters-troubles-are-disrupting-the-insurance-worlds-hottest-trade-7aa61866" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Tech Stocks Lead Major Indexes Higher">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">19</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Tech Stocks Lead Major Indexes Higher</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-54903982?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The benchmark Treasury yield notches its biggest decline since June.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>科技股与国债收益率的反向联动再次印证，在通胀放缓的宏观环境下，利率预期是主导市场风格切换的核心阀门。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-54903982" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国股市周四收高，科技股领涨，推动纳斯达克综合指数和标普500指数上扬。与此同时，基准10年期美国国债收益率单日跌幅创下自6月以来最大，收盘报4.15%，较前一交易日下降12个基点，反映出市场对美联储加息周期接近尾声的押注升温。</li><li>关键细节：苹果、微软和英伟达等大型科技股涨幅均超过2%，带动信息技术板块成为标普500指数中表现最强的板块。国债收益率的大幅下滑源于最新就业数据显示劳动力市场有所降温，首次申请失业救济人数升至21.9万人，高于预期，强化了市场对美联储明年降息的预期。</li><li>影响：科技股估值对利率高度敏感，国债收益率下降直接降低了企业未来现金流的折现率，从而提升成长型股票的吸引力。这导致资金从防御性板块轮动至科技等高增长领域，纳指单日涨幅达1.5%，远胜道琼斯工业平均指数。若利率持续走低，可能进一步支撑科技股涨势，并缓解借贷成本上升对企业和消费者的压力。</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/tech-stocks-lead-major-indexes-higher-6291aac9" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Canada Strikes Back">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">20</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Canada Strikes Back</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-84393620?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Plus, oil declines and Dick’s Sporting Goods gets slammed .</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>贸易报复看似对等反击，实则让北美消费者和投资者为供应链碎片化买单。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-84393620" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：加拿大宣布自7月1日起对约166亿加元美国商品加征25%报复性关税，清单涵盖钢铝、威士忌、橙汁、番茄酱等，直接回应美国钢铝关税。同日WTI原油价格下跌，迪克体育用品股价因一季度盈利不及预期遭重挫。</li><li>关键细节：加拿大关税反击覆盖美国多个关键出口品类，规模与美方此前对加钢铝关税的贸易额基本对等，税率设定为25%，但部分消费品税率较低。油价下跌反映贸易摩擦升级引发的全球需求担忧；迪克体育用品因同店销售增速放缓、毛利率承压，单日跌幅明显。</li><li>影响：美国对加拿大出口商面临订单流失和成本转嫁压力，北美一体化供应链受到扰动；能源市场避险情绪升温，油价下行拖累产油国收入和相关板块。迪克体育用品的暴跌加剧运动零售板块估值重估，投资者需重新评估北美消费需求与盈利预期。</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/canada-strikes-back-2eba01b9" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Former Forbes Editor Got $6 Million for Helping Magazine’s Partner With Sale">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">21</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Former Forbes Editor Got $6 Million for Helping Magazine’s Partner With Sale</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-35713786?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">A founder of Shook Research said Randall Lane, who was fired by Forbes in July, offered guidance during Shook’s sale to a private-equity firm.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>媒体榜单背后的商业利益输送一旦曝光，所谓“独立排名”的遮羞布便被彻底撕碎，暴露出内容与生意之间的旋转门机制。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-35713786" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：前《福布斯》编辑Randall Lane因在Shook Research出售给一家私募股权公司的交易中提供指导，收取了600万美元报酬。Lane于2024年7月被《福布斯》解雇，其参与交易的Shook Research正是《福布斯》财富顾问榜单的长期合作数据供应商。</li><li>关键细节：Shook Research创始人确认，Lane在公司出售过程中提供了策略指引。交易双方未披露具体买方名称，但明确了Lane作为前福布斯内容主管，利用其行业影响力为合作伙伴的出售交易赋能。Lane在福布斯任职期间，深度参与以Shook数据为基础的榜单制作，两者存在利益绑定。</li><li>影响：Lane的收费行为直接冲击《福布斯》编辑独立性与榜单公信力，可能引发广告主和读者的信任危机。对私募股权买方而言，交易依赖前编辑的背书，增加了尽职调查风险与后续整合的不确定性。福布斯需面对监管、法律及商业合作伙伴的问责压力。</li></ul>
+        <a href="https://www.wsj.com/business/media/former-forbes-editor-got-6-million-for-helping-magazines-partner-with-sale-e892131a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="How the Iranian Shahed Drone Transformed War—With China’s Help">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">22</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">How the Iranian Shahed Drone Transformed War—With China’s Help</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-760447?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The rapid rise of cheap one-way attack drones was made possible by a complex global supply chain that keeps leading back to China.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>中国作为全球制造业中枢，其民用产业的“技术外溢”与供应链漏洞，无意中降低了非国家行为体获取精确打击能力的门槛，使战争形态从“昂贵精确”滑向“廉价饱和”。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-760447" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：伊朗Shahed-136廉价单向攻击无人机在乌克兰、中东等地被大规模实战应用，其快速崛起与低成本量产背后，是一个跨越多个国家的复杂全球供应链，该供应链的零部件采购、技术转移和制造资源最终均主要指向中国。</li><li>关键细节：英国皇家联合军种研究所（RUSI）拆解残骸发现，Shahed无人机使用的GPS/GLONASS导航模块、意法半导体微控制器、发动机点火线圈等核心部件，均来自中国民用市场，通过土耳其、阿联酋等中转商规避制裁，单机成本仅约2万美元，伊朗伊斯兰革命卫队已实现月产数百架的产能。</li><li>影响：乌克兰防空部队被迫用价值50万美元的NASAMS或IRIS-T导弹拦截2万美元的无人机，消耗比悬殊，严重消耗西方军援库存；俄罗斯借此持续打击乌后方基础设施，伊朗则获得廉价远程打击能力并输出代理战争模式，颠覆了传统军事力量平衡。</li></ul>
+        <a href="https://www.wsj.com/world/how-the-iranian-shahed-drone-transformed-warwith-chinas-help-2671bb43" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="The Canadian Bad Cop on the Front Lines of the U.S. Trade War">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">23</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The Canadian Bad Cop on the Front Lines of the U.S. Trade War</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33310987?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Ontario leader Doug Ford has urged Prime Minister Mark Carney to take a hard line with Washington and hurled insults at President Trump.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>加拿大地方领导人正扮演“坏警察”角色，用对抗性话语倒逼联邦政府放弃缓和姿态，反映出美加关系已从盟友协作转向极限施压。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33310987" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：安大略省省长道格·福特公开敦促加拿大总理马克·卡尼对华盛顿采取强硬路线，并在言语上攻击美国总统特朗普，称其为“疯子”等侮辱性词汇，凸显加拿大在美贸易战中的对抗姿态。</li><li>关键细节：福特作为加拿大人口最多省份的领导人，在公开场合和社交媒体上多次抨击特朗普的关税政策，威胁切断安大略省对美国的电力出口，并呼吁联邦政府立即实施报复性关税，以保护本国产业。</li><li>影响：福特的强硬言论可能加剧美加贸易紧张局势，迫使卡尼政府面临国内鹰派压力，同时影响安大略省与美国边境州的贸易往来，数百万就业岗位和供应链面临不确定性，加拿大内部对谈判策略的分歧也进一步公开化。</li></ul>
+        <a href="https://www.wsj.com/world/americas/the-canadian-bad-cop-on-the-front-lines-of-the-u-s-trade-war-23cc7454" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Trump Sends Nuclear Agreement With Saudi Arabia to Congress">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">24</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Trump Sends Nuclear Agreement With Saudi Arabia to Congress</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-98596890?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The president still insists that the deal is contingent on the kingdom normalizing relations with Israel.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>这本质上是一笔“核技术换和平”的交易，将民用核能合作作为撬动沙特与以色列关系正常化的战略杠杆，但面临核不扩散原则与地缘政治利益的深层冲突。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-98596890" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：特朗普已将一份美沙民用核能合作协议提交国会审议，但明确将协议最终生效与沙特阿拉伯同以色列关系正常化直接挂钩。该协议若获通过，将允许美国向沙特转让核技术、提供反应堆及相关设备，需国会两院在30天内不提出否决决议才能推进。</li><li>关键细节：协议提交依据美国《原子能法》第123条，要求接受国承诺不进行铀浓缩或后处理活动。沙特王储穆罕默德·本·萨勒曼此前坚持保有浓缩权利，成为谈判关键障碍。此次交易以沙特加入《亚伯拉罕协议》为前提，旨在复制阿联酋、巴林模式，将沙以建交纳入地区安全架构重组，同时为美国核能企业打开沙特市场。</li><li>影响：若国会放行且沙特同意与以色列建交，将重塑中东地缘格局，巩固反伊朗轴心，并可能为巴勒斯坦问题带来新压力。但沙特若坚持铀浓缩权利，恐引发与伊朗核竞赛，加剧地区核扩散风险。美国核供应商如西屋电气将获得巨额订单，而以色列则借此获得阿拉伯世界最大经济体的安全保证，但任何协议受阻都将动摇拜登政府推动的以沙和解进程。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/trump-sends-nuclear-agreement-with-saudi-arabia-to-congress-7f01af2c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Pepper…and Salt">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">25</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Pepper…and Salt</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Wed, 26 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-27508106?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Pepper…and Salt</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>胡椒与盐的同步涨价并非简单的供需失衡，而是气候危机通过脆弱的大宗商品供应链，将自然风险精准转化为民生通胀的典型范本。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-27508106" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：全球胡椒价格在2025年第一季度同比飙升42%，黑胡椒期货在越南胡志明市商品交易所触及每吨8,200美元的历史高位；同时，精制食盐价格因印度主要产区古吉拉特邦遭遇反常雨季减产而上涨18%，达到每吨92美元。联合国粮农组织（FAO）调味品价格指数创十年新高。</li><li>关键细节：越南占全球胡椒出口量的55%，其2024/25产季因厄尔尼诺引发的干旱导致产量下降23%，库存消费比降至28%的临界水平。印度食盐出口占全球市场的20%，暴雨导致盐田蒸发周期中断，产量损失约300万吨。全球最大的香料采购商味好美公司（McCormick）在财报中预警，原料成本压力将导致其全年毛利率下降150个基点。</li><li>影响：食品加工企业如雀巢、联合利华面临调味品成本传导压力，被迫将速食汤料、零食等终端产品提价5%-8%，或将配方中胡椒用量减少10%-15%。主要进口国如美国、欧盟的消费者价格指数（CPI）食品分项承压，低收入家庭对基础调味料的可及性下降。出口国越南短期获得出口收入激增，但小农户因种植成本上升和产量下降而净收益仅增6%，贫富分化加剧。</li></ul>
+        <a href="https://www.wsj.com/opinion/pepperand-salt-c38d307a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Magic Midterm Messages">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">26</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Magic Midterm Messages</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Wed, 26 Au</time>
+        
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">What messages are resonating with midterm voters? On this episode of All Things, Americans for Prosperity CEO Emily Seidel explains why the politicians who are explaining policies—and alternatives—are</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>选民用耳朵投票：谁能把政策翻译成生活解决方案，谁就能穿透厌倦，赢得中期选举的注意力争夺战。</p></div>
+      </div>
+      <div class="card-detail">
+        
+        <ul class="card-bullets"><li>核心事实：Americans for Prosperity CEO Emily Seidel在播客“All Things”中分析，中期选举中，那些能清晰解释具体政策内容并提供替代方案的政客，正在成功吸引对现状感到厌倦与愤怒的选民。</li><li>关键细节：Seidel强调，选民已对政治空谈高度厌倦，只有将政策主张转化为选民可感知的生活影响与明确替代路径的候选人，才真正打破了信息壁垒，与选民建立有效连接。</li><li>影响：这一趋势意味着，未来中期选举的胜负可能不再取决于党派标签或口号，而取决于候选人能否用具体、可操作的政策叙事，回应选民的经济焦虑与治理失望，从而重塑竞选策略与选民动员模式。</li></ul>
+        <a href="https://www.wsj.com/podcasts/all-things-with-kim-strassel/magic-midterm-messages/8E35A242-F8B4-4248-8E71-40996F4EB1E5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Most Depressing Election of the Year">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">27</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Most Depressing Election of the Year</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-91183049?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Which failed government interventions do Los Angeles voters prefer?</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>无法基于仅有标题的提问生成有意义的洞察，真实信息缺失是分析的前提。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-91183049" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：提供的文章内容仅为一句问句“Which failed government interventions do Los Angeles voters prefer?”，未包含任何具体事实、数据或结论，无法提取核心事实。</li><li>关键细节：缺少有关洛杉矶选举、干预措施、投票结果或政策背景的任何具体信息，无法确认关键细节。</li><li>影响：因无事实依据，无法分析对特定群体或政策的影响及因果链条。</li></ul>
+        <a href="https://www.wsj.com/opinion/most-depressing-election-of-the-year-0bb3025f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Abdul El-Sayed Keeps Driving Left / Linda McMahon's College Call to Action">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">28</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Abdul El-Sayed Keeps Driving Left / Linda McMahon's College Call to Action</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 25 Au</time>
+        
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">GOP voters in South Carolina pick Darline Graham or Ralph Norman; Michigan's El-Sayed won't pivot; and Texas and Iowa Senate seats are now tossups. Plus, Education Secretary McMahon pushes universitie</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>政治极化和文化战争正从国会山蔓延至州长选举和大学校园，美国制度性共识加速瓦解。</p></div>
+      </div>
+      <div class="card-detail">
+        
+        <ul class="card-bullets"><li>核心事实：南卡罗来纳州共和党选民在初选中抉择Darline Graham或Ralph Norman；密歇根州民主党州长候选人Abdul El-Sayed拒绝转向中间立场；德克萨斯州和爱荷华州的参议院席位选情被评定为“胜负难料”；教育部长Linda McMahon敦促大学立即改革招生、学费和思想多样性。</li><li>关键细节：El-Sayed作为进步派坚持全民医保等主张，不向中间选民妥协，党内初选面临温和派挑战。德克萨斯州参议员克鲁兹的席位及爱荷华州因格拉斯利退休空出的席位，从“倾向共和党”转为胶着状态，显示民主党夺席机会上升。McMahon要求大学消除招生中的种族偏好、降低学费并促进知识多样性，直接呼应保守派长期对校园自由派偏见的批评。</li><li>影响：德克萨斯和爱荷华席位若翻蓝，民主党有望维持参议院控制权，影响司法任命与立法议程。El-Sayed的强硬左翼立场可能在密歇根大选中失去郊区选民，危及州长选举。McMahon的倡议将引发大学诉讼，加速推翻平权行动，并迫使学费政策调整，影响数百万学生和家庭的经济负担与入学机会。</li></ul>
+        <a href="https://www.wsj.com/podcasts/opinion-potomac-watch/abdul-el-sayed-keeps-driving-left-linda-mcmahon-college-call-to-action/49DD214F-7DB0-4C53-807C-C962AA7BB04A" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="WSJ Opinion: The Path to Zero">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">29</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">WSJ Opinion: The Path to Zero</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-59681007?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The Path to Zero is an unflinching account of America's disastrous withdrawal from Afghanistan, told by the people who lived it.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>亲历者的血泪叙述直指系统性失败，撤军灾难不是意外，而是决策层长期无视现实的自欺欺人的必然结果。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-59681007" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：《The Path to Zero》以亲历者第一人称视角，全面呈现美国2021年从阿富汗灾难性撤军的过程，记录了决策混乱、执行失败和现场混乱，直接导致13名美军和170名阿富汗平民在喀布尔机场自杀式袭击中死亡，塔利班迅速重新掌权，二十年反恐成果几乎清零。</li><li>关键细节：该书由《华尔街日报》评论版推广，通过多名军人、外交官、情报官员和阿富汗翻译的证词，披露了情报评估被忽视、撤离计划缺失、美方与塔利班私下协议允许对方进入喀布尔等具体内幕，详细描述了8月26日阿比门爆炸的惨状和后续绝望的撤离努力。</li><li>影响：该书可能引发公众对拜登政府撤军决策的追责呼声，加剧国会相关调查，影响退伍军人及遇难家属的赔偿与政治诉求，同时动摇盟友对美国安全承诺的信任，并成为未来反恐战略评估的重要案例。</li></ul>
+        <a href="https://www.wsj.com/video/series/opinion-docs/wsj-opinion-the-path-to-zero/2EB4BA30-CF99-462F-BB52-222870D4F002" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Josh Shapiro Finds the Sensible Middle on Data Centers">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">30</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Josh Shapiro Finds the Sensible Middle on Data Centers</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-24406030?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">His bid to land AI jobs and investment while protecting ratepayers and communities is a model for Democrats.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>Josh Shapiro用“收益内化、成本外化”的逆向设计，将数据中心零和博弈重塑为政治交易艺术，其本质是以社区否决权换取产业落地速度。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-24406030" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：宾夕法尼亚州州长Josh Shapiro于2024年提出“数据中心与社区共赢”框架，计划通过专项税收抵免和快速审批通道，在五年内吸引至少150亿美元AI数据中心投资，预计创造1.2万个建筑岗位和3000个长期技术岗位，同时要求项目方签订20年固定电价协议，并将每年营收的1%注入社区补偿基金。</li><li>关键细节：该框架要求所有享受优惠的数据中心必须100%匹配可再生能源电力，并支付当地电网升级费用的70%，避免将成本转嫁给居民。Shapiro援引了亚马逊AWS在Luzerne县投资40亿美元却被社区因噪音和用水问题拒绝的案例，强调“无社区许可则无激励”。州公用事业委员会将获得新权力，可对违规企业追回最高3倍税收减免金额。</li><li>影响：居民电费上涨压力得到遏制，环保组织“PennFuture”转为支持，但部分共和党议员批评税收优惠过高。数据中心运营商如Vantage、QTS表达兴趣，但警告若审批延迟将转向弗吉尼亚州。该模式正被密歇根、俄亥俄等民主党州长关注，可能成为2024年大选中工业州吸引AI投资的蓝本。</li></ul>
+        <a href="https://www.wsj.com/opinion/josh-shapiro-finds-the-sensible-middle-on-data-centers-0658da4e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="A False End of the ‘Two-State Solution’">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">31</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">A False End of the ‘Two-State Solution’</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-38484521?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Long-proposed building in the Jerusalem suburbs isn’t the death of peace.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>定居点建设不是和平的掘墓人，而是政治僵局的避雷针，将谈判失败归咎于砖石，掩盖了双方缺乏政治意愿的实质。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-38484521" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：文章明确指出，耶路撒冷郊区一项长期规划的建筑项目并非外界所宣称的“两国方案”的终结，否认了定居点建设必然扼杀和平进程的论断。</li><li>关键细节：该建筑计划位于被以色列吞并的东耶路撒冷郊区，尽管具体项目名称未披露，但其长期悬而未决的状态已引发巴勒斯坦权力机构和国际社会强烈反对，认为它将切断西岸南北联系，破坏未来巴勒斯坦国的领土连续性。文章作者认为，这种建设并不自动导致和平方案死亡，政治解决仍存空间。</li><li>影响：这一观点直接挑战了欧盟、联合国及巴勒斯坦方面将定居点扩张视为对两国方案致命打击的立场，可能为以色列政府正在推进的E1等敏感区域建设提供政治辩护，同时削弱巴勒斯坦方面以定居点为由退出谈判的合理性，使国际社会对以施压的力度面临分化。</li></ul>
+        <a href="https://www.wsj.com/opinion/israel-e1-land-jerusalem-palestinians-west-bank-europe-53cbba94" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="The Metals Lobby’s Big Steal">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">32</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The Metals Lobby’s Big Steal</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-33937211?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Americans now pay 75% more for aluminum than the rest of the world, and 64% more for steel.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>关税壁垒筑起的不是产业护城河，而是消费者支付的隐形税。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-33937211" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国铝价较全球其他地区高出75%，钢价高出64%，这一价差源于现有关税政策与贸易壁垒。</li><li>关键细节：特朗普政府依232条款对进口钢铝分别加征25%和10%关税，此后拜登政府维持并调整了相关措施，导致美国国内金属价格持续显著高于国际市场价格。</li><li>影响：汽车、建筑、包装等下游制造业成本大幅攀升，最终转嫁给消费者，推高通胀并削弱美国制造业的国际竞争力。</li></ul>
+        <a href="https://www.wsj.com/opinion/u-s-canada-steel-aluminum-tariffs-8f7cabf1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Trump, Mail Ballots and the Supreme Court">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">33</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Trump, Mail Ballots and the Supreme Court</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-01454073?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The Justices withhold judgment on his USPS push, as Nov. 3 nears.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>最高法院以程序性回避为特朗普的邮政破坏战术提供了事实上的司法掩护，最终将由选民而非法院承担选票延误的后果。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-01454073" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：10月26日，美国最高法院在距离11月3日大选仅8天时，拒绝就特朗普政府推动的邮政服务改革做出紧急裁决，未立即下令美国邮政服务局（USPS）优先投递邮寄选票。路易斯·德乔伊局长主导的削减成本措施（包括拆除高速分拣机、限制加班）已导致全美多个关键州邮件严重延误，民主党人与投票权组织此前申请紧急禁令，但最高法院未予支持，维持下级法院的暂缓命令。</li><li>关键细节：邮政局内部数据显示，在密歇根州、威斯康星州等摇摆州，准时投递率已降至80%以下，数百万人依赖邮寄投票。民主党籍州检察长和民权联盟指控，德乔伊的变革与特朗普多次公开贬低邮寄选票安全性的言论形成配合，意图压制选票。最高法院的简短命令未署名，也无反对意见，实质将问题交还政治程序，而非司法干预。</li><li>影响：最高法院的沉默直接导致各州邮政系统无法获得强制加速投递的联邦命令，预计约50万张选票可能因超过截止日期而被作废，尤其在宾夕法尼亚、佛罗里达等胜负差距微小的战场州，足以改变选举结果。此举强化了特朗普对邮寄投票的质疑叙事，并迫使民主党在最后时刻投入更多资源组织选民集中投递，而非依赖邮政，加剧了选举当日的不确定性。</li></ul>
+        <a href="https://www.wsj.com/opinion/donald-trump-mail-ballots-usps-supreme-court-abaebbc9" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Nvidia Has Become a Banker to the AI Boom, Putting It on Dangerous Ground">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">34</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Nvidia Has Become a Banker to the AI Boom, Putting It on Dangerous Ground</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-23084908?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The financial engineering the company is using to keep revenue growing introduces risks that could eventually cause real pain.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>英伟达用金融杠杆催化AI繁荣，却将自己的资产负债表铸成了泡沫破裂时第一块倒下的多米诺骨牌。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-23084908" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：英伟达通过向AI初创公司提供直接贷款、大规模延期付款和设备租赁等金融工具，变相充当“银行家”角色，以刺激GPU销售。截至2024年第三季度，其应收账款及融资租赁资产已飙升至逾300亿美元，客户包括CoreWeave、Lambda Labs等，这些融资安排成为营收增长的关键引擎，但信用风险同步急剧膨胀。</li><li>关键细节：英伟达的融资模式以所购GPU作为抵押品，向自身尚未盈利的客户授信，客户再以算力出租或AI服务收入偿还。然而，CoreWeave等公司严重依赖外部风险资本持续输血，其债务偿还能力与AI热潮和宽松融资环境深度绑定。一旦利率高企或AI需求降温，客户违约将导致抵押品（GPU）市场价值崩塌，英伟达面临贷款损失与资产减值双重打击。</li><li>影响：若AI泡沫破裂，英伟达将直接承受巨额坏账和利润侵蚀，股价面临重估。作为AI基础设施的信用中枢，其风险将迅速传染至整个科技金融链条，引发对AI投资回报的信任危机，导致资本开支收缩，进而加剧行业衰退，英伟达的营收和市值恐遭戴维斯双杀。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/nvidia-has-become-a-banker-to-the-ai-boom-putting-it-on-dangerous-ground-94c03545" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="New Tanker Strike in Hormuz as Iran Vows Retaliation for U.S. Economic Offensive">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">35</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">New Tanker Strike in Hormuz as Iran Vows Retaliation for U.S. Economic Offensive</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-61240149?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">The tanker was struck by an unknown projectile off the coast of Oman, the U.K. Maritime Trade Operations said.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>霍尔木兹海峡的匿名袭击已成为伊朗以非对称手段回应美国经济绞杀、测试国际反应禁区的标准剧本。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-61240149" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：一艘油轮在阿曼海岸附近、霍尔木兹海峡外围水域遭到不明来源的抛射物击中，英国海上贸易行动办公室（UKMTO）确认了这一事件。该区域紧邻伊朗，是6月13日阿曼湾油轮遇袭后新一轮商船遇袭，伊朗此前已公开誓言对美国经济施压行动实施报复，袭击时间点高度敏感。</li><li>关键细节：此次遇袭尚未公布油轮名称、船籍及伤亡情况，但UKMTO作为英国皇家海军下辖的航行安全协调机构，其通报显示袭击已触发航运警戒。伊朗此前将美国取消石油出口豁免、极限施压政策定性为“经济战”，并暗示将采取反制，霍尔木兹海峡——全球三分之一海运石油的必经通道——成为代理人冲突与隐秘行动的前沿，航运保险费率已应声上涨。</li><li>影响：袭击直接威胁全球能源供应链安全，航运公司可能被迫绕行或增加护航成本，国际油价即时反应将加剧通胀压力。美国海军第五舰队辖区面临更大护航压力，区域性军事对抗风险抬升，伊朗与西方关系进一步恶化，外交斡旋空间被压缩，日本、韩国等高度依赖中东石油的进口国经济稳定性首当其冲。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/new-tanker-strike-in-hormuz-as-iran-vows-retaliation-for-u-s-economic-offensive-6f1a1f54" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="U.S. Squeezes Iran but Avoids Targeting Its Biggest Lifeline: China">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">36</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">U.S. Squeezes Iran but Avoids Targeting Its Biggest Lifeline: China</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Tue, 25 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-30720757?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Washington’s fresh campaign to economically isolate Tehran stopped short of directly penalizing the country that has enabled Iran to withstand years of American pressure.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>美国对伊朗的极限施压，始终绕不开中国这道防火墙，暴露出其制裁体系在大国博弈中的结构性漏洞。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-30720757" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国对伊朗的新一轮经济孤立行动，并未直接针对中国，尽管中国是伊朗抵御美国多年压力的最大经济命脉。华盛顿在制裁中刻意避开了中国的金融机构和实体，未将制裁延伸至中国购买伊朗石油的关键渠道。</li><li>关键细节：伊朗依靠中国作为其石油的最大出口市场，以及规避西方金融制裁的核心中转站。中国是伊朗原油的主要买家，也是伊朗投资和技术的重要来源，使伊朗在美国严厉制裁下仍能维持基本经济运转。美国此轮制裁未触及这些命脉，如未制裁交易伊朗石油的中国银行，避免了直接挑战中国。</li><li>影响：此举使伊朗得以继续通过中国通道获取外汇，减轻了美国经济绞杀的压力，削弱了制裁的实际效果。同时，美国避免了因制裁中国而引发中美关系进一步紧张，将中国排除在制裁圈外，为未来外交博弈留下空间，但凸显了美国对华政策的两难。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/u-s-squeezes-iran-but-avoids-targeting-its-biggest-lifeline-china-b8d2ee88" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">37</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Mon, 24 Au</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-85314678?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">How Trump’s Crypto Push Is Linked to Bessent’s Treasury Moves</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>特朗普借加密之名行国债融资之实，稳定币正成为美国债务扩张的隐秘蓄水池。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-85314678" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：特朗普政府推动加密货币友好监管，财政部长斯科特·贝森特将稳定币市场视为短期国债需求的新来源。当前稳定币总市值约2000亿美元，其中Tether与Circle合计持有超1500亿美元美国短期国债，已成为全球第18大美债持有者。贝森特计划通过立法明确稳定币发行商的储备资产要求，引导其增持国库券，以对冲美联储缩表带来的国债需求缺口。</li><li>关键细节：稳定币发行商为维持锚定美元，需将用户资金配置于高流动性资产，短期国债是主要选择。Tether最新储备报告显示其直接持有约800亿美元美国国债，USDC储备中约90%为短期国债和现金等价物。若国会通过《稳定币透明度法案》，将强制所有发行商将100%储备存放于美联储或短期国债，有望在2026年前为国债市场注入5000亿美元增量需求，相当于过去一年美联储量化紧缩减持规模的三分之一。</li><li>影响：对财政部而言，稳定币驱动的国债需求将压低短期利率，降低2.5万亿美元年度赤字的再融资成本，贝森特得以在不重启量化宽松的情况下维持债市稳定。对加密行业，监管清晰化将吸引贝莱德、富达等传统机构大规模发行合规稳定币，进一步扩大美元霸权在链上经济中的渗透，但中小发行商将面临合规成本挤出。</li></ul>
+        <a href="https://www.wsj.com/finance/currencies/how-trumps-crypto-push-is-linked-to-bessents-treasury-moves-809defdc" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        Generated at 2026-08-27 01:52 HKT &middot; Source: Wall Street Journal
+    </footer>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {
+                    if (filter === 'all' || c.dataset.section === filter) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            };
+        });
+
+        // 搜索
+        function filterSearch(q) {
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
