@@ -22,6 +22,8 @@ def llm_call(prompt, system_msg="你是一名专业的财经信息分析师", ma
     import urllib.error
 
     def _try_model(model, timeout=120):
+        # kimi-k3 only allows temperature=1
+        model_temp = 1.0 if model == "kimi-k3" else temperature
         body = {
             "model": model,
             "messages": [
@@ -29,7 +31,7 @@ def llm_call(prompt, system_msg="你是一名专业的财经信息分析师", ma
                 {"role": "user", "content": prompt},
             ],
             "max_tokens": max_tokens,
-            "temperature": temperature,
+            "temperature": model_temp,
         }
         # Claude/GPT models via Sophnet: use top-level system param
         if model in ("ac-op-4-8-aws",):
