@@ -174,7 +174,7 @@ def pw_fetch_homepage(url, timeout=30):
                     print(f"    [pw状态] {resp.status if resp else 'None'} for {url[:50]}")
                     await browser.close()
                     return None, None
-                await page.wait_for_timeout(3000)
+                await page.wait_for_timeout(1000)
                 text = await page.inner_text("body")
                 html = await page.content()
                 return text, html
@@ -476,79 +476,97 @@ def normalize_url(url):
     return url
 
 
-def scrape_cn_homepage(limit=30):
-    """用 Playwright 抓 cn.wsj.com 首页，提取文章链接+标题+描述+配图
-    解析策略：使用 Playwright DOM API 提取卡片结构，每张卡片 1 文 1 图"""
-    print("  抓取 cn.wsj.com 首页 (CDP)...")
+def scrape_cn_homepage_cdp(limit=30):
+    """通过CDP WebSocket直接在cn.wsj.com tab上提取文章"""
+    import asyncio, websockets, json as _json
+    import requests as _requests
+    print("  抓取 cn.wsj.com 首页 (CDP WebSocket)...")
     
     async def _scrape():
-        import asyncio
-        from playwright.async_api import async_playwright
+        # 找到cn.wsj.com tab
+        try:
+            tabs = json.loads(_requests.get("http://127.0.0.1:9222/json", timeout=5).text)
+        except:
+            print("  CDP不可用")
+            return []
         
-        async with async_playwright() as p:
-            # v37d: CDP 连接已运行 Chrome（--remote-debugging-port=9222 + 独立 user-data-dir）
+        cn_tab = None
+        for t in tabs:
+            if t.get("type") == "page" and "cn.wsj.com" in (t.get("url") or ""):
+                cn_tab = t
+                break
+        
+        if not cn_tab:
+            # 没有cn.wsj.com tab，创建一个
+            print("  没有cn.wsj.com tab，尝试在新tab打开...")
             try:
-                browser = await p.chromium.connect_over_cdp("http://127.0.0.1:9222")
-                # v37o-fix3: 清理多余CDP tab，防止内存压力导致超时
-                try:
-                    ctx = browser.contexts[0] if browser.contexts else await browser.new_context()
-                    tabs = ctx.pages
-                    if len(tabs) > 5:
-                        print(f"  CDP tab清理: {len(tabs)} → 保留最新2个")
-                        for t in tabs[:-2]:
-                            try: await t.close()
-                            except: pass
-                except Exception as e:
-                    print(f"  CDP tab清理跳过: {e}")
-                context = browser.contexts[0] if browser.contexts else await browser.new_context()
-            except Exception as e:
-                print(f"  CDP 连接失败，回退到 headless: {e}")
-                browser = await p.chromium.launch(headless=True, channel="chrome")
-                context = await browser.new_context(
-                    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-                    viewport={"width": 1920, "height": 1080},
-                    locale="zh-CN",
-                )
-                wsj_cookies = _load_wsj_cookies()
-                if wsj_cookies:
-                    await context.add_cookies(wsj_cookies)
-            page = await context.new_page()
-            try:
-                resp = await page.goto("https://cn.wsj.com/", wait_until="domcontentloaded", timeout=30000)
-                if not resp or resp.status != 200:
-                    await browser.close()
-                    print("  cn.wsj.com 首页失败")
-                    return []
-                await page.wait_for_timeout(3000)
+                _requests.get("http://127.0.0.1:9222/json/new?https://cn.wsj.com/", timeout=10)
+                await asyncio.sleep(3)
+                tabs = json.loads(_requests.get("http://127.0.0.1:9222/json", timeout=5).text)
+                for t in tabs:
+                    if t.get("type") == "page" and "cn.wsj.com" in (t.get("url") or ""):
+                        cn_tab = t
+                        break
+            except:
+                pass
+        
+        if not cn_tab:
+            print("  无法获取cn.wsj.com tab")
+            return []
+        
+        ws_url = cn_tab["webSocketDebuggerUrl"]
+        
+        try:
+            async with websockets.connect(ws_url, max_size=10*1024*1024) as ws:
+                msg_id = 1
                 
-                # Use DOM API: find <a> tags that contain <img> from images.wsj.net
-                JS_SCRAPE = r"""
-                () => {
+                # 1. 导航到首页
+                print("  导航到 cn.wsj.com...")
+                await ws.send(json.dumps({"id": msg_id, "method": "Page.navigate", "params": {"url": "https://cn.wsj.com/"}}))
+                resp = json.loads(await ws.recv())
+                msg_id += 1
+                
+                # 2. 等待JS渲染（轮询body大小）
+                for wait in range(15):
+                    await asyncio.sleep(2)
+                    js = "document.body ? document.body.innerHTML.length : 0"
+                    await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js, "returnByValue": True}}))
+                    resp = json.loads(await ws.recv())
+                    msg_id += 1
+                    size = resp.get("result", {}).get("result", {}).get("value", 0)
+                    if size > 10000:
+                        print(f"  页面渲染完成 ({wait*2+2}s, {size} bytes)")
+                        break
+                
+                # 3. 提取文章
+                js_scrape = """
+                (() => {
+                    const articles = [];
+                    const seen = new Set();
                     const nav_words = new Set([
-                        "SKIP TO MAIN CONTENT", "The Wall Street Journal", "订阅", "登录", "华尔街日报",
-                        "中文 (Chinese)", "简体版", "更多", "首页", "国际", "中国", "金融市场", "经济",
-                        "商业", "科技", "生活与理财", "专栏与观点", "视频", "专题报道", "广告", "独家报道"
+                        "订阅", "登录", "华尔街日报", "简体版", "更多", "首页",
+                        "国际", "中国", "金融市场", "经济", "商业", "科技",
+                        "生活与理财", "专栏与观点", "视频", "专题报道", "广告", "独家报道"
                     ]);
                     
-                    const articles = [];
-                    const seen_urls = new Set();
-                    
-                    const all_links = document.querySelectorAll('a');
-                    for (const link of all_links) {
+                    const links = document.querySelectorAll('a');
+                    for (const link of links) {
                         const href = link.href || '';
                         if (href.indexOf('/articles/') === -1) continue;
                         
+                        const url = href.split('?')[0].replace(/[.,;\\)\\]]+$/, '');
+                        if (seen.has(url)) continue;
+                        seen.add(url);
+                        
+                        // 提取标题
+                        let title = '';
                         const img = link.querySelector('img');
-                        if (!img) continue;
-                        
-                        const url = href.split('?')[0].replace(/[.,;\)\]]+$/, '');
-                        if (seen_urls.has(url)) continue;
-                        seen_urls.add(url);
-                        
-                        const img_src = img.src || '';
-                        if (img_src.indexOf('images.wsj.net') === -1) continue;
-                        
-                        let title = (img.alt || '').replace(/^Image thumbnail for article titled\s*/i, '');
+                        if (img) {
+                            title = (img.alt || '').replace(/^Image thumbnail for article titled\\s*/i, '');
+                        }
+                        if (!title || title.length < 4) {
+                            title = (link.textContent || '').trim();
+                        }
                         if (!title || title.length < 4) {
                             const parent = link.parentElement;
                             if (parent) {
@@ -563,121 +581,80 @@ def scrape_cn_homepage(limit=30):
                             }
                         }
                         
-                        // v37c: 尝试从DOM提取时间
-                        let pub_time = '';
-                        let el = link;
-                        for (let lv = 0; lv < 5 && !pub_time; lv++) {
-                            if (!el) break;
-                            const timeEls = el.querySelectorAll('time');
-                            for (const t of timeEls) {
-                                const txt = (t.textContent || '').trim();
-                                if (txt) { pub_time = txt; break; }
+                        // 过滤CSS垃圾
+                        if (!title || title.length < 4) continue;
+                        if (title.startsWith('.css-') || title.startsWith('{') || title.startsWith('@')) continue;
+                        if (nav_words.has(title)) continue;
+                        if (/^\\d+px/.test(title)) continue;
+                        
+                        // 提取图片
+                        let imgSrc = '';
+                        if (img) {
+                            imgSrc = img.src || img.getAttribute('data-src') || '';
+                            if (imgSrc && imgSrc.indexOf('images.wsj.net') === -1 && imgSrc.indexOf('wsj.net') === -1) {
+                                imgSrc = '';
                             }
-                            if (pub_time) break;
-                            const dtEls = el.querySelectorAll('[datetime]');
-                            for (const t of dtEls) {
-                                const dt = t.getAttribute('datetime');
-                                if (dt) { pub_time = dt; break; }
+                        }
+                        // 也检查父元素是否有图片
+                        if (!imgSrc) {
+                            const parentImg = link.parentElement && link.parentElement.querySelector('img');
+                            if (parentImg) {
+                                const pSrc = parentImg.src || '';
+                                if (pSrc.indexOf('wsj.net') !== -1) imgSrc = pSrc;
                             }
-                            if (pub_time) break;
-                            const leaves = el.querySelectorAll('*');
-                            for (const s of leaves) {
-                                if (s.children.length > 0) continue;
-                                const txt = (s.textContent || '').trim();
-                                if (txt.length > 0 && txt.length < 60 && /\d{4}年\d{1,2}月|\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}|Aug|Jul|Jun|Jan|Feb|Mar|Apr|May|Sep|Oct|Nov|Dec/i.test(txt)) {
-                                    pub_time = txt; break;
-                                }
-                            }
-                            if (pub_time) break;
-                            el = el.parentElement;
                         }
                         
-                        if (title && title.length >= 4 && title.length <= 100) {
-                            articles.push({
-                                url: url,
-                                title: title,
-                                image: img_src.replace(/&amp;/g, '&'),
-                                summary: '',
-                                pub_time: pub_time
-                            });
+                        // 提取摘要
+                        let summary = '';
+                        const parent = link.parentElement;
+                        if (parent) {
+                            const p = parent.querySelector('p');
+                            if (p) summary = p.textContent.trim();
                         }
+                        
+                        articles.push({
+                            url: url,
+                            title: title,
+                            image: imgSrc,
+                            summary: summary
+                        });
                     }
-                    
-                    return articles;
-                }
+                    return JSON.stringify(articles);
+                })()
                 """
-                articles_data = await page.evaluate(JS_SCRAPE)
+                await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js_scrape, "returnByValue": True}}))
+                resp = json.loads(await ws.recv())
+                msg_id += 1
                 
-                # v37k: 用 CDP 逐个访问文章页提取 published_time + og:description
-                time_count = 0
-                lead_count = 0
-                for a in articles_data:
-                    url = a.get('url', '')
-                    if not url:
+                result = resp.get("result", {}).get("result", {}).get("value", "[]")
+                articles = json.loads(result)
+                
+                # 去重和过滤
+                seen_urls = set()
+                clean = []
+                for a in articles:
+                    url = a.get("url", "")
+                    title = a.get("title", "")
+                    if url in seen_urls:
                         continue
-                    try:
-                        await page.goto(url, wait_until="domcontentloaded", timeout=15000)
-                        await page.wait_for_timeout(1000)
-                        result = await page.evaluate("""
-                        (()=>{
-                            var pt='', od='';
-                            var metas=document.querySelectorAll('meta');
-                            for(var i=0;i<metas.length;i++){
-                                var p=metas[i].getAttribute('property')||'';
-                                var n=metas[i].getAttribute('name')||'';
-                                if(!pt && (p==='article:published_time'||n==='article:published_time'||n==='pubdate')){
-                                    pt=metas[i].getAttribute('content')||'';
-                                }
-                                if(!od && (p==='og:description'||n==='description')){
-                                    od=metas[i].getAttribute('content')||'';
-                                }
-                            }
-                            if(!pt){
-                                var ss=document.querySelectorAll('script[type="application/ld+json"]');
-                                for(var i=0;i<ss.length;i++){
-                                    try{var d=JSON.parse(ss[i].textContent);
-                                    if(d.datePublished){pt=d.datePublished;break;}
-                                    }catch(e){}
-                                }
-                            }
-                            // v37o: 也提取 figure img + figcaption
-                            var fi='', fc='';
-                            var fig=document.querySelector('figure img');
-                            if(fig) fi=fig.src||'';
-                            var fce=document.querySelector('figcaption');
-                            if(fce) fc=(fce.textContent||'').trim();
-                            return JSON.stringify({pt:pt, od:od, fi:fi, fc:fc});
-                        })()
-                        """)
-                        import json as _json
-                        data = _json.loads(result)
-                        if data.get('pt'):
-                            a['pub_time'] = data['pt']
-                            time_count += 1
-                        if data.get('od'):
-                            a['summary'] = data['od']
-                            lead_count += 1
-                        if data.get('fi'):
-                            a['image'] = data['fi']
-                        if data.get('fc'):
-                            a['image_caption'] = data['fc']
-                    except:
-                        pass
-                    print(f"  时间提取: {time_count}/{len(articles_data)} 篇有时间, 导语提取: {lead_count} 篇有导语")
+                    # 过滤CSS垃圾
+                    if title.startswith(".css-") or title.startswith("{") or title.startswith("@media"):
+                        continue
+                    if len(title) < 4 or len(title) > 200:
+                        continue
+                    seen_urls.add(url)
+                    a["source"] = "cn_home"
+                    a["section"] = "🇨🇳 中文版"
+                    clean.append(a)
                 
-                await browser.close()
-                return articles_data[:limit]
-            except Exception as e:
-                print(f"  [pw错误] {e}")
-                await browser.close()
-                return []
+                print(f"  cn.wsj.com: {len(clean)} 篇（{sum(1 for a in clean if a.get('image'))} 篇有图）")
+                return clean[:limit]
+        
+        except Exception as e:
+            print(f"  [CDP错误] {e}")
+            return []
     
-    import asyncio
-    articles = asyncio.run(_scrape())
-    has_img = sum(1 for a in articles if a.get("image"))
-    unique_img = len(set(a.get("image", "") for a in articles if a.get("image")))
-    print(f"  cn.wsj.com: {len(articles)} 篇（{has_img} 篇有图, {unique_img} 张独立图片）")
-    return articles
+    return asyncio.run(_scrape())
 
 
 # ── Cookie 加载 ──────────────────────────────────────
@@ -1254,7 +1231,7 @@ def pw_fetch_article_with_cookies(url, timeout=15):
                 if not resp or resp.status != 200:
                     await browser.close()
                     return None, None, ""
-                await page.wait_for_timeout(3000)
+                await page.wait_for_timeout(1000)
                 text = await page.inner_text("body")
                 html = await page.content()
                 
@@ -1473,3 +1450,9 @@ def collect_all():
 
 if __name__ == "__main__":
     collect_all()
+
+# 别名
+scrape_cn_homepage = scrape_cn_homepage_cdp
+
+# v37o-fix5: 别名
+scrape_cn_homepage = scrape_cn_homepage_cdp
