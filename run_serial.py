@@ -87,16 +87,56 @@ def patched_generate(articles):
 articles = patched_generate(articles)
 
 # 3. 翻译标题+生成导语 — 跳过，用已有lead
-print("\n=== 处理标题和导语 ===")
-for a in articles:
-    if not a.get('title_en') and a.get('source') != 'cn_home':
-        a['title_en'] = a.get('title', '')
-        # 用RSS summary作为lead
-        if not a.get('lead'):
-            a['lead'] = a.get('summary', '') or a.get('fulltext', '')[:200]
-        a['lead_en'] = a.get('lead', '')
+print("\n=== 翻译标题 ===")
+from generate_and_publish import llm_call as _llm_call
+import re as _re
 
-print(f"标题处理: {sum(1 for a in articles if a.get('title_en'))}篇有英文标题")
+translated_count = 0
+for i, a in enumerate(articles):
+    title = a.get('title', '')
+    # 跳过已有中文标题或cn_home文章
+    if _re.search(r'[\u4e00-\u9fff]', title) or a.get('source') == 'cn_home':
+        a['title_en'] = ''
+        continue
+    # 保存英文原文
+    a['title_en'] = title
+    try:
+        t0 = time.time()
+        result = _llm_call(
+            f"任务：英文新闻标题翻译。\n输入：{title}\n输出要求：只输出简体中文翻译，不要解释，不要加引号，不要加前缀。\n参考风格：华尔街日报中文版标题风格，简洁专业。\n现在输出翻译：",
+            max_tokens=2000,
+            temperature=0.3,
+        )
+        translated = result.strip()
+        # 清理前缀
+        for prefix in ["中文翻译：", "中文标题：", "**中文翻译：**", "**中文标题：**",
+                       "标准财经标题翻译：", "**标准财经标题译法：**", "推荐翻译：",
+                       "**推荐翻译：**", "专业财经标题翻译："]:
+            if translated.startswith(prefix):
+                translated = translated[len(prefix):].strip()
+        translated = _re.sub(r'\*+', '', translated).strip()
+        translated = translated.lstrip('`>').rstrip('`').strip()
+        if '\n' in translated:
+            translated = translated.split('\n')[0].strip()
+        # 验证有中文
+        if _re.search(r'[\u4e00-\u9fff]', translated) and len(translated) < 200:
+            a['title'] = translated
+            translated_count += 1
+            print(f"  [{i+1}/{len(articles)}] {title[:30]}... → {translated[:25]}")
+        else:
+            print(f"  [{i+1}/{len(articles)}] {title[:30]}... ✗ 无中文")
+    except Exception as e:
+        print(f"  [{i+1}/{len(articles)}] {title[:30]}... ✗ {str(e)[:50]}")
+
+print(f"标题翻译: {translated_count}/{len(articles)}")
+
+# 导语处理
+print("\n=== 导语处理 ===")
+for a in articles:
+    if not a.get('lead'):
+        a['lead'] = a.get('summary', '') or a.get('fulltext', '')[:200]
+    a['lead_en'] = a.get('lead', '')
+
 print(f"导语处理: {sum(1 for a in articles if a.get('lead'))}篇有导语")
 
 # 4. 生成HTML
