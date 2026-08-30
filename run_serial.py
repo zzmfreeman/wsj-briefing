@@ -13,7 +13,7 @@ os.chdir("/Users/zzm/wsj-briefing")
 print("=== 采集 ===")
 env = os.environ.copy()
 env['SKIP_SAVE_DEDUP'] = '1'
-result = subprocess.run(["python3", "remote_collect.py"], capture_output=True, text=True, timeout=300, env=env)
+result = subprocess.run(["python3", "remote_collect.py"], capture_output=True, text=True, timeout=600, env=env)
 match = re.search(r'===COLLECT_RESULT_START===\n(.*?)\n===COLLECT_RESULT_END===', result.stdout, re.DOTALL)
 if not match:
     print("采集失败")
