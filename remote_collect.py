@@ -1286,7 +1286,7 @@ def collect_all():
     # 2. cn.wsj.com 全文（有 cookie 的用 Playwright，否则跳过）
     if cn_articles:
         # 尝试用 cookie 方式获取全文
-        cn_articles = fetch_fulltext_batch(cn_articles, timeout=30)
+        cn_articles = cdp_fetch_batch(cn_articles)
 
     # 3. RSS (Google News WSJ feeds)
     print("  === RSS (Google News WSJ) ===")
@@ -1301,7 +1301,7 @@ def collect_all():
 
     # 4. RSS 文章也抓正文（Playwright + cookies）
     if rss_articles:
-        rss_articles = fetch_fulltext_batch(rss_articles, timeout=30)
+        rss_articles = cdp_fetch_batch(rss_articles)
     
     # 5. 所有文章配图
     all_articles = cn_articles + rss_articles
@@ -1448,11 +1448,197 @@ def collect_all():
     print("===COLLECT_RESULT_END===")
 
 
-if __name__ == "__main__":
-    collect_all()
-
 # 别名
 scrape_cn_homepage = scrape_cn_homepage_cdp
 
-# v37o-fix5: 别名
-scrape_cn_homepage = scrape_cn_homepage_cdp
+if __name__ == "__main__":
+    collect_all()
+
+#!/usr/bin/env python3
+"""CDP WebSocket版wsj.com正文+图片抓取
+替代Playwright的fetch_fulltext_batch + pw_fetch_og_image
+"""
+
+SH_TZ = timezone(timedelta(hours=8))
+
+# CDP tab缓存
+_wsj_tab_ws_url = None
+_cn_tab_ws_url = None
+
+def _get_wsj_tab_ws_url():
+    """获取wsj.com tab的WebSocket URL，没有则创建"""
+    global _wsj_tab_ws_url
+    if _wsj_tab_ws_url:
+        return _wsj_tab_ws_url
+    
+    try:
+        tabs = json.loads(requests.get("http://127.0.0.1:9222/json", timeout=5).text)
+    except:
+        return None
+    
+    for t in tabs:
+        url = t.get("url", "")
+        if t.get("type") == "page" and "wsj.com" in url and "cn.wsj.com" not in url:
+            _wsj_tab_ws_url = t["webSocketDebuggerUrl"]
+            return _wsj_tab_ws_url
+    
+    # 没有wsj.com tab，创建一个
+    try:
+        resp = requests.get("http://127.0.0.1:9222/json/new?https://www.wsj.com/", timeout=10)
+        tab = resp.json()
+        _wsj_tab_ws_url = tab.get("webSocketDebuggerUrl")
+        time.sleep(3)  # 等待页面加载
+    except:
+        pass
+    
+    return _wsj_tab_ws_url
+
+
+def cdp_fetch_article(url, timeout=20):
+    """通过CDP抓取单篇wsj.com文章的正文+图片+figcaption"""
+    ws_url = _get_wsj_tab_ws_url()
+    if not ws_url:
+        return None
+    
+    async def _fetch():
+        async with websockets.connect(ws_url, max_size=10*1024*1024) as ws:
+            mid = 1
+            
+            # 导航到文章
+            await ws.send(json.dumps({"id": mid, "method": "Page.navigate", "params": {"url": url}}))
+            json.loads(await ws.recv())
+            mid += 1
+            
+            # 等待渲染（最多15秒）
+            rendered = False
+            for w in range(8):
+                await asyncio.sleep(2)
+                js = "document.body ? document.body.innerHTML.length : 0"
+                await ws.send(json.dumps({"id": mid, "method": "Runtime.evaluate", "params": {"expression": js, "returnByValue": True}}))
+                r = json.loads(await ws.recv())
+                mid += 1
+                sz = r.get("result", {}).get("result", {}).get("value", 0)
+                if sz > 5000:
+                    rendered = True
+                    break
+            
+            if not rendered:
+                return None
+            
+            # 提取内容
+            js_extract = """
+            (() => {
+                var title = '';
+                var h1 = document.querySelector('h1');
+                if (h1) title = h1.textContent.trim();
+                if (!title) {
+                    var m = document.querySelector('meta[property="og:title"]');
+                    if (m) title = m.getAttribute('content') || '';
+                }
+                
+                var paragraphs = [];
+                var ps = document.querySelectorAll('article p');
+                if (ps.length === 0) ps = document.querySelectorAll('section[data-module] p');
+                if (ps.length === 0) ps = document.querySelectorAll('div[class*="article"] p');
+                if (ps.length === 0) ps = document.querySelectorAll('main p');
+                ps.forEach(function(p) {
+                    var t = p.textContent.trim();
+                    if (t.length > 20) paragraphs.push(t);
+                });
+                var fullText = paragraphs.join('\\n');
+                
+                var ogImg = '';
+                var mi = document.querySelector('meta[property="og:image"]');
+                if (mi) ogImg = mi.getAttribute('content') || '';
+                
+                var figImgs = [];
+                document.querySelectorAll('figure img').forEach(function(img) {
+                    var src = img.src || img.getAttribute('data-src') || '';
+                    if (src && src.indexOf('wsj.net') !== -1) {
+                        // 获取高清版
+                        if (src.indexOf('width=') === -1) {
+                            src = src + (src.indexOf('?') !== -1 ? '&' : '?') + 'width=700';
+                        }
+                        figImgs.push(src);
+                    }
+                });
+                
+                var figcaption = '';
+                var fc = document.querySelector('figcaption');
+                if (fc) figcaption = fc.textContent.trim();
+                
+                var is404 = title === '404' || title.indexOf('Not Found') !== -1;
+                
+                return JSON.stringify({
+                    title: title.substring(0, 200),
+                    fullText: fullText.substring(0, 10000),
+                    paraCount: paragraphs.length,
+                    ogImage: ogImg,
+                    figImgs: figImgs,
+                    figcaption: figcaption.substring(0, 200),
+                    is404: is404
+                });
+            })()
+            """
+            await ws.send(json.dumps({"id": mid, "method": "Runtime.evaluate", "params": {"expression": js_extract, "returnByValue": True}}))
+            r = json.loads(await ws.recv())
+            mid += 1
+            
+            result = json.loads(r.get("result", {}).get("result", {}).get("value", "{}"))
+            return result
+    
+    try:
+        return asyncio.run(_fetch())
+    except Exception as e:
+        print(f"  [CDP错误] {e}")
+        return None
+
+
+def cdp_fetch_batch(articles, max_concurrent=1):
+    """批量用CDP抓取文章正文+图片
+    串行执行避免CDP tab冲突
+    """
+    print(f"  CDP批量抓取 {len(articles)} 篇文章正文+图片...")
+    results = {}
+    success = 0
+    has_text = 0
+    has_img = 0
+    has_figcaption = 0
+    
+    for i, a in enumerate(articles):
+        url = a.get("url", "")
+        if not url or "wsj.com" not in url:
+            results[url] = a
+            continue
+        
+        # cn.wsj.com文章不抓正文（首页已scrape）
+        if "cn.wsj.com" in url:
+            results[url] = a
+            continue
+        
+        r = cdp_fetch_article(url)
+        
+        if r and not r.get("is404"):
+            if r.get("fullText") and len(r["fullText"]) > 100:
+                a["fulltext"] = r["fullText"]
+                has_text += 1
+            if r.get("ogImage"):
+                a["image"] = r["ogImage"]
+                has_img += 1
+            if r.get("figImgs"):
+                # 用figure大图替代og:image
+                a["image"] = r["figImgs"][0]
+                a["image_large"] = r["figImgs"][0]
+                has_img += 1
+            if r.get("figcaption"):
+                a["image_caption"] = r["figcaption"]
+                has_figcaption += 1
+            success += 1
+        
+        results[url] = a
+        
+        if (i + 1) % 10 == 0:
+            print(f"    [{i+1}/{len(articles)}] 成功{success} 正文{has_text} 图片{has_img} figcaption{has_figcaption}")
+    
+    print(f"  完成: {success}/{len(articles)} 成功, {has_text}篇正文, {has_img}篇有图, {has_figcaption}篇有figcaption")
+    return list(results.values())
