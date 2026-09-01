@@ -561,28 +561,30 @@ def scrape_cn_homepage_cdp(limit=30):
                         seen.add(url);
                         
                         // 提取标题
-                        let title = '';
-                        const img = link.querySelector('img');
+                        let title = "";
+                        const img = link.querySelector("img");
                         if (img) {
-                            title = (img.alt || '').replace(/^Image thumbnail for article titled\\s*/i, '');
+                            title = (img.alt || "").replace(/^Image thumbnail for article titled\\s*/i, "");
                         }
                         if (!title || title.length < 4) {
-                            title = (link.textContent || '').trim();
+                            title = (link.textContent || "").trim();
                         }
                         if (!title || title.length < 4) {
-                            const parent = link.parentElement;
-                            if (parent) {
-                                const spans = parent.querySelectorAll('span, h1, h2, h3, p');
-                                for (const s of spans) {
+                            let p = link.parentElement;
+                            for (let depth = 0; depth < 3 && p && (!title || title.length < 4); depth++) {
+                                const elems = p.querySelectorAll("span, h1, h2, h3, h4, p");
+                                for (const s of elems) {
+                                    if (s === link) continue;
                                     const t = s.textContent.trim();
-                                    if (t.length >= 4 && t.length <= 100 && !nav_words.has(t)) {
+                                    if (t.length >= 6 && t.length <= 100 && !nav_words.has(t) && !t.startsWith(".css")) {
                                         title = t;
                                         break;
                                     }
                                 }
+                                p = p.parentElement;
                             }
                         }
-                        
+
                         // 过滤CSS垃圾
                         if (!title || title.length < 4) continue;
                         if (title.startsWith('.css-') || title.startsWith('{') || title.startsWith('@')) continue;
