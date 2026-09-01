@@ -95,7 +95,7 @@ IMAGE_CACHE_FILE = Path.home() / "wsj-briefing/image_cache.json"
 SEEN_URLS_FILE = Path.home() / "wsj-briefing/seen_urls.json"
 # 过去 N 天已发过的文章不再重复收录
 DEDUP_DAYS = 7
-MAX_ARTICLE_AGE_DAYS = 1  # 只保留1天内发布的文章
+MAX_ARTICLE_AGE_DAYS = 2  # 只保留2天内发布的文章
 AUTOCLI = "/usr/local/bin/autocli"
 
 # Google News RSS for WSJ articles (WSJ's own RSS feeds are all dead: 401/403/404)
