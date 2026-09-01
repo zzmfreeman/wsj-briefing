@@ -1637,7 +1637,7 @@ def collect_all():
                     break
 
         # cn 首页加权
-        cn_bonus = 10 if a.get('source') == 'cn_home' else 0
+        cn_bonus = 200 if a.get('source') == 'cn_home' else 0
 
         return -(time_score + topic_score + cn_bonus)  # 负数用于降序
 
