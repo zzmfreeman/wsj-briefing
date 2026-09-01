@@ -107,7 +107,7 @@ RSS_FEEDS = [
     ("🏢 Business", "https://feeds.content.dowjones.io/public/rss/RSSOpinion"),
 ]
 ARTICLES_PER_SECTION = 10
-CN_ARTICLES_LIMIT = 15
+CN_ARTICLES_LIMIT = 40
 
 
 # ── autocli read 封装 ─────────────────────────────────
@@ -523,7 +523,7 @@ def scrape_cn_homepage_cdp(limit=30):
                 msg_id = 1
                 
                 # 1. 导航到首页
-                print("  导航到 cn.wsj.com...")
+                print("  导航到 cn.wsj.com 首页...")
                 await ws.send(json.dumps({"id": msg_id, "method": "Page.navigate", "params": {"url": "https://cn.wsj.com/"}}))
                 resp = json.loads(await ws.recv())
                 msg_id += 1
@@ -537,7 +537,7 @@ def scrape_cn_homepage_cdp(limit=30):
                     msg_id += 1
                     size = resp.get("result", {}).get("result", {}).get("value", 0)
                     if size > 10000:
-                        print(f"  页面渲染完成 ({wait*2+2}s, {size} bytes)")
+                        print(f"  首页渲染完成 ({wait*2+2}s, {size} bytes)")
                         break
                 
                 # 3. 提取文章
@@ -649,7 +649,54 @@ def scrape_cn_homepage_cdp(limit=30):
                     a["section"] = "🇨🇳 中文版"
                     clean.append(a)
                 
-                print(f"  cn.wsj.com: {len(clean)} 篇（{sum(1 for a in clean if a.get('image'))} 篇有图）")
+                _img_count = sum(1 for a in clean if a.get("image"))
+                print(f"  cn.wsj.com 首页: {len(clean)} 篇（{_img_count} 篇有图）")
+                
+                # 3b. 导航到科技分类页抓更多文章
+                cn_tech_url = "https://cn.wsj.com/zh-hans/news/technology"
+                print(f"  导航到科技分类页: {cn_tech_url}")
+                await ws.send(json.dumps({"id": msg_id, "method": "Page.navigate", "params": {"url": cn_tech_url}}))
+                resp = json.loads(await ws.recv())
+                msg_id += 1
+                
+                for wait2 in range(10):
+                    await asyncio.sleep(2)
+                    js2 = "document.body ? document.body.innerHTML.length : 0"
+                    await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js2, "returnByValue": True}}))
+                    resp = json.loads(await ws.recv())
+                    msg_id += 1
+                    size2 = resp.get("result", {}).get("result", {}).get("value", 0)
+                    if size2 > 10000:
+                        print(f"  科技页渲染完成 ({wait2*2+2}s, {size2} bytes)")
+                        break
+                
+                await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js_scrape, "returnByValue": True}}))
+                resp = json.loads(await ws.recv())
+                msg_id += 1
+                
+                result2 = resp.get("result", {}).get("result", {}).get("value", "[]")
+                if isinstance(result2, str):
+                    articles2 = json.loads(result2)
+                    existing_urls = set(a.get("url","") for a in clean)
+                    tech_added = 0
+                    for a in articles2:
+                        url = a.get("url", "")
+                        title = a.get("title", "")
+                        if url in existing_urls:
+                            continue
+                        if title.startswith(".css-") or title.startswith("{") or title.startswith("@media"):
+                            continue
+                        if len(title) < 4 or len(title) > 200:
+                            continue
+                        existing_urls.add(url)
+                        a["source"] = "cn_home"
+                        a["section"] = "🇨🇳 中文版"
+                        clean.append(a)
+                        tech_added += 1
+                    print(f"  科技页新增: {tech_added} 篇")
+                
+                _img_count2 = sum(1 for a in clean if a.get("image"))
+                print(f"  cn.wsj.com 总计: {len(clean)} 篇（{_img_count2} 篇有图）")
                 return clean[:limit]
         
         except Exception as e:

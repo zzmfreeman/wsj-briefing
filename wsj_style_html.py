@@ -161,7 +161,18 @@ def generate_html(articles, date_str, generated_at):
     total = len(articles)
     pie_parts = []
     angle = 0
+    for sec in SECTION_COLORS:
+        if sec not in sections:
+            continue
+        count = sections[sec]
+        pct = count / total if total else 0
+        color = SECTION_COLORS.get(sec, '#333')
+        end_angle = angle + pct * 360
+        pie_parts.append(f"{color} {angle}deg {end_angle}deg")
+        angle = end_angle
     for sec, count in sections.items():
+        if sec in SECTION_COLORS:
+            continue
         pct = count / total if total else 0
         color = SECTION_COLORS.get(sec, '#333')
         end_angle = angle + pct * 360
@@ -169,10 +180,15 @@ def generate_html(articles, date_str, generated_at):
         angle = end_angle
     pie_css = " ".join(pie_parts)
 
-    # 板块筛选按钮
+    # 板块筛选按钮（按SECTION_COLORS定义顺序排列）
     filter_btns = '<button class="filter-btn active" data-filter="all">全部</button>'
+    for sec in SECTION_COLORS:
+        if sec in sections:
+            count = sections[sec]
+            filter_btns += f'<button class="filter-btn" data-filter="{sec}">{sec} <span class="filter-count">{count}</span></button>'
     for sec, count in sections.items():
-        filter_btns += f'<button class="filter-btn" data-filter="{sec}">{sec} <span class="filter-count">{count}</span></button>'
+        if sec not in SECTION_COLORS:
+            filter_btns += f'<button class="filter-btn" data-filter="{sec}">{sec} <span class="filter-count">{count}</span></button>'
 
     return f'''<!DOCTYPE html>
 <html lang="zh-CN">
