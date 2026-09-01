@@ -95,7 +95,7 @@ IMAGE_CACHE_FILE = Path.home() / "wsj-briefing/image_cache.json"
 SEEN_URLS_FILE = Path.home() / "wsj-briefing/seen_urls.json"
 # 过去 N 天已发过的文章不再重复收录
 DEDUP_DAYS = 7
-MAX_ARTICLE_AGE_DAYS = 3  # 只保留3天内发布的文章
+MAX_ARTICLE_AGE_DAYS = 1  # 只保留1天内发布的文章
 AUTOCLI = "/usr/local/bin/autocli"
 
 # Google News RSS for WSJ articles (WSJ's own RSS feeds are all dead: 401/403/404)
@@ -107,7 +107,7 @@ RSS_FEEDS = [
     ("🏢 Business", "https://feeds.content.dowjones.io/public/rss/RSSOpinion"),
 ]
 ARTICLES_PER_SECTION = 10
-CN_ARTICLES_LIMIT = 40
+CN_ARTICLES_LIMIT = 60
 
 
 # ── autocli read 封装 ─────────────────────────────────
@@ -1390,6 +1390,17 @@ async def _fetch_article_via_ws(ws, url, mid_start):
         var figcaption = '';
         var fc = document.querySelector('figcaption');
         if (fc) figcaption = fc.textContent.trim();
+        var pubTime = '';
+        var timeEl = document.querySelector('time[datetime]');
+        if (timeEl) pubTime = timeEl.getAttribute('datetime') || '';
+        if (!pubTime) {
+            var metaTime = document.querySelector('meta[property="article:published_time"]');
+            if (metaTime) pubTime = metaTime.getAttribute('content') || '';
+        }
+        if (!pubTime) {
+            var dateEl = document.querySelector('.article-timestamp, .timestamp, [data-timestamp]');
+            if (dateEl) pubTime = dateEl.textContent || dateEl.getAttribute('data-timestamp') || '';
+        }
         var is404 = title === '404' || title.indexOf('Not Found') !== -1;
         return JSON.stringify({
             title: title.substring(0, 200),
@@ -1398,7 +1409,8 @@ async def _fetch_article_via_ws(ws, url, mid_start):
             ogImage: ogImg,
             figImgs: figImgs,
             figcaption: figcaption.substring(0, 200),
-            is404: is404
+            is404: is404,
+            pubTime: pubTime
         });
     })()
     """
@@ -1409,53 +1421,110 @@ async def _fetch_article_via_ws(ws, url, mid_start):
     return json.loads(r.get("result", {}).get("result", {}).get("value", "{}")), mid
 
 
+def _get_cn_tab_ws_url():
+    """获取cn.wsj.com tab的WebSocket URL"""
+    try:
+        tabs = json.loads(urllib.request.urlopen("http://127.0.0.1:9222/json").read())
+        for t in tabs:
+            if t.get("type") == "page" and "cn.wsj.com" in (t.get("url") or ""):
+                return t.get("webSocketDebuggerUrl")
+    except:
+        pass
+    return None
+
+
 async def _fetch_all(articles):
-    """用一个WebSocket连接抓取所有文章"""
-    ws_url = _get_wsj_tab_ws_url()
-    if not ws_url:
-        print("  [CDP] 无法获取wsj.com tab")
-        return articles
-    
+    """用WebSocket连接抓取所有文章（cn.wsj.com和wsj.com分别用各自的tab）"""
     results = []
-    mid = 100
     success = 0
     has_text = 0
     has_img = 0
     has_fc = 0
-    
-    async with websockets.connect(ws_url, max_size=10*1024*1024) as ws:
-        for i, a in enumerate(articles):
-            url = a.get("url", "")
-            if not url or "wsj.com" not in url or "cn.wsj.com" in url:
-                results.append(a)
-                continue
-            
-            try:
-                r, mid = await _fetch_article_via_ws(ws, url, mid)
-                if r and not r.get("is404"):
-                    if r.get("fullText") and len(r["fullText"]) > 100:
-                        a["fulltext"] = r["fullText"]
-                        has_text += 1
-                    if r.get("figImgs"):
-                        a["image"] = r["figImgs"][0]
-                        a["image_large"] = r["figImgs"][0]
-                        has_img += 1
-                    elif r.get("ogImage"):
-                        a["image"] = r["ogImage"]
-                        has_img += 1
-                    if r.get("figcaption"):
-                        a["image_caption"] = r["figcaption"]
-                        has_fc += 1
-                    success += 1
-            except Exception as e:
-                print(f"    [{i+1}] 错误: {e}")
-            
-            results.append(a)
-            
-            if (i + 1) % 10 == 0:
-                print(f"    [{i+1}/{len(articles)}] 成功{success} 正文{has_text} 图片{has_img} figcaption{has_fc}")
-    
-    print(f"  完成: {success}/{len(articles)} 成功, {has_text}篇正文, {has_img}篇有图, {has_fc}篇有figcaption")
+    has_pub = 0
+
+    # 分组：cn.wsj.com文章 和 wsj.com文章
+    cn_arts = [a for a in articles if "cn.wsj.com" in (a.get("url") or "")]
+    wsj_arts = [a for a in articles if "cn.wsj.com" not in (a.get("url") or "") and "wsj.com" in (a.get("url") or "")]
+    other_arts = [a for a in articles if "wsj.com" not in (a.get("url") or "")]
+    results.extend(other_arts)
+
+    # 1. 抓取 cn.wsj.com 文章（用 cn.wsj.com tab）
+    if cn_arts:
+        cn_ws_url = _get_cn_tab_ws_url()
+        if cn_ws_url:
+            print(f"  [CDP] cn.wsj.com: {len(cn_arts)}篇")
+            mid = 100
+            async with websockets.connect(cn_ws_url, max_size=10*1024*1024) as ws:
+                for i, a in enumerate(cn_arts):
+                    url = a.get("url", "")
+                    try:
+                        r, mid = await _fetch_article_via_ws(ws, url, mid)
+                        if r and not r.get("is404"):
+                            if r.get("fullText") and len(r["fullText"]) > 100:
+                                a["fulltext"] = r["fullText"]
+                                has_text += 1
+                            if r.get("figImgs"):
+                                a["image"] = r["figImgs"][0]
+                                a["image_large"] = r["figImgs"][0]
+                                has_img += 1
+                            elif r.get("ogImage"):
+                                a["image"] = r["ogImage"]
+                                has_img += 1
+                            if r.get("figcaption"):
+                                a["image_caption"] = r["figcaption"]
+                                has_fc += 1
+                            if r.get("pubTime"):
+                                a["published"] = r["pubTime"]
+                                has_pub += 1
+                            success += 1
+                    except Exception as e:
+                        print(f"    cn [{i+1}] 错误: {e}")
+                    results.append(a)
+                    if (i + 1) % 10 == 0:
+                        print(f"    cn [{i+1}/{len(cn_arts)}] 成功{success} 正文{has_text} 时间{has_pub}")
+        else:
+            print("  [CDP] 无法获取cn.wsj.com tab，跳过")
+            results.extend(cn_arts)
+
+    # 2. 抓取 wsj.com 文章（用 wsj.com tab）
+    if wsj_arts:
+        wsj_ws_url = _get_wsj_tab_ws_url()
+        if wsj_ws_url:
+            print(f"  [CDP] wsj.com: {len(wsj_arts)}篇")
+            mid = 200
+            async with websockets.connect(wsj_ws_url, max_size=10*1024*1024) as ws:
+                for i, a in enumerate(wsj_arts):
+                    url = a.get("url", "")
+                    try:
+                        r, mid = await _fetch_article_via_ws(ws, url, mid)
+                        if r and not r.get("is404"):
+                            if r.get("fullText") and len(r["fullText"]) > 100:
+                                a["fulltext"] = r["fullText"]
+                                has_text += 1
+                            if r.get("figImgs"):
+                                a["image"] = r["figImgs"][0]
+                                a["image_large"] = r["figImgs"][0]
+                                has_img += 1
+                            elif r.get("ogImage"):
+                                a["image"] = r["ogImage"]
+                                has_img += 1
+                            if r.get("figcaption"):
+                                a["image_caption"] = r["figcaption"]
+                                has_fc += 1
+                            if r.get("pubTime"):
+                                a["published"] = r["pubTime"]
+                                has_pub += 1
+                            success += 1
+                    except Exception as e:
+                        print(f"    wsj [{i+1}] 错误: {e}")
+                    results.append(a)
+                    if (i + 1) % 10 == 0:
+                        print(f"    wsj [{i+1}/{len(wsj_arts)}] 成功{success} 正文{has_text} 图片{has_img} figcaption{has_fc}")
+        else:
+            print("  [CDP] 无法获取wsj.com tab，跳过")
+            results.extend(wsj_arts)
+
+    print(f"  完成: {success}/{len(articles)} 成功, {has_text}篇正文, {has_img}篇有图, {has_fc}篇figcaption, {has_pub}篇有发布时间")
     return results
 
 
@@ -1588,10 +1657,13 @@ def collect_all():
     before_filter = len(all_articles)
     # 只过滤有日期且超过 MAX_ARTICLE_AGE_DAYS 的文章
     # 无日期的 cn.wsj.com 文章保留（首页推荐默认最新），但排序时给中性分
+    # 有日期的：过滤超过 MAX_ARTICLE_AGE_DAYS 天的
+    # 无日期的：保留（cn.wsj.com首页文章默认是最新推荐）
+    has_date = sum(1 for a in all_articles if _parse_published_date(a))
+    no_date = len(all_articles) - has_date
     all_articles = [a for a in all_articles if not (dt := _parse_published_date(a)) or dt >= cutoff]
     removed_age = before_filter - len(all_articles)
-    if removed_age:
-        print(f"  日期过滤: 移除 {removed_age} 篇超过 {MAX_ARTICLE_AGE_DAYS} 天的文章")
+    print(f"  日期过滤: {has_date}篇有日期({no_date}篇无日期保留), 移除 {removed_age} 篇超过 {MAX_ARTICLE_AGE_DAYS} 天的文章")
 
     # ── 统一排序权重 ──
     # 时间分 (0-100) + 主题分 (0-30) + cn首页加权 (+10)
