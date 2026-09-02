@@ -1390,6 +1390,21 @@ async def _fetch_article_via_ws(ws, url, mid_start):
         var figcaption = '';
         var fc = document.querySelector('figcaption');
         if (fc) figcaption = fc.textContent.trim();
+        var dek = '';
+        var dekEl = document.querySelector('h2[data-testid="dek-block"]');
+        if (dekEl) dek = dekEl.textContent.trim();
+        if (!dek) {
+            var dekP = document.querySelector('p.dek, p[class*="dek"]');
+            if (dekP) dek = dekP.textContent.trim();
+        }
+        if (!dek) {
+            var ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) dek = (ogDesc.getAttribute('content') || '').trim();
+        }
+        if (!dek) {
+            var metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) dek = (metaDesc.getAttribute('content') || '').trim();
+        }
         var pubTime = '';
         var timeEl = document.querySelector('time[datetime]');
         if (timeEl) pubTime = timeEl.getAttribute('datetime') || '';
@@ -1410,7 +1425,8 @@ async def _fetch_article_via_ws(ws, url, mid_start):
             figImgs: figImgs,
             figcaption: figcaption.substring(0, 200),
             is404: is404,
-            pubTime: pubTime
+            pubTime: pubTime,
+            dek: dek
         });
     })()
     """
@@ -1476,6 +1492,9 @@ async def _fetch_all(articles):
                             if r.get("pubTime"):
                                 a["published"] = r["pubTime"]
                                 has_pub += 1
+                            if r.get("dek") and len(r.get("dek", "")) > 10:
+                                a["lead"] = r["dek"]
+                                a["lead_from"] = "cdp_dek"
                             success += 1
                     except Exception as e:
                         print(f"    cn [{i+1}] 错误: {e}")
@@ -1514,6 +1533,9 @@ async def _fetch_all(articles):
                             if r.get("pubTime"):
                                 a["published"] = r["pubTime"]
                                 has_pub += 1
+                            if r.get("dek") and len(r.get("dek", "")) > 10:
+                                a["lead"] = r["dek"]
+                                a["lead_from"] = "cdp_dek"
                             success += 1
                     except Exception as e:
                         print(f"    wsj [{i+1}] 错误: {e}")
