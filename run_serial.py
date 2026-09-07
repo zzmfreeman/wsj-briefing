@@ -130,6 +130,35 @@ for i, a in enumerate(articles):
 
 print(f"标题翻译: {translated_count}/{len(articles)}")
 
+# 翻译后去重：标题完全相同的只保留第一篇
+print("\n=== 翻译后去重 ===")
+seen_titles = []
+deduped = []
+for a in articles:
+    title = a.get('title', '').strip()
+    if title and len(title) >= 8:
+        is_dup = False
+        for st in seen_titles:
+            if title == st:
+                is_dup = True
+                break
+            if len(title) >= 10 and len(st) >= 10:
+                shorter = title if len(title) <= len(st) else st
+                longer = st if len(title) <= len(st) else title
+                if shorter in longer:
+                    is_dup = True
+                    break
+        if is_dup:
+            print(f"  去重: {title[:40]}")
+            continue
+        seen_titles.append(title)
+    deduped.append(a)
+if len(deduped) < len(articles):
+    print(f"去重: {len(articles)} → {len(deduped)}")
+    articles = deduped
+else:
+    print("无重复")
+
 # 导语处理
 print("\n=== 导语处理 ===")
 for a in articles:
