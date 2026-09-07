@@ -491,7 +491,7 @@ def generate_html(articles, date_str, generated_at):
             padding: 0 16px;
         }}
         .card.expanded .card-detail {{
-            max-height: 1000px;
+            max-height: 3000px;
             padding: 0 16px 12px;
         }}
 

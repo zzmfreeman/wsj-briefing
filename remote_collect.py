@@ -1614,16 +1614,41 @@ def collect_all():
     # 5. 所有文章配图
     all_articles = cn_articles + rss_articles
 
-    # ── URL 去重：同一 URL 只保留第一篇（跨 RSS feed 重复） ──
-    seen_in_batch = set()
+    # ── URL + 标题去重：同一URL或相似标题只保留第一篇 ──
+    seen_urls_batch = set()
+    seen_titles = []
     deduped = []
+    title_dup = 0
+    url_dup = 0
     for a in all_articles:
         url = a.get('url') or a.get('link', '')
-        if url and url not in seen_in_batch:
-            seen_in_batch.add(url)
-            deduped.append(a)
-    if len(deduped) < len(all_articles):
-        print(f"  URL去重: {len(all_articles)} → {len(deduped)}（移除 {len(all_articles) - len(deduped)} 篇跨 feed 重复）")
+        title = a.get('title', '').strip()
+        if url and url in seen_urls_batch:
+            url_dup += 1
+            continue
+        if title and len(title) >= 8:
+            is_dup = False
+            for st in seen_titles:
+                if title == st:
+                    is_dup = True
+                    break
+                if len(title) >= 10 and len(st) >= 10:
+                    shorter = title if len(title) <= len(st) else st
+                    longer = st if len(title) <= len(st) else title
+                    if shorter in longer:
+                        is_dup = True
+                        break
+            if is_dup:
+                title_dup += 1
+                continue
+        if url:
+            seen_urls_batch.add(url)
+        if title:
+            seen_titles.append(title)
+        deduped.append(a)
+    removed = len(all_articles) - len(deduped)
+    if removed > 0:
+        print(f"  去重: {len(all_articles)} -> {len(deduped)} (URL重复{url_dup} + 标题重复{title_dup})")
     all_articles = deduped
 
     # ── 日期过滤：只保留 MAX_ARTICLE_AGE_DAYS 天内的文章 ──
