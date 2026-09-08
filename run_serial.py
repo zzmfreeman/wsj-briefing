@@ -130,31 +130,41 @@ for i, a in enumerate(articles):
 
 print(f"标题翻译: {translated_count}/{len(articles)}")
 
-# 翻译后去重：标题完全相同的只保留第一篇
+# 翻译后去重：精确+包含+模糊匹配
 print("\n=== 翻译后去重 ===")
+from difflib import SequenceMatcher
 seen_titles = []
 deduped = []
+dup_count = 0
 for a in articles:
     title = a.get('title', '').strip()
     if title and len(title) >= 8:
         is_dup = False
         for st in seen_titles:
+            # 精确匹配
             if title == st:
                 is_dup = True
                 break
+            # 包含匹配
             if len(title) >= 10 and len(st) >= 10:
                 shorter = title if len(title) <= len(st) else st
                 longer = st if len(title) <= len(st) else title
                 if shorter in longer:
                     is_dup = True
                     break
+            # 模糊匹配：相似度>0.8
+            ratio = SequenceMatcher(None, title, st).ratio()
+            if ratio > 0.8:
+                print(f"  去重(相似{ratio:.2f}): {title[:35]}")
+                is_dup = True
+                break
         if is_dup:
-            print(f"  去重: {title[:40]}")
+            dup_count += 1
             continue
         seen_titles.append(title)
     deduped.append(a)
-if len(deduped) < len(articles):
-    print(f"去重: {len(articles)} → {len(deduped)}")
+if dup_count > 0:
+    print(f"去重: {len(articles)} → {len(deduped)} (移除{dup_count}篇)")
     articles = deduped
 else:
     print("无重复")
