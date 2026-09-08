@@ -1,5 +1,12 @@
 import websockets
 import asyncio
+
+async def _ws_recv_timeout(ws, timeout=30):
+    """WebSocket recv with timeout protection"""
+    try:
+        return await asyncio.wait_for(ws.recv(), timeout=timeout)
+    except asyncio.TimeoutError:
+        raise TimeoutError(f"ws.recv() timed out after {timeout}s")
 #!/usr/bin/env python3
 """
 WSJ Briefing 远程采集模块（v3 - autocli read 版）
@@ -525,7 +532,7 @@ def scrape_cn_homepage_cdp(limit=30):
                 # 1. 导航到首页
                 print("  导航到 cn.wsj.com 首页...")
                 await ws.send(json.dumps({"id": msg_id, "method": "Page.navigate", "params": {"url": "https://cn.wsj.com/"}}))
-                resp = json.loads(await ws.recv())
+                resp = json.loads(await _ws_recv_timeout(ws))
                 msg_id += 1
                 
                 # 2. 等待JS渲染（轮询body大小）
@@ -533,7 +540,7 @@ def scrape_cn_homepage_cdp(limit=30):
                     await asyncio.sleep(2)
                     js = "document.body ? document.body.innerHTML.length : 0"
                     await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js, "returnByValue": True}}))
-                    resp = json.loads(await ws.recv())
+                    resp = json.loads(await _ws_recv_timeout(ws))
                     msg_id += 1
                     size = resp.get("result", {}).get("result", {}).get("value", 0)
                     if size > 10000:
@@ -627,7 +634,7 @@ def scrape_cn_homepage_cdp(limit=30):
                 })()
                 """
                 await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js_scrape, "returnByValue": True}}))
-                resp = json.loads(await ws.recv())
+                resp = json.loads(await _ws_recv_timeout(ws))
                 msg_id += 1
                 
                 result = resp.get("result", {}).get("result", {}).get("value", "[]")
@@ -654,26 +661,32 @@ def scrape_cn_homepage_cdp(limit=30):
                 _img_count = sum(1 for a in clean if a.get("image"))
                 print(f"  cn.wsj.com 首页: {len(clean)} 篇（{_img_count} 篇有图）")
                 
-                # 3b. 导航到科技分类页抓更多文章
-                cn_tech_url = "https://cn.wsj.com/zh-hans/news/technology"
-                print(f"  导航到科技分类页: {cn_tech_url}")
-                await ws.send(json.dumps({"id": msg_id, "method": "Page.navigate", "params": {"url": cn_tech_url}}))
-                resp = json.loads(await ws.recv())
-                msg_id += 1
-                
-                for wait2 in range(10):
-                    await asyncio.sleep(2)
-                    js2 = "document.body ? document.body.innerHTML.length : 0"
-                    await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js2, "returnByValue": True}}))
-                    resp = json.loads(await ws.recv())
+                # 3b. 导航到各分类页抓更多文章
+                cn_categories = [
+                    ("科技", "https://cn.wsj.com/zh-hans/news/technology"),
+                    ("中国", "https://cn.wsj.com/zh-hans/news/china"),
+                    ("商业", "https://cn.wsj.com/zh-hans/news/business"),
+                    ("经济", "https://cn.wsj.com/zh-hans/news/economy"),
+                    ("国际", "https://cn.wsj.com/zh-hans/news/world"),
+                ]
+                for cat_name, cat_url in cn_categories:
+                    print(f"  导航到{cat_name}分类页: {cat_url}")
+                    await ws.send(json.dumps({"id": msg_id, "method": "Page.navigate", "params": {"url": cat_url}}))
+                    resp = json.loads(await _ws_recv_timeout(ws))
                     msg_id += 1
-                    size2 = resp.get("result", {}).get("result", {}).get("value", 0)
-                    if size2 > 10000:
-                        print(f"  科技页渲染完成 ({wait2*2+2}s, {size2} bytes)")
-                        break
+                    
+                    for wait2 in range(10):
+                        await asyncio.sleep(2)
+                        js2 = "document.body ? document.body.innerHTML.length : 0"
+                        await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js2, "returnByValue": True}}))
+                        resp = json.loads(await _ws_recv_timeout(ws))
+                        msg_id += 1
+                        size2 = resp.get("result", {}).get("result", {}).get("value", 0)
+                        if size2 > 10000:
+                            break
                 
                 await ws.send(json.dumps({"id": msg_id, "method": "Runtime.evaluate", "params": {"expression": js_scrape, "returnByValue": True}}))
-                resp = json.loads(await ws.recv())
+                resp = json.loads(await _ws_recv_timeout(ws))
                 msg_id += 1
                 
                 result2 = resp.get("result", {}).get("result", {}).get("value", "[]")
@@ -695,7 +708,7 @@ def scrape_cn_homepage_cdp(limit=30):
                         a["section"] = "🇨🇳 中文版"
                         clean.append(a)
                         tech_added += 1
-                    print(f"  科技页新增: {tech_added} 篇")
+                    print(f"  {cat_name}页新增: {tech_added} 篇")
                 
                 _img_count2 = sum(1 for a in clean if a.get("image"))
                 print(f"  cn.wsj.com 总计: {len(clean)} 篇（{_img_count2} 篇有图）")
@@ -1340,7 +1353,7 @@ async def _fetch_article_via_ws(ws, url, mid_start):
     
     # 导航
     await ws.send(json.dumps({"id": mid, "method": "Page.navigate", "params": {"url": url}}))
-    json.loads(await ws.recv())
+    json.loads(await _ws_recv_timeout(ws))
     mid += 1
     
     # 等待渲染
@@ -1348,7 +1361,7 @@ async def _fetch_article_via_ws(ws, url, mid_start):
         await asyncio.sleep(2)
         js = "document.body ? document.body.innerHTML.length : 0"
         await ws.send(json.dumps({"id": mid, "method": "Runtime.evaluate", "params": {"expression": js, "returnByValue": True}}))
-        r = json.loads(await ws.recv())
+        r = json.loads(await _ws_recv_timeout(ws))
         mid += 1
         sz = r.get("result", {}).get("result", {}).get("value", 0)
         if sz > 5000:
@@ -1431,7 +1444,7 @@ async def _fetch_article_via_ws(ws, url, mid_start):
     })()
     """
     await ws.send(json.dumps({"id": mid, "method": "Runtime.evaluate", "params": {"expression": js_extract, "returnByValue": True}}))
-    r = json.loads(await ws.recv())
+    r = json.loads(await _ws_recv_timeout(ws))
     mid += 1
     
     return json.loads(r.get("result", {}).get("result", {}).get("value", "{}")), mid
