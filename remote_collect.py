@@ -1361,15 +1361,15 @@ async def _fetch_article_via_ws(ws, url, mid_start):
     json.loads(await _ws_recv_timeout(ws))
     mid += 1
     
-    # 等待渲染
-    for w in range(8):
+    # 等待渲染（增加重试：body太小则继续等）
+    for w in range(15):
         await asyncio.sleep(2)
         js = "document.body ? document.body.innerHTML.length : 0"
         await ws.send(json.dumps({"id": mid, "method": "Runtime.evaluate", "params": {"expression": js, "returnByValue": True}}))
         r = json.loads(await _ws_recv_timeout(ws))
         mid += 1
         sz = r.get("result", {}).get("result", {}).get("value", 0)
-        if sz > 5000:
+        if sz > 10000:
             break
     
     # 提取内容
@@ -1521,6 +1521,10 @@ async def _fetch_all(articles):
                                 if new_title != old_title and len(new_title) <= 200:
                                     a["title"] = new_title
                                     a["title_fixed"] = True
+                            # fallback：CDP没拿到dek时用首页summary
+                            if not a.get("lead") and a.get("summary"):
+                                a["lead"] = a["summary"]
+                                a["lead_from"] = "homepage_summary"
                             success += 1
                     except Exception as e:
                         print(f"    cn [{i+1}] 错误: {e}")
