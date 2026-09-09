@@ -570,11 +570,16 @@ def scrape_cn_homepage_cdp(limit=30):
                         // 提取标题
                         let title = "";
                         const img = link.querySelector("img");
-                        if (img) {
-                            title = (img.alt || "").replace(/^Image thumbnail for article titled\\s*/i, "");
+                        // 优先用img.alt（标题更可靠）
+                        if (img && img.alt && img.alt.length >= 4 && img.alt.length <= 100) {
+                            title = img.alt.replace(/^Image thumbnail for article titled\\s*/i, "");
                         }
+                        // textContent如果过长(>50字)可能是导语不是标题
                         if (!title || title.length < 4) {
-                            title = (link.textContent || "").trim();
+                            var tc = (link.textContent || "").trim();
+                            if (tc.length >= 4 && tc.length <= 100) {
+                                title = tc;
+                            }
                         }
                         if (!title || title.length < 4) {
                             let p = link.parentElement;
@@ -1508,6 +1513,13 @@ async def _fetch_all(articles):
                             if r.get("dek") and len(r.get("dek", "")) > 10:
                                 a["lead"] = r["dek"]
                                 a["lead_from"] = "cdp_dek"
+                            # 更新标题：详情页h1 > og:title > 原标题
+                            if r.get("title") and len(r["title"]) >= 4:
+                                old_title = a.get("title", "")
+                                new_title = r["title"]
+                                if new_title != old_title and len(new_title) <= 200:
+                                    a["title"] = new_title
+                                    a["title_fixed"] = True
                             success += 1
                     except Exception as e:
                         print(f"    cn [{i+1}] 错误: {e}")
@@ -1549,6 +1561,13 @@ async def _fetch_all(articles):
                             if r.get("dek") and len(r.get("dek", "")) > 10:
                                 a["lead"] = r["dek"]
                                 a["lead_from"] = "cdp_dek"
+                            # 更新标题：详情页h1 > og:title > 原标题
+                            if r.get("title") and len(r["title"]) >= 4:
+                                old_title = a.get("title", "")
+                                new_title = r["title"]
+                                if new_title != old_title and len(new_title) <= 200:
+                                    a["title"] = new_title
+                                    a["title_fixed"] = True
                             success += 1
                     except Exception as e:
                         print(f"    wsj [{i+1}] 错误: {e}")
