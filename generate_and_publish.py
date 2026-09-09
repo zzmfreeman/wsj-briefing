@@ -72,7 +72,35 @@ def llm_call(prompt, system_msg="你是一名专业的财经信息分析师", ma
             last_err = str(e)
             print(f"      LiteLLM {model} error: {e}")
     
-    raise RuntimeError(f"All LiteLLM models failed. Last error: {last_err}")
+    # 本地 Ollama 兜底（无内容审查）
+    try:
+        ollama_body = {
+            "model": "qwen2.5:14b-instruct",
+            "messages": [
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": prompt},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "stream": False,
+        }
+        ollama_req = urllib.request.Request(
+            "http://localhost:11434/api/chat",
+            data=json.dumps(ollama_body).encode(),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(ollama_req, timeout=180) as resp:
+            odata = json.loads(resp.read().decode())
+        result = odata.get("message", {}).get("content", "").strip()
+        if result and len(result) > 2:
+            print("      Ollama qwen2.5:14b 兜底成功")
+            return result
+        last_err = "Ollama returned empty"
+    except Exception as e:
+        last_err = f"Ollama error: {e}"
+        print(f"      Ollama error: {e}")
+
+    raise RuntimeError(f"All models failed (incl Ollama). Last error: {last_err}")
 
 
 
