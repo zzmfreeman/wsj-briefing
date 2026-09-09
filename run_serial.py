@@ -64,8 +64,21 @@ def patched_generate(articles):
                     print(f"  [{completed}/{len(articles)}] {a.get('title','')[:35]}... ✓ ({t1-t0:.1f}s)")
                     continue
             except (json.JSONDecodeError, TypeError):
-                pass
-            # Fallback: treat as plain text
+                # 尝试从非标准JSON中提取insight和bullets
+                insight_m = re.search(r'"insight"\s*:\s*"([^"]+)"', result)
+                bullet_ms = re.findall(r'"(?:核心事实|关键细节|影响)[^"]*"\s*:\s*"([^"]+)"', result)
+                parts = []
+                if bullet_ms:
+                    parts.append("|||BULLETS|||" + "|||".join(bullet_ms))
+                if insight_m:
+                    parts.append("|||INSIGHT|||" + insight_m.group(1))
+                combined = "\n".join(parts)
+                if combined:
+                    a['ai_summary'] = combined
+                    completed += 1
+                    print(f"  [{completed}/{len(articles)}] {a.get('title','')[:35]}... ✓ fallback ({t1-t0:.1f}s)")
+                    continue
+                # 最终fallback：纯文本
             result = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', result)
             result = re.sub(r'[{}"\[\]]', '', result).strip()
             a['ai_summary'] = result[:300] if result else ""
