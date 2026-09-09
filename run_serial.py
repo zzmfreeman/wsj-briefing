@@ -169,12 +169,53 @@ if dup_count > 0:
 else:
     print("无重复")
 
-# 导语处理
+# 导语处理 + 翻译
 print("\n=== 导语处理 ===")
+import re as _re2
 for a in articles:
     if not a.get('lead'):
         a['lead'] = a.get('summary', '') or a.get('fulltext', '')[:200]
     a['lead_en'] = a.get('lead', '')
+
+# 翻译英文导语为中文
+print("\n=== 导语翻译 ===")
+from generate_and_publish import llm_call as _llm_call2
+dek_translated = 0
+for i, a in enumerate(articles):
+    lead = a.get('lead', '')
+    if not lead or len(lead) < 10:
+        continue
+    # 跳过已有中文导语
+    if _re2.search(r'[\u4e00-\u9fff]', lead):
+        continue
+    try:
+        result = _llm_call2(
+            "任务：英文新闻导语翻译。\n输入：{lead}\n输出要求：只输出简体中文翻译，不要解释，不要加引号。\n参考风格：华尔街日报中文版导语风格，简洁专业。\n现在输出翻译：".format(lead=lead[:300]),
+            max_tokens=2000,
+            temperature=0.3,
+        )
+        translated = result.strip()
+        for prefix in ["中文翻译：", "翻译：", "**翻译：**"]:
+            if translated.startswith(prefix):
+                translated = translated[len(prefix):].strip()
+        translated = _re2.sub(r'\*+', '', translated).strip()
+        if _re2.search(r'[\u4e00-\u9fff]', translated) and len(translated) < 300:
+            a['lead'] = translated
+            dek_translated += 1
+            print(f"  [{i+1}/{len(articles)}] {lead[:30]}... -> {translated[:25]}")
+        else:
+            print(f"  [{i+1}/{len(articles)}] 翻译失败，保留英文")
+    except Exception as e:
+        print(f"  [{i+1}/{len(articles)}] 翻译错误: {str(e)[:40]}")
+
+print(f"导语翻译: {dek_translated}/{len(articles)}")
+
+# 导语质量检查
+no_cn_dek = sum(1 for a in articles if a.get('lead') and not _re2.search(r'[\u4e00-\u9fff]', a.get('lead', '')))
+if no_cn_dek > 0:
+    print(f"⚠️ {no_cn_dek}篇导语仍为英文!")
+else:
+    print("✓ 全部导语为中文")
 
 print(f"导语处理: {sum(1 for a in articles if a.get('lead'))}篇有导语")
 
