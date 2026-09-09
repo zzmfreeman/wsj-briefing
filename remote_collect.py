@@ -1409,19 +1409,20 @@ async def _fetch_article_via_ws(ws, url, mid_start):
         var fc = document.querySelector('figcaption');
         if (fc) figcaption = fc.textContent.trim();
         var dek = '';
-        var dekEl = document.querySelector('h2[data-testid="dek-block"]');
-        if (dekEl) dek = dekEl.textContent.trim();
-        if (!dek) {
-            var dekP = document.querySelector('p.dek, p[class*="dek"]');
-            if (dekP) dek = dekP.textContent.trim();
-        }
-        if (!dek) {
-            var ogDesc = document.querySelector('meta[property="og:description"]');
-            if (ogDesc) dek = (ogDesc.getAttribute('content') || '').trim();
-        }
+        // 优先用og:description（最可靠的导语来源）
+        var ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) dek = (ogDesc.getAttribute('content') || '').trim();
         if (!dek) {
             var metaDesc = document.querySelector('meta[name="description"]');
             if (metaDesc) dek = (metaDesc.getAttribute('content') || '').trim();
+        }
+        if (!dek) {
+            var dekEl = document.querySelector('h2[data-testid="dek-block"]');
+            if (dekEl) dek = dekEl.textContent.trim();
+        }
+        if (!dek) {
+            var dekP = document.querySelector('p.dek, p[class*="dek"]');
+            if (dekP) dek = dekP.textContent.trim();
         }
         var pubTime = '';
         var timeEl = document.querySelector('time[datetime]');
