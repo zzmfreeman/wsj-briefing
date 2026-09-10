@@ -60,6 +60,7 @@ def patched_generate(articles):
                 combined = "\n".join(parts)
                 if combined:
                     a['ai_summary'] = combined
+                    a['importance'] = int(parsed.get("importance", 3))
                     completed += 1
                     print(f"  [{completed}/{len(articles)}] {a.get('title','')[:35]}... ✓ ({t1-t0:.1f}s)")
                     continue
@@ -98,6 +99,66 @@ def patched_generate(articles):
     return articles
 
 articles = patched_generate(articles)
+
+# 2.5 保存当天文章历史 + 加载过去5天重要未读文章
+import json as _json2
+from datetime import timedelta as _td
+from pathlib import Path as _Path
+
+HISTORY_DIR = _Path.home() / "wsj-briefing" / "article_history"
+HISTORY_DIR.mkdir(exist_ok=True)
+today_str = datetime.now(SH_TZ).strftime("%Y-%m-%d")
+history_file = HISTORY_DIR / f"{today_str}.json"
+
+# 保存当天文章（精简字段）
+today_articles = []
+for a in articles:
+    today_articles.append({
+        "url": a.get("url", ""),
+        "title": a.get("title", ""),
+        "lead": a.get("lead", ""),
+        "ai_summary": a.get("ai_summary", ""),
+        "importance": a.get("importance", 3),
+        "section": a.get("section", ""),
+        "source": a.get("source", ""),
+        "published": a.get("published", ""),
+        "image": a.get("image", ""),
+    })
+history_file.write_text(_json2.dumps(today_articles, ensure_ascii=False, indent=2))
+print(f"\n=== 文章历史 ===")
+print(f"保存 {len(today_articles)} 篇到 {history_file.name}")
+
+# 加载过去5天重要文章（importance>=3）
+REVIEW_DAYS = 5
+review_articles = []
+seen_urls_today = set(a.get("url", "") for a in articles)
+for days_ago in range(1, REVIEW_DAYS + 1):
+    review_date = (datetime.now(SH_TZ) - _td(days=days_ago)).strftime("%Y-%m-%d")
+    review_file = HISTORY_DIR / f"{review_date}.json"
+    if not review_file.exists():
+        continue
+    try:
+        old_articles = _json2.loads(review_file.read_text())
+        for oa in old_articles:
+            url = oa.get("url", "")
+            if url in seen_urls_today:
+                continue
+            if oa.get("importance", 3) >= 3:
+                oa["source"] = "review"
+                oa["section"] = "📌 未读回顾"
+                oa["review_date"] = review_date
+                review_articles.append(oa)
+                seen_urls_today.add(url)
+    except:
+        pass
+
+if review_articles:
+    # 按重要性降序
+    review_articles.sort(key=lambda x: x.get("importance", 3), reverse=True)
+    articles.extend(review_articles)
+    print(f"未读回顾: {len(review_articles)} 篇 (importance>=3, 过去{REVIEW_DAYS}天)")
+else:
+    print("未读回顾: 0 篇")
 
 # 3. 翻译标题+生成导语 — 跳过，用已有lead
 print("\n=== 翻译标题 ===")

@@ -16,6 +16,7 @@ SECTION_COLORS = {
     '📈 Markets':  '#00853e',
     '🌍 World':    '#333',
     '🏢 Business': '#8b572a',
+    '📌 未读回顾':  '#6b3fa0',
 }
 
 
