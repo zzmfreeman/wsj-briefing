@@ -587,6 +587,8 @@ def scrape_cn_homepage_cdp(limit=30):
                                 const elems = p.querySelectorAll("span, h1, h2, h3, h4, p");
                                 for (const s of elems) {
                                     if (s === link) continue;
+                                    // 排除属于其他文章链接的元素（防止URL-标题错配）
+                                    if (s.closest("a") && s.closest("a") !== link) continue;
                                     const t = s.textContent.trim();
                                     if (t.length >= 6 && t.length <= 100 && !nav_words.has(t) && !t.startsWith(".css")) {
                                         title = t;
