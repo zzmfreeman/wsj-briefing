@@ -128,8 +128,18 @@ history_file.write_text(_json2.dumps(today_articles, ensure_ascii=False, indent=
 print(f"\n=== 文章历史 ===")
 print(f"保存 {len(today_articles)} 篇到 {history_file.name}")
 
-# 加载过去5天重要文章（importance>=3）
-REVIEW_DAYS = 5
+# 当天文章精简：importance>=4，最多40篇
+_all_today = list(articles)
+articles = [a for a in articles if a.get("importance", 3) >= 4]
+articles.sort(key=lambda x: x.get("importance", 3), reverse=True)
+if len(articles) > 40:
+    articles = articles[:40]
+print(f"当天精简: {len(_all_today)}篇 -> {len(articles)}篇 (importance>=4, 上限40)")
+
+# 回顾：importance=5，过去3天，最多10篇
+REVIEW_DAYS = 3
+REVIEW_IMP = 5
+REVIEW_MAX = 10
 review_articles = []
 seen_urls_today = set(a.get("url", "") for a in articles)
 for days_ago in range(1, REVIEW_DAYS + 1):
@@ -143,7 +153,7 @@ for days_ago in range(1, REVIEW_DAYS + 1):
             url = oa.get("url", "")
             if url in seen_urls_today:
                 continue
-            if oa.get("importance", 3) >= 3:
+            if oa.get("importance", 3) >= REVIEW_IMP:
                 oa["source"] = "review"
                 oa["section"] = "📌 未读回顾"
                 oa["review_date"] = review_date
@@ -152,13 +162,12 @@ for days_ago in range(1, REVIEW_DAYS + 1):
     except:
         pass
 
-if review_articles:
-    # 按重要性降序
-    review_articles.sort(key=lambda x: x.get("importance", 3), reverse=True)
-    articles.extend(review_articles)
-    print(f"未读回顾: {len(review_articles)} 篇 (importance>=3, 过去{REVIEW_DAYS}天)")
-else:
-    print("未读回顾: 0 篇")
+review_articles.sort(key=lambda x: x.get("importance", 3), reverse=True)
+if len(review_articles) > REVIEW_MAX:
+    review_articles = review_articles[:REVIEW_MAX]
+articles.extend(review_articles)
+print(f"未读回顾: {len(review_articles)} 篇 (importance>={REVIEW_IMP}, 过去{REVIEW_DAYS}天, 上限{REVIEW_MAX})")
+print(f"总计: {len(articles)} 篇")
 
 # 3. 翻译标题+生成导语 — 跳过，用已有lead
 print("\n=== 翻译标题 ===")
