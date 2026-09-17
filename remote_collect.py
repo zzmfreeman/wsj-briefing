@@ -1470,6 +1470,35 @@ def _get_cn_tab_ws_url():
     return None
 
 
+async def _retry_fetch_deks(articles):
+    """对没有导语的文章重试CDP抓取dek"""
+    cn_urls = [a for a in articles if "cn.wsj.com" in (a.get("url") or "")]
+    wsj_urls = [a for a in articles if "cn.wsj.com" not in (a.get("url") or "")]
+    
+    for group, get_tab_fn, label in [
+        (cn_urls, _get_cn_tab_ws_url, "cn"),
+        (wsj_urls, _get_wsj_tab_ws_url, "wsj"),
+    ]:
+        if not group:
+            continue
+        ws_url = get_tab_fn()
+        if not ws_url:
+            print(f"  [{label}] 无法获取tab，跳过重试")
+            continue
+        async with websockets.connect(ws_url, max_size=10*1024*1024) as ws:
+            mid = 300
+            for a in group:
+                url = a.get("url", "")
+                try:
+                    r, mid = await _fetch_article_via_ws(ws, url, mid)
+                    if r and r.get("dek") and len(r["dek"]) > 10:
+                        a["lead"] = r["dek"]
+                        a["lead_from"] = "cdp_retry"
+                        print(f"  [{label}] 补抓导语成功: {a.get('title','')[:30]}")
+                except Exception as e:
+                    print(f"  [{label}] 重试失败: {str(e)[:40]}")
+
+
 async def _fetch_all(articles):
     """用WebSocket连接抓取所有文章（cn.wsj.com和wsj.com分别用各自的tab）"""
     results = []

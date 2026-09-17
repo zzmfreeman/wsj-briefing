@@ -255,6 +255,18 @@ else:
 # 导语处理 + 翻译
 print("\n=== 导语处理 ===")
 import re as _re2
+
+# CDP重试：对没有lead的文章重新抓取dek
+no_lead = [a for a in articles if not a.get('lead') or len(a.get('lead','')) < 10]
+if no_lead:
+    print(f"  {len(no_lead)}篇无导语，CDP重试...")
+    import asyncio as _aio2
+    import remote_collect as _rc
+    try:
+        _aio2.run(_rc._retry_fetch_deks(no_lead))
+    except Exception as e:
+        print(f"  CDP重试失败: {e}")
+
 for a in articles:
     if not a.get('lead'):
         a['lead'] = a.get('summary', '') or a.get('fulltext', '')[:200]
