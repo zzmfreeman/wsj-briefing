@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSJ日报 — 2026年09月21日</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-header h1 span {
+            color: var(--text);
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+        .stat-pill strong {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* 饼图 */
+        .pie-chart {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient(#0066cc 0deg 72.0deg #00853e 72.0deg 126.0deg #333 126.0deg 252.0deg #8b572a 252.0deg 324.0deg #6b3fa0 324.0deg 360.0deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .search-box {
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── 主布局 ── */
+        .dashboard-body {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 左侧筛选栏 */
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }
+        .filter-btn:hover {
+            background: var(--bg);
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .filter-btn.active .filter-count {
+            color: rgba(255,255,255,0.8);
+        }
+        .filter-count {
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+        .filter-btn.active .filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ── 卡片流 ── */
+        .card-stream {
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card.hidden {
+            display: none;
+        }
+
+        /* 卡片头部（可点击展开） */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #fafafa;
+        }
+        .card-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .card-titles {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .card-title-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
+        .card-section {
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card-time {
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {
+            padding: 0 16px 10px;
+        }
+
+        /* 导语 */
+        .card-dek {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }
+        .card-dek-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        /* 洞察 */
+        .card-insight {
+            padding: 8px 12px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-insight p {
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+        .card.expanded .card-detail {
+            max-height: 3000px;
+            padding: 0 16px 12px;
+        }
+
+        /* 图片 */
+        .card-hero {
+            margin: 0 0 10px;
+        }
+        .card-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets */
+        .card-bullets {
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+        .card-bullets li {
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .card-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .card-body-text {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* CTA */
+        .card-cta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* ── 页脚 ── */
+        .page-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .dashboard-body {
+                padding: 8px;
+            }
+            .card-stream {
+                padding: 0;
+            }
+            .search-box {
+                width: 140px;
+            }
+            .card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>20</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
+    </header>
+
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            <button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="💻 Tech">💻 Tech <span class="filter-count">4</span></button><button class="filter-btn" data-filter="📈 Markets">📈 Markets <span class="filter-count">3</span></button><button class="filter-btn" data-filter="🌍 World">🌍 World <span class="filter-count">7</span></button><button class="filter-btn" data-filter="🏢 Business">🏢 Business <span class="filter-count">4</span></button><button class="filter-btn" data-filter="📌 未读回顾">📌 未读回顾 <span class="filter-count">2</span></button>
+        </aside>
+        <div class="card-stream">
+            
+    <div class="card" data-section="💻 Tech" data-title="人工智能如何重塑以色列选举活动">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">01</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">人工智能如何重塑以色列选举活动</h3><span class="card-title-en">How AI Is Reshaping Election Campaigns in Israel</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-37286625?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">议员们正忙着聘请AI顾问、影响聊天机器人输出结果，并以快过监管者反应的速度大量炮制AI生成广告。</p><p class="card-dek-en">Lawmakers are hiring AI advisers, working to influence chatbot results and churning out AI-generated ads faster than regulators can keep up.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>当AI成为竞选武器，民主选举的首要威胁已从传统假新闻升级为系统性、自动化、难以追溯的舆论操控。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-37286625" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：以色列多个政党及议员已大规模引入AI顾问，用于生成竞选广告、定制化选民互动脚本，并系统性干预ChatGPT等聊天机器人的输出结果，以确保其对候选人的评价正面。AI生成内容的速度已远超以色列中央选举委员会及司法部现行监管框架的应对能力，形成执法真空。</li><li>关键细节：利库德集团、未来党等主要政党均直接雇佣AI策略公司，使用生成式AI工具批量生产包含深度伪造元素的视频广告，单日可产出数百条定制化信息。同时，议员团队通过向聊天机器人注入大量预设问题和答案，成功让AI在回应选民提问时优先推荐特定候选人立场，扭曲信息生态。</li><li>影响：选民正处于一场由AI驱动的信息轰炸中，难以辨别竞选内容的真伪，虚假信息传播速度和精准度大幅提升。监管机构因更新立法缓慢而无法及时封堵漏洞，导致非AI使用者候选人处于竞争劣势，选举公平性遭到侵蚀，未来可能引发对选举结果的合法性争议。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/how-ai-is-reshaping-election-campaigns-in-israel-f5a2e79a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="特朗普宣布组建“人工智能部队”，业界此前敲响警钟">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">02</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普宣布组建“人工智能部队”，业界此前敲响警钟</h3><span class="card-title-en">Trump Announces an ‘AI Force’ After Industry Sounded Alarm</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-73484170?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">总统呼吁对该行业实施联邦监管，因选民对人工智能的抵触情绪升温。</p><p class="card-dek-en">The president calls for federal oversight of the industry as opposition toward AI grows among voters.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>特朗普借“AI Force”名号将反AI民意转化为监管武器，实质是对科技巨头进行政治敲打，同时收割选民好感。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-73484170" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：总统特朗普宣布成立联邦级“AI Force”工作组，旨在对人工智能行业实施全面监管，回应选民中迅速蔓延的反AI情绪，此举标志着其转向积极干预科技产业的重大政策调整。</li><li>关键细节：决策出台前，多家AI头部企业及行业协会发出联合警报，呼吁政府规范无序发展；盖洛普最新民调显示，68%的美国选民担忧AI导致失业，55%认为隐私受威胁，直接推升白宫的政策紧迫性。</li><li>影响：OpenAI、谷歌、微软等公司面临强制性合规审查与研发报告义务，可能导致通用人工智能竞赛减速；科技股当日盘后下滑，风投对早期AI项目转趋谨慎，初创企业融资门槛提高。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/trump-announces-an-ai-force-after-industry-sounded-alarm-7c189b8f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="十年期美债收益率冲击5%关口之路的疯狂波动">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">03</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">十年期美债收益率冲击5%关口之路的疯狂波动</h3><span class="card-title-en">See the 10-Year Treasury Yield’s Wild Ride on the Road to 5%</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Mon, 21 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-30004945?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">自本十年初以来，疫情、战争和政府赤字重塑了债券市场。</p><p class="card-dek-en">A pandemic, wars and government deficits have reshaped the bond market since the start of the decade.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>这不仅是利率的正常化，更是全球廉价资本时代终结的正式宣言，财政无纪律最终由全社会承担代价。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-30004945" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：2023年10月，美国10年期国债收益率盘中突破5%大关，为2007年以来首次，自2020年3月疫情恐慌低点0.318%起累计飙升超过460个基点，期间经历了2022年创纪录的深度倒挂和2023年3月银行业动荡引发的单月超100个基点的剧烈震荡。</li><li>关键细节：疫情后美国政府推出逾5万亿美元财政刺激，推升联邦债务突破33万亿美元；同期俄乌战争引爆能源与粮食价格，CPI年率一度飙至9.1%，迫使美联储自2022年3月起累计加息525个基点。国债供给洪水与量化紧缩叠加，彻底打破了长达四十年的债券牛市。</li><li>影响：收益率飙升直接推高美国政府年度净利息成本至近1万亿美元，超过国防预算；30年期固定房贷利率突破8%，成屋销售跌至冰点；全球养老基金与银行债券组合巨亏，硅谷银行因此倒闭，并迫使新兴市场货币贬值与资本外流加剧，各国央行被迫干预。</li></ul>
+        <a href="https://www.wsj.com/finance/investing/see-the-10-year-treasury-yields-wild-ride-on-the-road-to-5-22e4bbc2" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="加密货币痛失良机，甩锅大战已开场">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">04</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">加密货币痛失良机，甩锅大战已开场</h3><span class="card-title-en">Crypto Blew Its Big Moment—and the Blame Game Has Begun</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33523433?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Coinbase首席执行官布莱恩·阿姆斯特朗置身于一场围绕数字资产在主流金融中角色的持久战中心。</p><p class="card-dek-en">Coinbase CEO Brian Armstrong was at the center of a protracted fight over the role of digital assets in mainstream finance.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>加密行业将本可借势打入主流的转折点，消耗在了路线内斗上，最终把责任推给最显眼的合规派旗手。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33523433" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Coinbase CEO Brian Armstrong 成为加密行业错失进入主流金融关键机会后内部互相指责的焦点人物，围绕数字资产在美国金融体系中的角色，一场持久争斗以行业分裂和立法停滞告终。</li><li>关键细节：这场争斗的核心是美国国会未能通过任何全面的加密货币监管框架，如《21世纪金融创新与技术法案》（FIT21）或稳定币法案，同时SEC对Coinbase等平台的未注册证券指控持续发酵。行业内部因策略分歧公开化，Armstrong 主张的合规路线遭到部分原生加密派批评，认为其向监管妥协过多，导致统一阵线瓦解。</li><li>影响：内部分裂削弱了加密行业在华盛顿的游说力量，使本已艰难的立法进程雪上加霜，Coinbase 面临诉讼和商业模式不确定性的双重压力，其股价承压。更重要的是，监管真空延续，创新外流担忧加剧，美国在数字资产规则制定上的领导力被欧盟等地区追赶，散户投资者继续缺乏清晰保护。</li></ul>
+        <a href="https://www.wsj.com/finance/currencies/crypto-blew-its-big-momentand-the-blame-game-has-begun-dff66a10" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="特朗普的格陵兰协议为美国企业打开北极岛屿商机">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">05</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普的格陵兰协议为美国企业打开北极岛屿商机</h3><span class="card-title-en">Trump’s Greenland Deal Eases Way for U.S. Business on Arctic Island</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-50406772?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该协议并未带来他想要的掌控力，但提升了吸引更多投资和缓解当地与美国合作污名化的希望。</p><p class="card-dek-en">The agreement doesn’t deliver the control he wanted, but it raises hopes of more investment and less local stigma around working with America.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>特朗普用商业交易逻辑重新定义了北极地缘博弈，将主权争议转化为资本准入，实则以企业先行铺路，实现华盛顿对战略资源的间接控制。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-50406772" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：特朗普政府与格陵兰自治政府及丹麦达成一项新协议，虽未实现美国直接购买格陵兰岛的目标，但为美国企业在格陵兰的矿业、能源和基础设施投资大幅放宽限制。协议明确开放稀土、铀矿和石油等战略资源勘探，并简化美企进入程序。</li><li>关键细节：协议包括建立美格联合经济区，允许美国公司享受与格陵兰本地企业同等的税收和监管待遇；美国进出口银行获授权提供数十亿美元融资支持。此前因2019年特朗普购岛提议引发的政治敏感，导致当地对美国资本的排斥，新协议专门加入“尊重自治和互惠”条款以淡化殖民联想。</li><li>影响：美国矿产公司和防务承包商将率先获益，如Ridgewood Energy已宣布启动稀土勘探项目，洛克希德·马丁评估在格陵兰南部建立深水港。格陵兰可借此摆脱对丹麦每年约5.4亿美元财政补贴的依赖，推动独立进程，但面临环保组织和原住民对资源过度开发的反对。</li></ul>
+        <a href="https://www.wsj.com/world/trumps-greenland-deal-eases-way-for-u-s-business-on-arctic-island-1cbef960" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="油轮短缺恐令汽油价格居高不下">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">06</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">油轮短缺恐令汽油价格居高不下</h3><span class="card-title-en">A Shortage of Oil Tankers Is Threatening to Keep Gas Prices High</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Mon, 21 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-71970372?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">霍尔木兹海峡航运费率创纪录，或可抵消原油价格跌势。</p><p class="card-dek-en">Record shipping rates through the Strait of Hormuz could offset falling crude prices.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>全球能源市场的定价逻辑正从“原油本位”转向“物流瓶颈本位”，霍尔木兹海峡的航运费率变成了比油田阀门更直接的终端价格控制器。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-71970372" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：霍尔木兹海峡油轮运价飙升至历史新高，部分航线日租金突破10万美元，导致原油运输成本在成品油价格中占比急剧上升，正在抵消近期国际原油价格下滑带来的降价空间，使汽油零售价维持高位。</li><li>关键细节：油轮短缺源于西方对俄罗斯石油制裁引发的全球船队结构性重组、老龄船舶淘汰加速以及船东因高运费推迟维修，造成运力紧张。霍尔木兹海峡作为全球约五分之一石油运输的咽喉，其超大型油轮费率自2023年三季度起上涨超50%，部分即期租船费率创2008年以来纪录。</li><li>影响：炼油厂和贸易商面临原料运输成本激增，难以将原油降价完全传导至汽油批发端；终端消费者在驾驶旺季前夕承受持续高企的加油站价格，欧美央行抑制通胀的努力遭遇供应链新梗阻，政策转向降息时点可能延后。</li></ul>
+        <a href="https://www.wsj.com/business/energy-oil/a-shortage-of-oil-tankers-is-threatening-to-keep-gas-prices-high-66b2675a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="特朗普加大力度寻求瓦解国际刑事法院">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">07</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普加大力度寻求瓦解国际刑事法院</h3><span class="card-title-en">Trump Ramps Up Bid to Dismantle International Criminal Court</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-38159210?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美国政府正准备实施全面制裁，切断该法院与全球大部分金融体系的联系。</p><p class="card-dek-en">The U.S. administration is preparing sweeping sanctions that would cut the court off from much of the global financial system.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>以金融霸权扼杀国际司法，本质是将“美国例外”凌驾于人类共同的法律底线之上。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-38159210" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：特朗普政府正准备对国际刑事法院（ICC）实施全面制裁，将切断该机构进入全球主要金融体系的通道，冻结其美元交易、资产和资金流动，旨在瘫痪ICC的运作能力。</li><li>关键细节：制裁方案由白宫国家安全委员会和财政部共同推动，预计将把ICC及其高级官员列入特别指定国民（SDN）名单，禁止美国个人和实体与其交易，并施压盟友银行终止与ICC的业务往来，此前美国已吊销首席检察官本苏达的签证。</li><li>影响：ICC将无法支付员工工资、维持办公和展开调查，其对美军在阿富汗的战争罪行调查、对以色列的潜在调查将被迫中止，全球问责机制遭受沉重打击，欧洲盟友面临维护多边秩序或追随美国制裁的两难困境。</li></ul>
+        <a href="https://www.wsj.com/politics/policy/trump-administration-prepares-to-sanction-the-international-criminal-court-85f5f44c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="圣杯癌症检测提交FDA">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">08</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">圣杯癌症检测提交FDA</h3><span class="card-title-en">A Grail Cancer Test for the FDA</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-50540553?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">多癌种血液检测被证实可提高早期发现率，从而挽救生命。</p><p class="card-dek-en">The multi-cancer blood test is proven to increase early detection that can save lives.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>多癌种血液检测走到FDA审批关口，意味着癌症筛查将从逐个器官的碎片化模式，转向一次抽血实现系统性早发现的范式重构。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-50540553" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Grail公司已向美国FDA提交其多癌种早期检测血液测试Galleri的上市申请。该检测通过分析DNA甲基化模式，能一次筛查超过50种癌症，其中45种缺乏常规筛查方法。在纳入6629人的PATHFINDER研究中，阳性结果中38%确诊为癌症，假阳性率低于1%，早期（I-III期）检出占比超过70%，特异性达99.5%。</li><li>关键细节：Galleri定位为50岁以上无症状人群的年度补充筛查，利用游离DNA甲基化测序与机器学习算法输出癌症信号及组织溯源。该检测已获FDA突破性医疗器械认定并进入优先审评，此前以实验室自建项目（LDT）形式在部分医疗系统使用。Grail曾为illumina旗下，2021年illumina在未获反垄断许可下完成收购，至今面临欧盟与美国监管强制剥离的压力。</li><li>影响：若获批，Galleri将开创泛癌种早筛时代，将多数癌症从发现即晚期的困境扭转为早期干预，直接受益人为高龄、遗传高风险人群及体检机构。医保政策与商业保险将被迫重新评估覆盖策略，推动液体活检行业加速分化与迭代。但单次949美元的自费价格及假阳性导致的不必要侵入性检查，可能限制其大规模推广。</li></ul>
+        <a href="https://www.wsj.com/opinion/a-grail-cancer-test-for-the-fda-376051a0" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="特朗普、习近平与黎智英">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">09</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普、习近平与黎智英</h3><span class="card-title-en">Donald Trump, Xi Jinping and Jimmy Lai</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-21314235?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">中国国家主席迄今未理会美国总统关于释放被囚的78岁香港出版商的呼吁。</p><p class="card-dek-en">China’s President has so far spurned the U.S. President’s appeals to release the imprisoned 78-year-old Hong Kong publisher.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>黎智英案已从香港内部法律事件升级为中美意识形态对抗的象征，北京将国家安全红线置于外交成本之上，释放出对主权问题零妥协的强硬信号。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-21314235" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：中国国家主席习近平拒绝了美国总统特朗普关于释放被囚香港壹传媒创始人黎智英的呼吁。78岁的黎智英因违反香港国安法被判处多项罪名，自2020年12月被羁押，目前仍在服刑。特朗普通过公开和私下渠道提出释放要求，但中方予以明确回绝。</li><li>关键细节：黎智英被控串谋勾结外国势力、煽动分裂国家等罪，2022年12月被裁定罪名成立。特朗普在2025年多次提及黎智英案，将其作为美中人权议题的焦点。中方强调香港司法独立，指任何外部干预均不可接受，并重申维护国家安全的坚定立场。香港特区政府亦表态支持中央决定。</li><li>影响：这一外交僵局加深了中美在人权和主权问题上的裂痕，直接冲击两国高层沟通氛围。美国可能借此事升级对华舆论施压或考虑进一步制裁，而中国则更加巩固对香港的高度管控，削弱西方干预预期。对黎智英个人而言，其获释可能性进一步降低，其健康状况和关押条件引发国际关注。</li></ul>
+        <a href="https://www.wsj.com/opinion/donald-trump-xi-jinping-and-jimmy-lai-fe457e86" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="最终，一桩不错的格陵兰交易">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">10</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">最终，一桩不错的格陵兰交易</h3><span class="card-title-en">In the End, a Good Greenland Deal</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-74883665?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">非北约国家将无法在该岛设立基地。</p><p class="card-dek-en">Non-NATO countries won’t be able to have a base on the island.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>格陵兰岛沦为大国博弈的筹码，主权让渡换安全承诺，本质是华盛顿用支票簿在地缘裂缝中打入的楔子。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-74883665" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国与丹麦及格陵兰自治政府达成协议，禁止非北约国家在格陵兰岛建立军事基地或部署军事设施，协议明确将中国、俄罗斯等国排除在外，并规定现有非北约国家的商业投资需接受严格安全审查。</li><li>关键细节：协议强化了美国在格陵兰图勒空军基地的无限期驻留权，丹麦承诺将格陵兰稀土矿产项目的股权向美方倾斜，以换取美方每年1.2亿美元的专项经济援助，且格陵兰自治政府获得未来矿产收益的更高分成比例。</li><li>影响：中国企业在格陵兰的稀土开采申请将被冻结，丹麦与美国联合制定矿产出口管制清单；俄罗斯在北极的军事扩张面临更紧密的美-丹情报监控网，北约北翼防御链条得以补全，格陵兰本地经济短期内依赖援助，长期则面临产业选择受限的争议。</li></ul>
+        <a href="https://www.wsj.com/opinion/in-the-end-a-good-greenland-deal-9a7cf4e5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="摆脱对华依赖 须自建电池产业">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">11</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">摆脱对华依赖 须自建电池产业</h3><span class="card-title-en">To Wean Off China, Build Domestic Batteries</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-01807919?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美国企业需要一条通往价格合理、供应可靠的切实路径。</p><p class="card-dek-en">American businesses need a credible path to affordable, reliable supply.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>把工厂搬回美国只是第一步，真正的命门—金属精炼和材料技术—依旧牢牢握在中国手中。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-01807919" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国锂离子电池产能仅占全球不足10%，而中国控制着全球70%以上的电池制造和85%的关键矿物精炼产能。2023年美国本土电池产线投资额突破920亿美元，但实际建成产能仅满足国内需求的15%，大量电芯仍需从中国进口。</li><li>关键细节：《通胀削减法案》规定，获得全额补贴的电动车必须使用在北美组装且矿物来自美国或自贸伙伴的电池，每千瓦时电池可抵免35美元。能源部已向Redwood Materials、Albemarle等12个项目承诺总计超70亿美元贷款，用于建设锂、镍精炼和正极材料工厂。</li><li>影响：车企若无法在2025年前锁定本土或友岸电池供应，将面临单车最高7500美元税收抵免减半的风险，直接削弱价格竞争力。韩国电池三巨头加紧在美建厂但仍依赖中国前驱体，短期供应缺口可能推高美国电动车上游成本约18%，并迫使部分车型推迟上市。</li></ul>
+        <a href="https://www.wsj.com/opinion/to-wean-off-china-build-domestic-batteries-4a11bce6" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="难以捉摸的债市信号">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">12</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">难以捉摸的债市信号</h3><span class="card-title-en">Why It’s So Hard to Work Out What the Bond Market Is Telling Us</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-93732985?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">债券收益率上升是因为经济强劲还是因为美国的信誉面临风险？</p><p class="card-dek-en">Did bond yields rise because the economy is strong or because America’s credibility is on the line?</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>债券市场的叙事分裂，实则是市场在“增长信仰”与“信用忧虑”之间反复撕扯，信任裂痕本身已成为一种系统性风险。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-93732985" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：2023年秋季以来，美国10年期国债收益率在突破5%后虽回落，仍维持在4.5%附近高位，远超年初市场预期。这一走势引发两种对立解读：一派认为收益率上行反映美国经济韧性超预期，另一派则警告这是市场对美国债务可持续性与政治信誉的定价，尤其在惠誉下调美国AAA评级后，长期国债的“无风险”属性遭到质疑。</li><li>关键细节：美国联邦债务总额已突破34万亿美元，国会预算办公室预测2024财年联邦赤字将达1.6万亿美元，利息支出超过国防预算。与此同时，美联储持续缩表、外国官方持有者减持美债，供需失衡加剧。10年期美债的期限溢价自2023年中由负转正，表明投资者要求额外补偿以持有长期政府债券，这一变化与经济增长信号相背离。</li><li>影响：当债市信号含糊不清，美联储货币政策陷入两难：若因经济强劲而维持高利率，政府偿债压力进一步飙升，可能引发财政信誉螺旋恶化；若因债务风险而暂停紧缩，通胀预期可能脱锚。企业借贷成本同步走高，30年期抵押贷款利率重回7%以上，抑制住房与投资需求，全球风险资产定价基准亦随之摇摆，新兴市场资本外流压力陡增。</li></ul>
+        <a href="https://www.wsj.com/finance/investing/why-its-so-hard-to-work-out-what-the-bond-market-is-telling-us-aeac2d3a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="炼油厂已成全球能源供应的主要瓶颈">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">13</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">炼油厂已成全球能源供应的主要瓶颈</h3><span class="card-title-en">Refineries Are Now the Main Chokepoint for Global Energy Supplies</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Sun, 20 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-64365735?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">伊朗和乌克兰战争暴露了全球对中东和俄罗斯柴油的依赖。</p><p class="card-dek-en">The Iran and Ukraine wars have exposed the world’s reliance on the Middle East and Russia for diesel.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>能源安全的软肋已从“找不到油”变成“炼不出油”，战争暴露的是全球对少数柴油出口枢纽的致命依赖，而非原油短缺本身。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-64365735" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：全球炼油能力不足已成为能源供应链的最大瓶颈。2024年全球炼油产能缺口达到约200万桶/日，柴油裂解价差在2023年一度飙升至每桶70美元以上，较历史均值高出3倍。伊朗支持的胡塞武装袭击红海航运，迫使油轮绕行好望角，单程延迟14-18天，直接推高成品油运输成本，而非原油供应本身。</li><li>关键细节：欧盟自2023年2月全面禁止俄罗斯海运柴油进口后，市场失去约60万桶/日的关键供应，而中东新炼厂如阿联酋鲁韦斯和沙特吉赞项目投产延迟。同时，美国墨西哥湾沿岸炼厂因计划性检修和飓风影响开工率降至85%，全球成品油库存降至5年低位。中国成品油出口配额收紧进一步减少市场缓冲。</li><li>影响：柴油作为工业和农业核心燃料，其价格飙升直接推高全球物流成本，美国卡车运输成本同比上升22%，欧洲农场主面临每公顷种植成本增加120欧元。发展中国家如巴基斯坦因无力承受高价柴油而频繁断电，加剧社会动荡。这种炼瓶颈的脆弱性使各国央行抗通胀努力受阻，国际货币基金组织估计柴油每上涨10%将拖累全球GDP 0.2个百分点。</li></ul>
+        <a href="https://www.wsj.com/business/energy-oil/refineries-are-now-the-main-chokepoint-for-global-energy-supplies-f923e1ba" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="达里奥称AI应减速，黄仁勋欲全速推进">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">14</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">达里奥称AI应减速，黄仁勋欲全速推进</h3><span class="card-title-en">Dario Says AI Should Slow Down. Jensen Wants to Go Full Steam Ahead.</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Sat, 19 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-21291316?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">英伟达首席执行官主张以工程解决方案应对AI安全担忧，而非制定新规或设置行业减速带</p><p class="card-dek-en">The Nvidia chief makes the case for engineering solutions—not new laws or industry speed bumps—to address AI safety concerns.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>卖铲子的人永远不主张淘金热减速，这场争辩的本质是算力供给方对安全需求方的降维压制。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-21291316" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Nvidia CEO黄仁勋与Anthropic CEO Dario Amodei就AI发展速度出现公开分歧。Dario呼吁放慢步伐以防范风险，黄仁勋则主张全速推进，并强调应依靠工程方案而非新法律或行业强制减速带来解决AI安全问题。</li><li>关键细节：黄仁勋在公开场合明确反对通过监管减速AI发展，认为现有工程手段足以管控风险，从而维护其GPU硬件需求的持续暴增。Anthropic等安全导向实验室则担忧激进迭代会导致失控，Dario此前多次主张设立国际监管机制和强制性的安全测试门槛。</li><li>影响：双方分歧凸显了AI供应链上下游的根本利益冲突。若黄仁勋的“工程自洽”论被政策制定者采纳，AI立法可能放宽对算力扩张的限制，直接利好Nvidia和云服务商，但将加剧前沿模型开发者的安全压力，并可能促使欧盟等监管激进派强化单边干预。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/nvidia-jensen-huang-resists-ai-slowdown-334a24e1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="德国将军出任北约最高军职，获警示俄罗斯平台">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">15</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">德国将军出任北约最高军职，获警示俄罗斯平台</h3><span class="card-title-en">German General Wins Top NATO Role—and a Platform to Warn About Russia</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Sat, 19 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-49339083?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">卡斯滕·布罗伊尔主张欧洲对俄实施强力防御，他将出任北约最高军事长官。</p><p class="card-dek-en">Carsten Breuer, an advocate of strong European defense against Russia, will become the alliance’s highest military official.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>一位将俄罗斯威胁刻入军事信条的德国将军执掌北约军权，不仅完成了德国二战后军事角色的历史蜕变，更意味着欧洲安全秩序已从对话优先彻底转向威慑优先。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-49339083" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：德国国防军总监卡尔斯滕·布劳尔上将获任北约军事委员会主席，将于2025年1月正式就职，成为北约最高军事官员。该职位负责向北约秘书长及北大西洋理事会提供军事战略建议，并协调联盟内32个成员国的联合防务行动。布劳尔接替现任主席、荷兰海军上将罗布·鲍尔，成为该职位自1963年设立以来首位德国籍官员。</li><li>关键细节：布劳尔自2023年3月起担任德国国防军总监，在任内多次公开警告俄罗斯是欧洲安全的最大直接威胁。俄乌冲突后，他主导了德国联邦国防军1000亿欧元特别基金的落实，推动德国国防开支首度达到GDP的2%目标。此前他曾任德国国土防御司令部司令，直接负责应对混合威胁和基础设施保护，其军事思想一贯强调“威慑与防御的整合作战概念”。</li><li>影响：布劳尔的上任将使北约军事决策层对俄姿态进一步强硬，加快东翼永久性部署和兵力轮换规模。他公开主张欧洲必须在不依赖美国的前提下建立自身防御纵深，可能推动法德等国加速防务整合与军工产能扩张。俄方或视此为北约系统化遏俄的标志性事件，加剧波罗的海及黑海地区的军事对峙，增加误判风险。同时，德国国内将对“军队自主干预”的政治限制产生新的辩论。</li></ul>
+        <a href="https://www.wsj.com/world/europe/german-general-wins-top-nato-roleand-a-platform-to-warn-about-russia-fecf91c5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="霍华德·巴菲特挺身维护父亲基业">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">16</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">霍华德·巴菲特挺身维护父亲基业</h3><span class="card-title-en">Howie Buffett Steps In to Preserve What His Father Built</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Sat, 19 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-94051181?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外，我们专访了玛丽亚·科里纳·马查多，谈及她重返委内瑞拉的计划，并深度解析苹果最新款iPhone和手表。</p><p class="card-dek-en">Plus, our interview with María Corina Machado on her plans to return to Venezuela, and a closer look at Apple’s newest iPhones and watches.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>巴菲特把王国的钥匙交给了一个守护者，而非建筑师，这意味着伯克希尔将永远停留在他的文化烙印里。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-94051181" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：霍华德·巴菲特（Howie Buffett）正式介入伯克希尔·哈撒韦的传承安排，将出任非执行董事长，全权负责守护其父沃伦·巴菲特耗时六十年构建的逾万亿美元商业帝国与企业文化，确保权力交接后公司价值观不被稀释。</li><li>关键细节：霍华德自1993年起担任伯克希尔董事会成员，长期担任家族农场及慈善机构负责人，其职责限定于维护公司文化、遴选并监督CEO，不介入日常运营与投资决策，沃伦·巴菲特此前已明确长子是“文化守护者”而非投资继承人。</li><li>影响：该安排为伯克希尔·哈撒韦的“后巴菲特时代”提供了制度性稳定器，直接安抚了全球数以万计的股东及收购标的创始人家族，避免因领袖空缺引发管理层动荡或资本配置逻辑突变，巩固了公司作为长期资本避风港的定位。</li></ul>
+        <a href="https://www.wsj.com/tech/howie-buffett-steps-in-to-preserve-what-his-father-built-5271efb3" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="也门胡塞武装声称袭击沙特首都，此前机场燃料库起火">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">17</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">也门胡塞武装声称袭击沙特首都，此前机场燃料库起火</h3><span class="card-title-en">Yemen’s Houthis Claim Attack on Saudi Capital After Fuel Depot Burns at Airport</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Sat, 19 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33842845?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">沙特此番遇袭正值该国遭也门胡塞叛军及伊拉克无人机袭击之际。</p><p class="card-dek-en">The assault comes as the kingdom has been targeted by Yemen’s Houthi rebels and by drones from Iraq.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>首都遇袭打破了沙特本土的“安全特区”神话，伊朗借助多国代理人网络的非对称消耗战已深入王国心脏。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33842845" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：也门胡塞武装宣布用无人机袭击了沙特首都利雅得的哈立德国王国际机场，击中一处燃料库并引发大火。同日，来自伊拉克的无人机也跨境袭击沙特，形成南北夹击之势。这是2019年以来利雅得首次遭此类攻击，防空系统未能完全拦截。</li><li>关键细节：沙特领导的联军持续空袭也门胡塞目标，此次袭击是胡塞武装的直接报复。伊拉克方向的无人机被指向亲伊朗民兵，表明德黑兰正协调“抵抗轴心”多线对沙特施压。机场一度瘫痪，燃料库大火数小时后才被控制，尚无人员伤亡报告。</li><li>影响：袭击直指沙特航空枢纽与石油设施保护漏洞，可能推高全球能源风险溢价。也门停火谈判进程严重受挫，沙特与伊朗的地区代理人战争升维至首都安全层面。美国或加速向沙特提供反无人机系统，并对伊朗追加制裁，中东火药桶进一步升温。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/air-attack-sets-fuel-depot-ablaze-at-airport-in-saudi-capital-8bcc439c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="伊朗镇压怒火下的孪生姐妹">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">18</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">伊朗镇压怒火下的孪生姐妹</h3><span class="card-title-en">The Twin Sisters Facing the Wrath of Iran’s Crackdown</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Sat, 19 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-29380564?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">罗米娜·拉希米和塔拉内·拉希米在一波抗议活动后于1月被拘留。一人被判数十年监禁，另一人被判死刑。</p><p class="card-dek-en">Romina and Taraneh Rahimi were detained in January after a wave of protests. One was sentenced to decades behind bars; the other was condemned to death.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>对双胞胎姐妹的极端量刑并非孤立个案，而是伊朗政权系统性地将司法工具化以镇压异见的可怕缩影。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-29380564" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：伊朗双胞胎姐妹Romina与Taraneh Rahimi于2025年1月抗议浪潮中被捕，Taraneh被判处死刑，Romina被判处数十年监禁，具体刑期未公开。</li><li>关键细节：该对姐妹因参与席卷伊朗的抗议活动遭当局指控，罪名涉及“尘世腐败”等国家安全重罪；Taraneh的死刑判决引发国际人权组织强烈谴责，凸显伊朗司法系统对抗议者的严厉打压。</li><li>影响：此案进一步加剧伊朗社会恐惧，压制民间异议声音，尤其对女性活动家群体产生寒蝉效应；同时可能招致欧盟、美国等进一步制裁，加剧伊朗外交孤立与经济困境。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/the-twin-sisters-facing-the-wrath-of-irans-crackdown-81adce68" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📌 未读回顾" data-title="特朗普宣布禁止CNN、MS NOW和Politico进入白宫">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">19</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普宣布禁止CNN、MS NOW和Politico进入白宫</h3></div>
+        <span class="card-section" style="background:#6b3fa0">📌 未读回顾</span>
+        <time class="card-time">08:01</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-87407758?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">限制这三家颇具影响力的新闻机构采访权限，标志着特朗普与新闻界这场长达数年的角力骤然升级。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>特朗普以“谎言”为由封杀三媒体，实质是将信息准入变为政治效忠筛子，侵蚀第四权力监督根基。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-87407758?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国总统特朗普宣布立即禁止CNN、MS NOW和Politico记者进入白宫，指责其“接连不断地编写或报道虚构内容与谎言”。他在Truth Social发文称禁令即刻生效，并表示未来将封杀更多媒体。这是继此前禁止美联社（因拒绝改用“美国湾”名称）后的又一限制行动。</li><li>关键细节：Politico声明将继续公正报道并捍卫第一修正案权利；CNN称禁令非法，宪法保障记者报道不受政府阻碍；MS NOW拒绝置评。特朗普近期已因美联社拒绝将“墨西哥湾”改称“美国湾”而禁止其记者进入总统活动区域，美联社就此提起诉讼。此前他还起诉《华尔街日报》等诽谤，并向多家媒体发传票，冲突持续多年。</li><li>影响：此举标志着特朗普与主流媒体角力骤然升级。白宫已接管随行记者团人选与新闻发布室座位安排，增设“新媒体”席位，压缩传统媒体空间。禁令可能引发法律挑战，直接剥夺三家媒体采访总统的权利，削弱公众通过关键新闻机构获取政府信息的渠道，加剧对新闻自由的担忧。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E7%89%B9%E6%9C%97%E6%99%AE%E5%AE%A3%E5%B8%83%E7%A6%81%E6%AD%A2cnn-ms-now%E5%92%8Cpolitico%E8%BF%9B%E5%85%A5%E7%99%BD%E5%AE%AB-42cbfc4e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📌 未读回顾" data-title="沙特阿拉伯还有另一种石油外运选择">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">20</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">沙特阿拉伯还有另一种石油外运选择</h3></div>
+        <span class="card-section" style="background:#6b3fa0">📌 未读回顾</span>
+        <time class="card-time">09:15</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-16747042?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">近几天，沙特的东西输油管道遭到来自伊拉克的无人机袭击，被迫关闭。利用穿梭转运服务把石油运出霍尔木兹海峡可能是沙特眼下的最佳选择。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>当唯一的安全阀被无人机摧毁，全球石油命脉重新系于一条布满地缘阳谋的窄海峡，成本与风险双双飙升。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-16747042?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：沙特阿拉伯东西输油管道遭无人机袭击后关闭，此前该管道在7-8月弥补了霍尔木兹海峡关闭造成的近五分之一石油供应损失。国际能源署数据显示，8月延布港日均出口降至290万桶，较3-7月均值500万桶骤降42%，布伦特现货油价周内涨至每桶132美元。</li><li>关键细节：穿梭转运成为替代方案，油轮在美军保护下夜间通过霍尔木兹海峡，随后在阿曼湾船对船转运，每桶成本16-20美元，船货保险可达价值10%。交易员估算每日约900万桶原油及成品油以此方式运出，但设备供应趋紧。沙特阿美70%投入品可在本地采购，具备快速修复管道的能力。</li><li>影响：管道被毁使沙特退路切断，不得不依赖高风险且昂贵的海峡转运，直接推升全球能源成本。布伦特油价四周内从90美元涨至132美元。沙特政府55%财政收入来自石油，第二季度阿美上缴利雅得合计500亿美元，复产压力巨大，全球石油供应安全脆弱性暴露无遗。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E6%B2%99%E7%89%B9%E9%98%BF%E6%8B%89%E4%BC%AF%E8%BF%98%E6%9C%89%E5%8F%A6%E4%B8%80%E7%A7%8D%E7%9F%B3%E6%B2%B9%E5%A4%96%E8%BF%90%E9%80%89%E6%8B%A9-883b95a0" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        Generated at 2026-09-21 12:40 HKT &middot; Source: Wall Street Journal
+    </footer>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {
+                    if (filter === 'all' || c.dataset.section === filter) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            };
+        });
+
+        // 搜索
+        function filterSearch(q) {
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
