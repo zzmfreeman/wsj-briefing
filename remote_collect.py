@@ -1364,7 +1364,7 @@ async def _fetch_article_via_ws(ws, url, mid_start):
     mid += 1
     
     # 等待渲染（增加重试：body太小则继续等）
-    for w in range(15):
+    for w in range(5):
         await asyncio.sleep(2)
         js = "document.body ? document.body.innerHTML.length : 0"
         await ws.send(json.dumps({"id": mid, "method": "Runtime.evaluate", "params": {"expression": js, "returnByValue": True}}))
