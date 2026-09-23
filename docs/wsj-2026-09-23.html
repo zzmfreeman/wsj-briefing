@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSJ日报 — 2026年09月23日</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-header h1 span {
+            color: var(--text);
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+        .stat-pill strong {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* 饼图 */
+        .pie-chart {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient(#0066cc 0deg 60.0deg #00853e 60.0deg 100.0deg #333 100.0deg 280.0deg #8b572a 280.0deg 340.0deg #6b3fa0 340.0deg 360.0deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .search-box {
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── 主布局 ── */
+        .dashboard-body {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 左侧筛选栏 */
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }
+        .filter-btn:hover {
+            background: var(--bg);
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .filter-btn.active .filter-count {
+            color: rgba(255,255,255,0.8);
+        }
+        .filter-count {
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+        .filter-btn.active .filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ── 卡片流 ── */
+        .card-stream {
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card.hidden {
+            display: none;
+        }
+
+        /* 卡片头部（可点击展开） */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #fafafa;
+        }
+        .card-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .card-titles {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .card-title-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
+        .card-section {
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card-time {
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {
+            padding: 0 16px 10px;
+        }
+
+        /* 导语 */
+        .card-dek {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }
+        .card-dek-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        /* 洞察 */
+        .card-insight {
+            padding: 8px 12px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-insight p {
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+        .card.expanded .card-detail {
+            max-height: 3000px;
+            padding: 0 16px 12px;
+        }
+
+        /* 图片 */
+        .card-hero {
+            margin: 0 0 10px;
+        }
+        .card-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets */
+        .card-bullets {
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+        .card-bullets li {
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .card-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .card-body-text {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* CTA */
+        .card-cta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* ── 页脚 ── */
+        .page-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .dashboard-body {
+                padding: 8px;
+            }
+            .card-stream {
+                padding: 0;
+            }
+            .search-box {
+                width: 140px;
+            }
+            .card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>18</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
+    </header>
+
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            <button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="💻 Tech">💻 Tech <span class="filter-count">3</span></button><button class="filter-btn" data-filter="📈 Markets">📈 Markets <span class="filter-count">2</span></button><button class="filter-btn" data-filter="🌍 World">🌍 World <span class="filter-count">9</span></button><button class="filter-btn" data-filter="🏢 Business">🏢 Business <span class="filter-count">3</span></button><button class="filter-btn" data-filter="📌 未读回顾">📌 未读回顾 <span class="filter-count">1</span></button>
+        </aside>
+        <div class="card-stream">
+            
+    <div class="card" data-section="💻 Tech" data-title="Meta新AI代理迅速走红，但反弹声浪已起">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">01</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Meta新AI代理迅速走红，但反弹声浪已起</h3><span class="card-title-en">Meta’s New AI Agent Is an Instant Hit—and the Backlash Has Already Begun</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Wed, 23 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-67009155?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">亚马逊屏蔽了Muse应用在其网站上的购物功能，隐私与安全担忧随之升温。</p><p class="card-dek-en">Amazon blocked the Muse app from shopping on its site, and privacy and security concerns are mounting.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>AI代理的便利性刚崭露头角，就撞上平台数据主权的铁壁，暴露出开放网络与围墙花园之间的根本冲突。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-67009155" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Meta推出AI代理Muse，上线后迅速走红，但随即遭亚马逊封杀——亚马逊明确禁止Muse在其平台执行商品搜索、比价与下单操作，理由为违反服务条款。与此同时，隐私与安全争议急剧升温。</li><li>关键细节：Muse能跨平台自动完成购物任务，但需获取用户电商账户权限、浏览历史与支付信息。安全专家指出，此类代理缺乏透明机制，可能大规模泄露支付数据与消费习惯。亚马逊的封堵显示平台对第三方AI绕开官方接口、抓取数据的行为采取零容忍立场。</li><li>影响：Muse的实用性与扩张速度将因平台抵制而严重受限，Meta的AI商业化路径面临监管与商业双重阻力。用户陷入便利与隐私的两难，若更多电商跟进封杀，AI代理的跨平台价值将大幅缩水。此举可能加速行业对AI代理行为准则的立法与平台规则重塑。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/meta-ai-agent-muse-reactions-5bf236af" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="人工智能领袖正站在责任地雷上">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">02</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">人工智能领袖正站在责任地雷上</h3><span class="card-title-en">AI Leaders Are Standing On a Liability Landmine</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-67009155?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外，Anthropic推迟IPO，AI代理面临信任问题。</p><p class="card-dek-en">Plus, Anthropic delays its IPO, and AI agents have trust issues.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>AI的“责任地雷”意味着技术领先并不能豁免法律与信任的清算，资本化进程正被治理能力拖累。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-67009155" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：AI行业领导者正面临日益严峻的法律责任风险，AI系统因模型幻觉、数据偏见或错误决策可能引发用户与监管机构诉讼。与此同时，Anthropic已推迟其原定IPO计划，反映出资本市场对AI公司治理与盈利模式仍存疑虑。AI代理因频繁出现执行错误和不可预测行为，正遭遇企业客户的信任危机，部署进度明显放缓。</li><li>关键细节：Anthropic作为OpenAI主要竞争对手，估值曾达约600亿美元，其推迟IPO或与SEC对AI公司披露要求收紧、持续亏损以及责任诉讼阴影有关。法律专家指出，AI公司若无法证明模型输出经过充分安全测试，可能在产品责任诉讼中承担巨额赔偿。AI代理在金融、客服等场景中已出现多起错误下单、泄露隐私事件，导致企业暂停扩大部署。</li><li>影响：AI公司需大幅增加法律合规、安全测试和保险支出，压缩利润率；Anthropic推迟IPO使其融资窗口收窄，员工股权流动性受限；企业客户对AI代理的信任下降将延缓AI在关键业务流程中的落地，使AI商业化速度低于预期，并可能引发监管机构对AI责任归属的进一步立法。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/ai-leaders-are-standing-on-a-liability-landmine-736a8060" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Meta表明AI代理不再仅限于企业">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">03</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Meta表明AI代理不再仅限于企业</h3><span class="card-title-en">Meta Shows AI Agents Aren’t Just For Businesses Anymore</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-49747531?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外，OpenAI敦促华盛顿牵头制定全球AI安全标准。</p><p class="card-dek-en">Plus, OpenAI urges Washington to lead global AI-safety standards effort</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>AI正从企业效率工具下沉为个人生活组件，而全球AI安全标准之争实质是数字时代的技术主权博弈。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-49747531" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Meta宣布AI代理不再局限于企业用途，正式面向消费者开放，用户可在Facebook、Instagram等平台创建个性化AI助手，通过AI Studio工具自定义AI角色并与其互动。同时，OpenAI向美国政府提交政策文件，敦促华盛顿牵头制定全球AI安全标准，以防范通用人工智能（AGI）带来的潜在灾难性风险。</li><li>关键细节：Meta的AI代理功能允许用户基于个人兴趣和对话风格进行训练，并集成至WhatsApp、Messenger等应用，初期面向美国市场推出，未来计划扩展至更多地区。OpenAI在建议中呼吁建立类似国际原子能机构的AI监管组织，联合盟友统一技术规范，强调若缺乏全球协调，AI发展可能引发军备竞赛和不可控的安全漏洞。</li><li>影响：Meta的转向可能推动AI代理从生产力工具演变为社交娱乐入口，加速消费级AI市场增长，但也引发对隐私、虚假信息及内容审核的新挑战。OpenAI的倡导若获采纳，将重塑AI治理版图，使美国在规则制定中占据主导，对欧盟及中国的AI产业形成合规压力，倒逼企业提前布局跨国合规策略。</li></ul>
+        <a href="https://www.wsj.com/cio-journal/meta-shows-ai-agents-arent-just-for-businesses-anymore-b78bd8b8" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Meta旗下Muse剑指金融股">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">04</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Meta旗下Muse剑指金融股</h3><span class="card-title-en">Meta’s Muse Comes for Financial Stocks</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-05973138?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">新型人工智能代理的迅速普及可能颠覆财富管理公司、券商和保险公司。</p><p class="card-dek-en">The rapid adoption of the new artificial-intelligence agent threatens to disrupt wealth managers, brokerages and insurers.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>AI代理对金融业的冲击不是简单的工具替代，而是对“专业判断”这一金融服务业核心价值主张的全面解构。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-05973138" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Meta公司推出的新型人工智能代理Muse正被快速应用于金融服务领域，其自动化决策能力直接威胁到财富管理公司、券商和保险机构的核心业务模式，可能导致这些行业出现大规模岗位流失和客户交互方式重构。</li><li>关键细节：Muse能够以远超人类的速度和规模分析市场数据、执行交易并管理客户投资组合，部分早期采用该技术的对冲基金已报告运营效率提升超过40%。摩根士丹利、嘉信理财等传统机构正面临来自采用AI代理的金融科技初创公司的激烈竞争压力。</li><li>影响：财富管理行业的人为顾问服务模式受到根本性挑战，初级分析师和客户经理岗位可能首先被替代；券商佣金收入模式因AI代理的高频精准交易而承压；保险公司精算和理赔流程的自动化将迫使数万名从业人员进行技能转型，行业集中度可能进一步提升。</li></ul>
+        <a href="https://www.wsj.com/finance/investing/metas-muse-comes-for-financial-stocks-17bdf11a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="幕后推动习近平访美获红毯礼遇的内情">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">05</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">幕后推动习近平访美获红毯礼遇的内情</h3><span class="card-title-en">The Behind-the-Scenes Push to Get Xi a Red Carpet Welcome in America</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 23 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-73591753?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">双方花了数周时间讨论中国领导人访问华盛顿的细节安排，而最大的紧张源则基本未触及。</p><p class="card-dek-en">The two sides have spent weeks discussing the trappings of the Chinese leader’s Washington visit, while leaving the biggest sources of tension largely untouched.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>当外交沦为礼仪编排，红地毯铺得越讲究，越凸显双方在真问题上无话可谈。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-73591753" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：中美双方在过去数周密集磋商中国领导人在华盛顿访问的礼仪细节，包括红地毯、国宴规格、白宫欢迎仪式等象征性安排，试图营造友好氛围，但两国在贸易、科技竞争、台湾问题等核心紧张议题上几乎未取得实质性进展，分歧被刻意搁置。</li><li>关键细节：美方由国家安全委员会和白宫礼宾处牵头，中方派出高级别先遣团队，双方就车队路线、合影站位、酒店安保等流程反复沟通。此次访问正值两国关系因芯片出口管制、南海争端和气球事件持续紧张之际，高层面对面交流的象征意义远大于实际议题突破的预期。</li><li>影响：精心设计的红地毯欢迎或可短暂缓和公开敌意，为后续工作层谈判创造相对温和的政治氛围，但结构性矛盾未解使实质性协议难以达成，美国商界和盟友对访问成果的期待有限，两国关系的长期僵局不会因一次礼仪周全的访问而根本扭转。</li></ul>
+        <a href="https://www.wsj.com/world/china/trump-xi-meeting-china-image-df83c33f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="日本领导人呼吁联合国取消敌国标签">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">06</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">日本领导人呼吁联合国取消敌国标签</h3><span class="card-title-en">Japan’s Leader Calls on U.N. to Drop ‘Enemy State’ Label</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 23 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-55038152?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">中国利用联合国宪章中的措辞抨击日本，这是一场广泛施压行动的一部分，东京希望华盛顿帮助终结这一行动。</p><p class="card-dek-en">China has used language in the United Nations charter to attack Japan as part of a broad pressure campaign that Tokyo wants Washington to help bring to an end.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>敌国条款的存废已从历史遗留问题演变为中日地缘竞争的现实法律武器。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-55038152" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：日本首相石破茂在联合国大会一般性辩论中正式呼吁删除联合国宪章中的“敌国”条款，称其为“不公正的历史残留”。石破茂同时请求美国协助在安理会推动修宪，以终结中国利用该条款对日施压的外交攻势。此举将二战标签争议提至联合国改革议程的前沿。</li><li>关键细节：中国常驻联合国代表多次在安理会会议中援引宪章第53条、第107条，将日本定性为“敌国”，指责其扩充军备、介入区域安全事务等行为违反战后安排。中方亦在多边场合借此孤立日本，形成法律与舆论的双重压制。东京认为该条款已成北京的施压工具，促使首相公开向华盛顿求助，希望借助美国常任理事国席位推动修宪。</li><li>影响：若敌国条款成功删除，日本将摆脱战败国法律枷锁，削弱中国以“敌国”叙事施压的合法性，改善其国际正常化形象，但可能激化中日对立。美国是否公开支持修宪将起决定性作用——若积极推动，可强化美日同盟并加速联合国改革；若保留态度，日本外交挫败感将加剧，影响两国战略协调与互信。</li></ul>
+        <a href="https://www.wsj.com/world/asia/japans-leader-calls-on-u-n-to-drop-enemy-state-label-7da04175" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="特朗普在联合国阐述外交政策愿景，威胁将摧毁伊朗">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">07</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普在联合国阐述外交政策愿景，威胁将摧毁伊朗</h3><span class="card-title-en">Trump Threatens to Annihilate Iran as He Lays Out Foreign-Policy Vision at U.N.</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 23 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-60954566?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">特朗普总统自称是和平人士，同时威胁要“消灭”伊朗并对其他国家动用美国力量。</p><p class="card-dek-en">President Trump labeled himself a man of peace while threatening to “annihilate” Iran and wield American power against other nations.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>自称和平者的灭国威胁，彻底暴露了“美国优先”外交政策中武力恫吓与道义言辞的深刻分裂。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-60954566" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国总统特朗普在联合国大会发表外交政策演讲时，一边自称“和平之人”，一边公然威胁要“消灭”伊朗，并宣称将动用美国力量对抗其他未指明的国家。</li><li>关键细节：特朗普在联大讲坛上将其外交政策定性为“有原则的现实主义”，强调主权与爱国，但演讲中同时包含了对伊朗政权前所未有的武力恫吓，使用“annihilate”一词，其强硬程度远超此前“所有选项都在桌面上”的表态。</li><li>影响：此举立即加剧美伊对抗烈度，粉碎了欧洲盟国维系伊核协议的外交努力，并使中东局势骤然紧张。伊朗方面必将做出强硬回应，国际油价和地区安全格局面临直接冲击，联合国多边外交平台沦为了单边极限施压的秀场。</li></ul>
+        <a href="https://www.wsj.com/politics/policy/trump-tells-u-n-he-is-confronting-world-threats-and-putting-america-first-5fe48626" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="泽连斯基向特朗普请求冬季武器援助，并期待推动能源停火">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">08</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">泽连斯基向特朗普请求冬季武器援助，并期待推动能源停火</h3><span class="card-title-en">Zelensky Asks Trump for Winter Arms Package, Expects Energy-Ceasefire Push</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 23 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-86413528?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">在接受《华尔街日报》采访时，乌克兰总统泽连斯基表示，若无华盛顿施加更大压力，俄罗斯总统普京不太可能收敛攻击。</p><p class="card-dek-en">In a WSJ interview, Ukrainian President Volodymyr Zelensky said Russia’s Putin is unlikely to curb attacks without more pressure from Washington.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>泽连斯基在权力交接真空期公开向特朗普喊话，既是对拜登政府力度不足的失望，也是提前设定议程以防美国政策大幅转向的孤注一掷。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-86413528" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：乌克兰总统泽连斯基接受《华尔街日报》专访，向即将就任的特朗普政府提出两项请求：提供冬季武器援助包，并推动俄乌双方达成“能源停火”协议，停止攻击发电厂、电网等民用设施。他警告，若无华盛顿更强压力，俄罗斯总统普京不会主动遏制攻击。</li><li>关键细节：泽连斯基在采访中直言，普京只在感受到美国真正威慑时才会让步。乌克兰能源系统经俄军持续导弹与无人机打击已损失过半发电能力，数百万平民面临严冬断电危机。他未公开武器清单，但强调急需防空系统和弹药。此次喊话正值特朗普团队酝酿调整对俄乌政策之际。</li><li>影响：若特朗普政府积极回应，乌克兰冬季人道灾难有望缓解，能源停火或为局部降温创造契机；若援助延迟或减少介入，乌能源设施恐遭系统性摧毁，加剧难民潮。泽连斯基提前施压将塑造美国舆论，影响国会共和党人态度，使特朗普的外交抉择面临更大公众审视。</li></ul>
+        <a href="https://www.wsj.com/world/ukraine-zelensky-interview-emma-tucker-757e9a30" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="可卡因走私者凭借快艇与科技突破欧洲执法防线">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">09</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">可卡因走私者凭借快艇与科技突破欧洲执法防线</h3><span class="card-title-en">Cocaine Smugglers Blow Past Europe’s Law Enforcement With Speedboats and Tech</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Wed, 23 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-18204564?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">船队甩开西班牙当局，运送毒品数量和质量无与伦比。</p><p class="card-dek-en">Fleets outrun Spanish authorities to deliver the drug in unmatched quantity and quality.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>技术竞赛改变了毒品走私格局，执法部门若不加速数字化转型，海上防线将持续崩溃。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-18204564" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：近期，毒品走私集团利用高速快艇与尖端技术，成功突破西班牙海上执法防线，将规模空前的高纯度可卡因源源不断运入欧洲。这些快艇航速普遍超过70节，配备雷达干扰装置和军用级加密通讯系统，使西班牙国民警卫队及海关的拦截行动屡告失败，查获量大幅下滑。</li><li>关键细节：走私者通常从摩洛哥或西非海岸的母船接货，利用夜色掩护高速冲滩，在西班牙加利西亚等传统登陆点卸货。快艇采用隐身材料和低轮廓设计，雷达难以探测。部分团伙还使用无人机提前侦察执法部署。警方虽投入新型巡逻艇和空中监视，但仍难以实时响应。</li><li>影响：高纯度可卡因大量涌入导致欧洲多地纯度指标上升、零售价下跌，公共卫生系统面临更大吸毒成瘾治疗压力。西班牙警方士气受挫，要求政府追加预算升级装备；毒品暴力伴随市场份额争夺可能在南方沿海城市加剧。</li></ul>
+        <a href="https://www.wsj.com/world/americas/cocaine-smugglers-europe-speedboats-9bed7f31" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="全球领导人几乎都同意一件事：联合国正在失灵">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">10</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">全球领导人几乎都同意一件事：联合国正在失灵</h3><span class="card-title-en">World Leaders Almost All Agree on One Thing: The U.N. Is Failing</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-69406354?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">战事蔓延再次引发呼吁，要求联合国安理会成员国扩大至美国、俄罗斯、中国、法国和英国以外的国家。</p><p class="card-dek-en">The spread of war has revived calls for the Security Council membership to expand beyond the U.S., Russia, China, France and the U.K.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>联合国安理会的瘫痪不是机制失灵，而是1945年的权力格局在拒绝承认世界已经变了。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-69406354" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：全球多地战事蔓延，联合国安理会因常任理事国——美国、俄罗斯、中国、法国和英国——频繁行使否决权而陷入瘫痪，未能有效制止冲突。各国领导人几乎形成共识，认为现行联合国架构已失灵，改革呼声聚焦于扩大安理会常任理事国席位，以反映21世纪的地缘政治现实。</li><li>关键细节：安理会自1945年成立以来，其核心权力结构从未改变。当前，非洲、拉丁美洲及主要新兴经济体在常任理事国中缺乏代表。美国近期表态支持为非洲增设两个常任席位，但反对赋予其否决权；日本、德国、印度和巴西组成的“四国集团”也已联合推动入常长达数十年。俄罗斯对此持保留态度，改革因大国博弈进展缓慢。</li><li>影响：安理会的僵局直接削弱了其调解俄乌战争、以哈冲突等危机的能力，导致多边主义信用破产，促使中小国家转向区域联盟或双边协议寻求安全保障。若改革持续停滞，联合国将面临被G20等更灵活的非正式集团边缘化的风险，全球治理体系可能进一步碎片化，加剧无政府状态下的冲突风险。</li></ul>
+        <a href="https://www.wsj.com/world/world-leaders-almost-all-agree-on-one-thing-the-u-n-is-failing-8740b01d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="海上受困，伊朗航班面临新限制">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">11</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">海上受困，伊朗航班面临新限制</h3><span class="card-title-en">Squeezed at Sea, Iran Faces New Restrictions on Its Flights</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-27672056?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美国威胁对机场实施次级制裁，伊朗航空公司航线被关闭。</p><p class="card-dek-en">U.S. threats of secondary sanctions against airports see routes closed off for Iranian carriers.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>美国正将石油之外的海上封锁逻辑复制到天空，用制裁机场截断伊朗最后的全球化毛细血管。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-27672056" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国威胁对接收伊朗飞机的机场实施二级制裁，导致黎巴嫩贝鲁特、叙利亚大马士革等多国机场关闭对伊朗航空公司的服务，伊朗航空、马汉航空等主要航司的国际航线网络急速萎缩，多条重要客运与货运航线停摆。</li><li>关键细节：伊朗航空公司此前依赖贝鲁特作为飞往欧洲、非洲的中转站，美国财政部外国资产控制办公室明确警告，任何允许伊朗航班起降的机场都可能被切断与美元金融体系的联系，机场运营方和燃油供应商被迫终止合作，伊朗机队无法获得地勤和加油服务。</li><li>影响：伊朗对外空中走廊被大幅压缩，海外伊朗人回国、医疗物资和关键零部件进口受阻，伊朗民航业年收入损失估计达数亿美元，同时迫使伊朗更多依赖陆路和海运，推高物流成本，加剧国内通胀压力。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/squeezed-at-sea-iran-faces-new-restrictions-on-its-flights-1e1af416" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="特朗普格陵兰协议对美国意味着什么">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">12</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普格陵兰协议对美国意味着什么</h3><span class="card-title-en">Here’s What Trump’s Greenland Deal Means for the U.S.</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-32956168?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该协议将为美国在该北极岛屿扩大军事存在扫清道路。</p><p class="card-dek-en">The agreement will clear the way for an expanded U.S. military presence on the Arctic island.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>特朗普用一纸安全协议把格陵兰从“想买买不到”的尴尬资产变成了无需主权交割的军事前哨，北极博弈从资源争夺升级为硬实力布点。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-32956168" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：特朗普政府与丹麦及格陵兰自治政府达成安全协议，为美国在格陵兰岛扩大军事存在扫清道路。协议包括升级现有图勒空军基地（后称皮图菲克太空基地）的雷达与卫星跟踪设施，并允许新建港口和机场跑道，以增强美国在北极地区的早期预警与快速反应能力。</li><li>关键细节：格陵兰地处北美与欧亚大陆之间，冰层下蕴藏稀土、铀和油气资源，且随着北极冰融，西北航道战略价值上升。美国早在1951年就与丹麦签署防务协定，但此次协议突破原有框架，允许美军在更多地点部署传感器和无人系统，合同金额涉及数十亿美元的基础设施投资。</li><li>影响：对俄罗斯而言，美国在格陵兰的雷达和潜艇监听站扩大，将压缩俄北方舰队在巴伦支海的活动空间，加剧北极军备竞赛。对丹麦和格陵兰，虽然换来美国驻军租金和基建援助，但主权争议升温，格陵兰内部反对派批评自治政府将安全自主权让渡给华盛顿。对北约，北极防务一体化加速，但加拿大和挪威担心美国单边行动削弱多边协调。</li></ul>
+        <a href="https://www.wsj.com/world/heres-what-trumps-greenland-deal-means-for-the-u-s-16c26745" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="特朗普联合国演讲五大要点">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">13</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普联合国演讲五大要点</h3><span class="card-title-en">Five Takeaways From Trump’s U.N. Speech</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-74859255?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">总统借世界领导人齐聚一堂之际，发表了一场竞选式演说，宣告美国黄金时代的到来。</p><p class="card-dek-en">The president used the gathering of world leaders to deliver a campaign-style speech, declaring a “Golden Age of America.”</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>特朗普将联合国讲台直接用作竞选集会，暴露其外交已完全沦为国内选举的工具，国际规则沦为表演道具。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-74859255" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国总统特朗普在第75届联合国大会上发表演讲，历时约30分钟，宣称美国正进入“前所未有的黄金时代”，并列举失业率降至3.5%、股市创历史新高等经济指标，同时指责中国“散布病毒”并退出世卫组织。</li><li>关键细节：演讲中特朗普17次使用“美国优先”措辞，将多边主义称为“全球主义的失败”，宣布正式退出《巴黎气候协定》，并要求联合国安理会对伊朗实施更严厉制裁，现场多国代表以沉默或摇头回应，伊朗外长随后在推特上称其为“竞选闹剧”。</li><li>影响：演讲在联合国历史上罕见地引发与会领导人当面驳斥，法国总统马克龙随即发言强调“民族主义不能解决问题”，德国总理默克尔推迟原定会晤；美国国内民调显示57%选民认为此举损害美国国际信誉，但特朗普在共和党内的支持率上升3个百分点。</li></ul>
+        <a href="https://www.wsj.com/world/five-takeaways-from-trumps-speech-to-the-united-nations-4f0ba7da" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="特朗普在联合国向世界传递的信息">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">14</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普在联合国向世界传递的信息</h3><span class="card-title-en">Trump’s U.N. Message to the World</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-23805449?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">他表示，美国中期选举的压力无法挽救伊朗政权。伊朗会相信吗？</p><p class="card-dek-en">He says the pressure of U.S. midterm elections won’t save Iran’s regime. Will Iran believe it?</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>特朗普将中期选举的国内压力外化为对伊外交的强硬注脚，看似在宣示政策韧性，实则反向凸显了美国极限施压策略对个人政治周期的脆弱依赖。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-23805449" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：特朗普在联合国大会上向伊朗政权发出直接警告，声称美国11月中期选举的政治压力不会迫使华盛顿放松对伊制裁或改变其对伊强硬路线。他明确表示，伊朗不应指望利用美国国内政治周期来逃脱经济绞索，并重申美国将继续执行“极限施压”政策，直至伊朗彻底放弃核野心及地区扩张。</li><li>关键细节：特朗普在联大演讲中援引美国财政部数据，称对伊制裁已使伊朗原油日出口量从2018年的250万桶骤降至不足50万桶，伊朗里亚尔贬值逾70%，年通胀率突破40%。他同时点名批评欧盟、中国和俄罗斯试图绕过美国制裁的INSTEX机制，威胁将对参与实体实施次级制裁。</li><li>影响：特朗普的警告进一步压缩了伊朗政权在制裁下的喘息空间，鲁哈尼政府面临更大的国内经济压力与民意不满，可能被迫重启核研发或加剧地区代理人冲突以转移矛盾。国际油价因供给担忧出现短期波动，欧洲企业加速撤出伊朗市场，伊核协议濒临彻底崩溃，中东局势再度升温。</li></ul>
+        <a href="https://www.wsj.com/opinion/donald-trump-unga-speech-iran-8d480dab" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="欢迎来到纽约（晚点数小时）">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">15</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">欢迎来到纽约（晚点数小时）</h3><span class="card-title-en">Welcome to New York (Hours Late)</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-54467733?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">空中交通管制接连失灵的一天，凸显了一个全国性的尴尬。</p><p class="card-dek-en">A day of air-traffic failures underscores a national embarrassment.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>一次系统文件损坏就能瘫痪全球最繁忙的空域，暴露的不是技术故障，而是治理失败。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-54467733" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：2023年1月11日，美国联邦航空管理局（FAA）的NOTAM（航行通告）系统发生全国性故障，导致全美境内航班自9·11事件以来首次全面停飞，超过1300架次航班被取消，近11000架次航班延误。</li><li>关键细节：故障源于一个关键系统文件损坏，且备份系统同样失效，迫使FAA采取重启系统的应急措施。交通部长皮特·布蒂吉格将此称为'国家尴尬'，并承认这是航空基础设施长期投资不足、技术系统陈旧落后的直接体现。</li><li>影响：此次事件暴露了美国航空核心基础设施的脆弱性，直接扰乱了数百万旅客的出行计划，对航空公司造成巨额经济损失，并引发国会两党对FAA技术现代化进程迟缓和资金使用效率的严厉质询，可能加速相关预算审批和系统改革。</li></ul>
+        <a href="https://www.wsj.com/opinion/newark-air-traffic-control-delays-sean-duffy-6114505b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="联邦学校选择或影响巨大">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">16</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">联邦学校选择或影响巨大</h3><span class="card-title-en">Federal School Choice Could Be Huge</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-54602618?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">即使捐赠者参与度不高，奖学金也可能高达数十亿美元。</p><p class="card-dek-en">Possibly many billions in scholarships, even with modest donor uptake.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>联邦税抵免实质上将公共财政转化为私人教育补贴，用税收杠杆撬动了一场教育资源的再分配。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-54602618" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：一项联邦学校选择法案草案拟设立每年最高100亿美元的税收抵免奖学金计划，个人和企业向州级奖学金组织捐款可获联邦税抵免，抵免上限为捐款额的90%。国会预算办公室初步估算，即使仅有15%的潜在捐赠者参与，首年即可释放约68亿美元奖学金，惠及约200万K-12学生。</li><li>关键细节：该法案由参议院财政委员会主席罗恩·怀登（Ron Wyden）与共和党参议员比尔·卡西迪（Bill Cassidy）共同发起，采用联邦与州双轨管理模式。捐赠者向经认证的非营利奖学金组织注资，资金定向用于低收入家庭学生私立学校学费、在线课程及特殊教育服务。法案设置家庭收入上限为地区中位数300%，并规定每生年均奖学金不超过1.2万美元。</li><li>影响：若法案通过，公立学校系统将面临生源流失压力，生均拨款减少可能触发部分学区财政紧缩。私立教育集团和在线教育平台直接受益，预计K12教育科技市场规模五年内额外增长240亿美元。低收入家庭择校能力显著提升，但批评者警告该计划可能加剧教育分层，并导致联邦税收每年净减少80亿至100亿美元。</li></ul>
+        <a href="https://www.wsj.com/opinion/federal-school-choice-tax-credit-donations-patrick-graff-report-3044cba3" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="股市新闻，2026年9月22日：油价跌破100美元，提振科技股">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">17</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">股市新闻，2026年9月22日：油价跌破100美元，提振科技股</h3><span class="card-title-en">Stock Market News, Sept. 22, 2026: Oil Sinks Below $100, Lifting Tech Stocks</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">Tue, 22 Se</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-34062673?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">纳斯达克指数再创新高，受AI智能体冲击的股票下挫</p><p class="card-dek-en">Nasdaq hits new record, while shares viewed as vulnerable to AI agents fall</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>油价的旧经济锚定一旦脱落，狂涌的流动性便直扑AI未来，同时毫不留情地绞杀被其视为下一个替代品的血肉公司。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-34062673" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：2026年9月22日，美国西得克萨斯中质原油（WTI）11月合约暴跌3.2%，收盘报每桶98.50美元，自2024年以来首次跌破100美元关口。纳斯达克综合指数则大涨1.4%，收于18,742点，创历史新高。同时，由高盛追踪的一篮子“AI易感股”指数重挫2.3%，其中客户服务外包公司Telus International暴跌7.1%，自由职业平台Upwork下滑5.8%。</li><li>关键细节：油价急挫的直接导火索是OPEC+当日意外宣布将从10月起增产每日180万桶，以回应美国战略石油储备的释放压力。这扫除了通胀的最大威胁，芝加哥商品交易所的利率期货显示，交易员对美联储11月降息50个基点的概率从35%飙升至68%。受此刺激，英伟达、微软和苹果等利率敏感型科技巨头集体上涨，推动纳指破顶。与之相反，市场加速抛弃那些核心业务可能被AI代理自动化的公司，Concentrix、TTEC Holdings等纷纷刷新52周低点。</li><li>影响：油价破百直接令埃克森美孚、雪佛龙等能源股板块单日蒸发逾450亿美元市值，而航空和邮轮股则迎来久违反弹，美国航空大涨4.1%。科技股虹吸效应加剧：ARK创新基金单日流入12亿美元，创三个月新高。但更深层的结构冲击来自AI易感股的崩塌，这向法律、会计、客服等白领密集行业发出了明确的替代预警，迫使相关公司加速向AI驱动模式转型，否则可能面临估值体系坍塌。</li></ul>
+        <a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-09-22-2026" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📌 未读回顾" data-title="特朗普宣布禁止CNN、MS NOW和Politico进入白宫">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">18</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普宣布禁止CNN、MS NOW和Politico进入白宫</h3></div>
+        <span class="card-section" style="background:#6b3fa0">📌 未读回顾</span>
+        <time class="card-time">08:01</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-87407758?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">限制这三家颇具影响力的新闻机构采访权限，标志着特朗普与新闻界这场长达数年的角力骤然升级。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>特朗普以“谎言”为由封杀三媒体，实质是将信息准入变为政治效忠筛子，侵蚀第四权力监督根基。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-87407758?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：美国总统特朗普宣布立即禁止CNN、MS NOW和Politico记者进入白宫，指责其“接连不断地编写或报道虚构内容与谎言”。他在Truth Social发文称禁令即刻生效，并表示未来将封杀更多媒体。这是继此前禁止美联社（因拒绝改用“美国湾”名称）后的又一限制行动。</li><li>关键细节：Politico声明将继续公正报道并捍卫第一修正案权利；CNN称禁令非法，宪法保障记者报道不受政府阻碍；MS NOW拒绝置评。特朗普近期已因美联社拒绝将“墨西哥湾”改称“美国湾”而禁止其记者进入总统活动区域，美联社就此提起诉讼。此前他还起诉《华尔街日报》等诽谤，并向多家媒体发传票，冲突持续多年。</li><li>影响：此举标志着特朗普与主流媒体角力骤然升级。白宫已接管随行记者团人选与新闻发布室座位安排，增设“新媒体”席位，压缩传统媒体空间。禁令可能引发法律挑战，直接剥夺三家媒体采访总统的权利，削弱公众通过关键新闻机构获取政府信息的渠道，加剧对新闻自由的担忧。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E7%89%B9%E6%9C%97%E6%99%AE%E5%AE%A3%E5%B8%83%E7%A6%81%E6%AD%A2cnn-ms-now%E5%92%8Cpolitico%E8%BF%9B%E5%85%A5%E7%99%BD%E5%AE%AB-42cbfc4e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        Generated at 2026-09-23 12:40 HKT &middot; Source: Wall Street Journal
+    </footer>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {
+                    if (filter === 'all' || c.dataset.section === filter) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            };
+        });
+
+        // 搜索
+        function filterSearch(q) {
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
