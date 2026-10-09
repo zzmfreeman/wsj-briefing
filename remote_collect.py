@@ -1787,6 +1787,55 @@ def collect_all():
         print(f"  去重: {len(all_articles)} -> {len(deduped)} (URL重复{url_dup} + 标题重复{title_dup})")
     all_articles = deduped
 
+    # ── 归一化 published 为带时区 ISO 8601 ──
+    # 下游日期过滤接受无时区字符串，但发布质量闸(cron_wsj_verify_html.publication_time)
+    # 要求显式时区；RSS 偶发 `2026-10-09 08:23` 这类无时区值会导致
+    # publication_dates_unverified → 整轮拒绝发布（2026-10-09 事故）。
+    # 采集阶段统一归一化，两端一致。
+    from email.utils import parsedate_to_datetime as _rd2dt
+    _pub_re = re.compile(r'(\d{4})[-/\u5e74](\d{1,2})[-/\u6708](\d{1,2})\u65e5?[ T]*(\d{1,2}):(\d{2})(?::(\d{2}))?')
+
+    def _normalize_published(pub):
+        if not pub or not isinstance(pub, str):
+            return pub
+        text = pub.strip()
+        dt = None
+        try:
+            dt = _rd2dt(text)
+        except Exception:
+            dt = None
+        if dt is None:
+            try:
+                dt = datetime.fromisoformat(text.replace('Z', '+00:00'))
+            except Exception:
+                dt = None
+        if dt is None:
+            m = _pub_re.match(text)
+            if m:
+                dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                              int(m.group(4)), int(m.group(5)), int(m.group(6) or 0))
+                _zm = re.search(r'\b(ET|EST|EDT|CST|PST|PDT|GMT|UTC)\b', text)
+                if _zm:
+                    _off = {'ET': -5, 'EST': -5, 'EDT': -4, 'CST': 8, 'PST': -8,
+                            'PDT': -7, 'GMT': 0, 'UTC': 0}.get(_zm.group(1), 0)
+                    dt = dt.replace(tzinfo=timezone(timedelta(hours=_off)))
+        if dt is None:
+            return pub
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    _norm_n = 0
+    for a in all_articles:
+        old = a.get('published')
+        if old:
+            new = _normalize_published(old)
+            if new != old:
+                a['published'] = new
+                _norm_n += 1
+    if _norm_n:
+        print(f"  日期归一化: {_norm_n} 篇")
+
     # ── 日期过滤：只保留 MAX_ARTICLE_AGE_DAYS 天内的文章 ──
     from email.utils import parsedate_to_datetime
     now = datetime.now(SH_TZ)
