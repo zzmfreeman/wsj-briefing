@@ -1675,6 +1675,15 @@ def collect_all():
     if removed:
         print(f"  去重: 移除 {removed} 篇已发RSS文章")
 
+    # v40: RSS 文章与 cn_home 同样以 RSS description/summary 作为英文导语底稿
+    # （此前 RSS 分支缺少该赋值，lead 恒为空，发布时被回填 gate fact 句 → 导语=核心事实）
+    for a in rss_articles:
+        if not a.get("lead") and a.get("summary") and len(a["summary"]) > 10:
+            a["lead"] = a["summary"]
+            a["lead_from"] = "rss_description"
+    n_lead = sum(1 for a in rss_articles if a.get("lead"))
+    print(f"  RSS 导语底稿: {n_lead}/{len(rss_articles)} 篇")
+
     # 4. RSS 文章也抓正文（Playwright + cookies）
     if rss_articles:
         rss_articles = cdp_fetch_batch(rss_articles)
