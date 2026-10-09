@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSJ日报 — 2026年10月10日</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-header h1 span {
+            color: var(--text);
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+        .stat-pill strong {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* 饼图 */
+        .pie-chart {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient(#c41e3a 0deg 30.0deg #0066cc 30.0deg 90.0deg #00853e 90.0deg 120.0deg #333 120.0deg 240.0deg #8b572a 240.0deg 360.0deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .search-box {
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── 主布局 ── */
+        .dashboard-body {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 左侧筛选栏 */
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }
+        .filter-btn:hover {
+            background: var(--bg);
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .filter-btn.active .filter-count {
+            color: rgba(255,255,255,0.8);
+        }
+        .filter-count {
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+        .filter-btn.active .filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ── 卡片流 ── */
+        .card-stream {
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card.hidden {
+            display: none;
+        }
+
+        /* 卡片头部（可点击展开） */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #fafafa;
+        }
+        .card-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .card-titles {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .card-title-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
+        .card-section {
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card-time {
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {
+            padding: 0 16px 10px;
+        }
+
+        /* 导语 */
+        .card-dek {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }
+        .card-dek-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        /* 洞察 */
+        .card-insight {
+            padding: 8px 12px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-insight p {
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+        .card.expanded .card-detail {
+            max-height: 3000px;
+            padding: 0 16px 12px;
+        }
+
+        /* 图片 */
+        .card-hero {
+            margin: 0 0 10px;
+        }
+        .card-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets */
+        .card-bullets {
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+        .card-bullets li {
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .card-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .card-body-text {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* CTA */
+        .card-cta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* ── 页脚 ── */
+        .page-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .dashboard-body {
+                padding: 8px;
+            }
+            .card-stream {
+                padding: 0;
+            }
+            .search-box {
+                width: 140px;
+            }
+            .card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>12</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
+    </header>
+
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            <button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="🇨🇳 中文版">🇨🇳 中文版 <span class="filter-count">1</span></button><button class="filter-btn" data-filter="💻 Tech">💻 Tech <span class="filter-count">2</span></button><button class="filter-btn" data-filter="📈 Markets">📈 Markets <span class="filter-count">1</span></button><button class="filter-btn" data-filter="🌍 World">🌍 World <span class="filter-count">4</span></button><button class="filter-btn" data-filter="🏢 Business">🏢 Business <span class="filter-count">4</span></button>
+        </aside>
+        <div class="card-stream">
+            
+    <div class="card" data-section="🇨🇳 中文版" data-title="AI价格战升温，OpenAI紧逼Anthropic">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">01</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI价格战升温，OpenAI紧逼Anthropic</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:01</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-18959482?width=80&height=596" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这两家公司都需要在按计划进行IPO之前，向华尔街证明其业务具有可持续性。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查OpenAI与Anthropic竞争指标、Claude Code服务中断与算力情况，以及是否存在价格变动证据。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-18959482?width=700&height=596" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Anthropic首席执行官达里奥·阿莫迪和OpenAI首席执行官山姆·阿尔特曼。 图片来源：David Paul Morris/Bloomberg News, Jeff Chiu/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称，今年早些时候Anthropic凭尖端模型和受美国企业喜爱的编程工具在AI竞争中领先；从一些指标看OpenAI正紧追其后；春季Claude Code需求强劲，Anthropic面临服务中断和算力紧张。</li><li>关键细节：标题称AI价格战升温，OpenAI紧逼Anthropic。</li><li>影响：条件推断——如果标题所称AI价格战升温属实，可能加剧厂商竞争，并影响企业编程工具选择；但材料未提供价格或份额证据。</li></ul>
+        <a href="https://cn.wsj.com/articles/the-ai-price-war-is-heating-upand-openai-is-gaining-ground-on-anthropic-33b7418e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Anthropic联合创始人Tom Brown被指负责修复公司声誉并推动IPO">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">02</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Anthropic联合创始人Tom Brown被指负责修复公司声誉并推动IPO</h3><span class="card-title-en">The Other Anthropic Founder Trying to Fix the Company’s ‘Woke’ Reputation</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">00:36</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56078428?width=80&height=700" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">汤姆·布朗正利用其共和党人脉和商业头脑争取华盛顿支持，并获取Anthropic所需的算力。</p><p class="card-dek-en">Tom Brown is leveraging his Republican ties and business savvy to win over Washington and secure the computing power Anthropic needs.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查Anthropic是否确有IPO计划、估值依据，以及Brown与白宫、马斯克方面接触的具体事实。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56078428?width=700&height=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>ZUMA Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称Tom Brown是Anthropic最初六位创始人之一，正将芯片交易谈判背景用于促成公司IPO所需的商业与政治联盟，该IPO估值可能超过2万亿美元。</li><li>关键细节：标题称另一位Anthropic联合创始人试图修复公司所谓“觉醒”声誉。</li><li>影响：条件推断——如果上述报道属实，Brown的谈判角色可能有助于Anthropic缓解与白宫及竞争对手的关系，并可能影响其IPO进程。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/tom-brown-athropic-669005ad" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="极端天气如今无处不在——如何为住宅防灾">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">03</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">极端天气如今无处不在——如何为住宅防灾</h3><span class="card-title-en">Extreme Weather Is Everywhere Now—How to Prepare Your Home</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">23:55</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-35764097?width=80&height=520" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外，人工智能如何帮助人手不足的消防部门、塑造战争的无声电子战场，以及试图将全球算力翻倍的初创公司。</p><p class="card-dek-en">Plus, how AI could help short-staffed fire departments, the silent electronic battleground shaping warfare, and the startup trying to double the world’s compute.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查相关研究细节、专家建议的适用条件，以及不同地区风险与措施有效性的证据。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-35764097?width=780&height=520" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>A tree-removal crew clears the oak tree downed by a nor’easter last month. Sam Gulliver for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称，专家Amy Myers Jaffe表示无论住在哪里，气候准备都可能值得考虑；研究显示美国许多地区极端高温和降雨已加剧，一些严重天气可能出现在迄今未发生此类事件的地方。</li><li>关键细节：标题称极端天气如今无处不在，并指向住宅防灾准备。</li><li>影响：条件推断——如果所在地区面临飓风、野火、极端高温或降雨等风险，采取住宅防灾措施可能有助于降低停电、洪水、烟雾等影响；但原文未证明这些措施必然有效或适用于所有住宅。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/extreme-weather-is-everywhere-nowhow-to-prepare-your-home-f5abcc52" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="库莫称代币化股票给市场带来根本性变化">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">04</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">库莫称代币化股票给市场带来根本性变化</h3><span class="card-title-en">Tokenized Stocks Bring ‘Radical Change’ to Markets, Cuomo Says</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">22:51</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-26137542?width=80&height=476" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">前纽约州州长库莫已签约担任OKXICE的联合主席。OKXICE是美国交易所巨头洲际交易所与OKX成立的合资企业，计划将股票代币化。</p><p class="card-dek-en">The former New York governor signed on as co-chairman of OKXICE, a joint venture between U.S. exchange powerhouse ICE and OKX that plans to tokenize stocks.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查原文全文、Cuomo相关表态的具体内容，以及代币化股票的定义与监管状态。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-26137542?width=700&height=476" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Andrew Cuomo first started advising the China-founded crypto company OKX in 2023. How Hwee Young/EPA/Shutterstock</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据摘要，前纽约州州长Andrew Cuomo成为美国市场代币化股票这一前沿领域不太可能的支持者。</li><li>关键细节：库莫称代币化股票将给市场带来根本性变化。</li><li>影响：条件推断——如果代币化股票进一步发展，可能对美国市场带来被描述为根本性的变化；原文未说明具体机制或已发生事实。</li></ul>
+        <a href="https://www.wsj.com/finance/investing/tokenized-stocks-bring-radical-change-to-markets-cuomo-says-fe1962b6" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="中国下一个“灰色地带”目标：对美军防卫台湾至关重要的岛链">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">05</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中国下一个“灰色地带”目标：对美军防卫台湾至关重要的岛链</h3><span class="card-title-en">China’s Next ‘Gray Zone’ Target: An Island Chain Critical to U.S. Defense of Taiwan</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">02:51</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-01137295?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">中国学者和媒体已为北京声称对巴丹群岛拥有主权奠定了基础，美军经常在该群岛进行训练。</p><p class="card-dek-en">Chinese academics and media have laid the groundwork for Beijing to claim the Batanes Islands, where U.S. troops frequently train.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查中国官方表态、菲律宾与美方回应，以及巴丹群岛军事部署和航行活动。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-01137295?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>The Philippines’ Batanes Islands sit just 100 miles southeast of Taiwan. Ezra Acayan/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：材料摘要称，巴丹群岛位于台湾以南，处于中国若攻台可能需控制的海峡；北京承诺必要时以武力拿下自治的台湾。</li><li>关键细节：材料标题称，中国下一个“灰色地带”（通常指低于战争门槛的施压）目标是对美军防卫台湾至关重要的岛链。</li><li>影响：条件推断——如果材料所述趋势属实，可能加剧美中在巴丹群岛周边的军事竞争，并影响台海冲突情景下的通道控制。</li></ul>
+        <a href="https://www.wsj.com/world/asia/chinas-next-gray-zone-target-an-island-chain-critical-to-u-s-defense-of-taiwan-f4233818" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="阿联酋称FlyDubai副驾驶计划撞以色列机场">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">06</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">阿联酋称FlyDubai副驾驶计划撞以色列机场</h3><span class="card-title-en">FlyDubai Co-Pilot Planned to Crash Into Israeli Airport, U.A.E. Says</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">01:46</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-10824282?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">阿联酋总检察长首次提供了袭击者哈马姆·哈马米在加入迪拜航空公司之前的行程官方时间线。</p><p class="card-dek-en">The Emirati attorney general provided the first official timeline of Hamam al-Hammami’s travels before the attacker joined the Dubai airline.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查阿联酋官方声明原文、FlyDubai与以色列方面回应，以及航班1073事件调查进展。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-10824282?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>A FlyDubai Boeing 737 MAX 8 aircraft after landing at Israel’s Ben Gurion Airport on Sept. 30. Jack Guez/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：阿联酋总检察长称，涉事者为居住在迪拜的阿曼籍Hamam al-Hammami，他用斧头袭击1073航班机长，并受9/11启发计划撞特拉维夫本古里安机场以尽可能多杀人。</li><li>关键细节：阿联酋称，FlyDubai一名副驾驶计划驾机撞向以色列机场。</li><li>影响：条件推断——如果上述阿联酋官方说法属实，可能加剧对FlyDubai及以色列机场安保的审查，并影响相关航线运营。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/flydubai-co-pilot-planned-to-crash-into-israeli-airport-u-a-e-says-5e337b5f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="美国制裁并威胁解散国际刑事法院">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">07</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">美国制裁并威胁解散国际刑事法院</h3><span class="card-title-en">U.S. Sanctions and Threatens to Dismantle International Criminal Court</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">01:42</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-39974096?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">制裁可能使国际刑事法院无法进入美国金融体系，并禁止其以美元进行交易。</p><p class="card-dek-en">The sanctions could cut the ICC off from the U.S. financial system and prohibit it from conducting transactions in dollars.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查美国官方公告、国际刑事法院回应及主流媒体独立报道，确认制裁范围与是否实施。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-39974096?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>The International Criminal Court, based in The Hague, is heir to the Nuremberg tribunals. Remko De Waal/ANP/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称特朗普政府周五宣布对国际刑事法院实施大规模制裁，并威胁解散该机构；此前该法院对以色列总理内塔尼亚胡发出逮捕令；同日南非前国际刑事法院法官纳维·皮莱获诺贝尔和平奖。</li><li>关键细节：标题称美国制裁并威胁解散国际刑事法院。</li><li>影响：条件推断——如果该制裁与威胁属实，可能加剧美国与国际刑事法院的紧张，并影响其运作；但原文未说明具体措施。</li></ul>
+        <a href="https://www.wsj.com/world/europe/u-s-sanctions-and-threatens-to-dismantle-international-criminal-court-1d7417c8" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Masked Thieves in Italy Make Off With $5.6 Million of High-End Wine">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">08</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Masked Thieves in Italy Make Off With $5.6 Million of High-End Wine</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">01:15</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-63567710?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">意大利发生一起盗窃案，蒙面窃贼利用一家公司自有的叉车盗走约3万瓶葡萄酒，其中包括名贵红酒，总价值达560万美元。</p><p class="card-dek-en">The bandits used a company’s own forklifts to steal some 30,000 bottles of wine, including prized reds.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-63567710?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Marchesi Antinori is a world-leading Italian brand in the wine industry. Sandro Michahelles/Alamy</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Masked Thieves in Italy Make Off With $5.6 Million of High-End Wine”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/world/europe/masked-thieves-in-italy-make-off-with-5-6-million-of-high-end-wine-f18134d5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="什么是特朗普经济学？">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">09</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">什么是特朗普经济学？</h3><span class="card-title-en">What Is Trumponomics?</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">02:54</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-36597481?width=80&size=1.501" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">历史性的联邦克制与令人不安的联邦干预并存。</p><p class="card-dek-en">Historic federal restraint along with disturbing federal interventions.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查特朗普第二任期时间、税收与监管改革、关税与产业政策及美国经济增长数据的一手来源。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-36597481?width=1280&size=1.501" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>President Donald Trump during a Columbus Day event in the East Room of the White House on Friday. Aaron Schwartz/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称，第二特朗普总统任期近半时仍难定义其治理哲学；经济政策含历史性税收与监管改革、重手关税及产业政策。</li><li>关键细节：标题提出“什么是特朗普经济学？”</li><li>影响：条件推断——如果该材料所述政策组合成立，这种政府克制与联邦干预混合可能解释美国经济“稳健但不惊艳”的增长，但影响可能有条件且需核实。</li></ul>
+        <a href="https://www.wsj.com/opinion/what-is-trumponomics-d2f802d9" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="美防长称军事基地将自发电">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">10</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">美防长称军事基地将自发电</h3><span class="card-title-en">Hegseth Empowers America</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">02:36</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-27470869/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">基地核反应堆将意味着减少污染，并降低民众的电费。</p><p class="card-dek-en">Nuclear reactors at bases would mean less pollution and reduced electricity rates for civilians.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查美国国防部是否正式确认该计划，以及小型模块化反应堆的部署可行性与监管进展。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-27470869/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Cooling towers at the Alvin W. Vogtle Electric Generating Plant in Waynesboro, Ga, May 31, 2024. Mike Stewart/Associated Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据该报道，美防长Hegseth在9月30日的“State of the Force”讲话中称，美国每个主要军事设施将自行发电，独立于民用电网。</li><li>关键细节：该报道称，此举只能依靠新核能实现，可能促使军方完善小型模块化反应堆，并可能降低普通电费缴纳者的价格。</li><li>影响：条件推断——如果军事基地脱离民用电网，可能释放公用事业公司目前为军方提供的容量，并可能推动小型模块化反应堆的完善。</li></ul>
+        <a href="https://www.wsj.com/opinion/hegseth-empowers-america-3e9bbd19" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="技术专家为何成为末日论者？">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">11</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">技术专家为何成为末日论者？</h3><span class="card-title-en">Why Did Technologists Become Doomers?</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">02:35</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-00568649/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">一位人工智能网络安全专家将此归因于一种自称“有效利他主义”的怪异哲学的影响。</p><p class="card-dek-en">An AI cybersecurity specialist puts it down to the influence of a weird philosophy that brands itself ‘effective altruism.’</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查 Gates 与 Hinton 相关言论的原始出处、时间与完整语境，以及 Korman 观点的来源和公司信息。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-00568649/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Zack Korman. Ken Fallin</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：该文称，Bill Gates 2007年曾预测科幻中多数事物十年内出现；Geoffrey Hinton 2016年称五年内深度学习会优于放射科医生。</li><li>关键细节：该文称，上月 Gates 警告 AI 可能致十亿人死亡；Hinton 称 AI 致人类灭绝可能性10%并非不合理。</li><li>影响：条件推断——如果这些警告反映真实风险，AI 政策讨论可能更聚焦安全与禁令争议；但原文未证明相关危害已发生。</li></ul>
+        <a href="https://www.wsj.com/opinion/why-did-technologists-become-doomers-74308938" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="解开约瑟夫斯密码">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">12</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">解开约瑟夫斯密码</h3><span class="card-title-en">Unlocking the Josephus Code</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">23:13</time>
+        <img class="card-thumb" src="http://opinion-images.wsj.net/im-45884270?width=80&height=720" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">《犹太古史》是现存最古老的非基督教耶稣记载。基督教学者T.C.施密特认为，尽管这段文字曾受质疑，但它确系真品，约翰·J·米勒写道。</p><p class="card-dek-en">The “Testimonium Flavianum” is the oldest non-Christian account of Jesus. According to Christian scholar T.C. Schmidt, though the text has been contested, it is authentic, writes John J. Miller.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查《Testimonium Flavianum》原文、相关学术争议，以及T.C. Schmidt和John J. Miller的论述。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="http://opinion-images.wsj.net/im-45884270?width=1280&height=720" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称《Testimonium Flavianum》是最早的非基督教耶稣记载；据基督教学者T.C. Schmidt称，该文本虽有争议，但被认为是真实的，John J. Miller写道。</li><li>关键细节：原文未提供更多可直接引用的事实。</li><li>影响：条件推断——如果该记载确为最早的非基督教耶稣记载且真实性成立，可能影响相关历史讨论。</li></ul>
+        <a href="https://www.wsj.com/video/unlocking-the-josephus-code/91E22B45-D149-4C1D-89A6-3D617C99E004" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        Generated at 2026-10-10 04:02 HKT &middot; Source: Wall Street Journal
+    </footer>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {
+                    if (filter === 'all' || c.dataset.section === filter) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            };
+        });
+
+        // 搜索
+        function filterSearch(q) {
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
