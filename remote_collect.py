@@ -509,7 +509,7 @@ def scrape_cn_homepage_cdp(limit=30):
             # 没有cn.wsj.com tab，创建一个
             print("  没有cn.wsj.com tab，尝试在新tab打开...")
             try:
-                _requests.get("http://127.0.0.1:9222/json/new?https://cn.wsj.com/", timeout=10)
+                _requests.put("http://127.0.0.1:9222/json/new?https://cn.wsj.com/", timeout=10)
                 await asyncio.sleep(3)
                 tabs = json.loads(_requests.get("http://127.0.0.1:9222/json", timeout=5).text)
                 for t in tabs:
@@ -1345,7 +1345,7 @@ def _get_wsj_tab_ws_url():
             return _wsj_tab_ws_url
     try:
         import urllib.request
-        resp = urllib.request.urlopen("http://127.0.0.1:9222/json/new?https://www.wsj.com/", timeout=10)
+        resp = urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:9222/json/new?https://www.wsj.com/", method="PUT"), timeout=10)
         tab = json.loads(resp.read())
         _wsj_tab_ws_url = tab.get("webSocketDebuggerUrl")
         time.sleep(3)
@@ -1630,9 +1630,68 @@ def cdp_fetch_batch(articles, max_concurrent=1):
 
 
 
+def ensure_cdp_chrome(port=9222, profile="/tmp/chrome_debug_profile", timeout=40):
+    """确保带 --remote-debugging-port 的调试 Chrome 在线（中文版采集的唯一入口）。
+
+    cn.wsj.com 只能通过 CDP 采集。Mac 重启或手工关闭后调试 Chrome 消失，
+    采集会静默退化为纯 RSS —— 中文版整批丢失（2026-10-09 事故）。
+    此函数在采集前自愈：端口无响应时，从主 Chrome profile 复制登录 Cookies
+    并重新拉起调试实例（不同 user-data-dir，不与用户日常 Chrome 冲突）。
+    """
+    import subprocess, shutil, os, time as _time, urllib.request as _url
+    probe = "http://127.0.0.1:%d/json/version" % port
+    try:
+        _url.urlopen(probe, timeout=3).read()
+        return True
+    except Exception:
+        pass
+    print("  \u26a0\ufe0f CDP %d 无响应 —— 重建调试 Chrome（中文版采集依赖）" % port)
+    chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    if not os.path.exists(chrome):
+        print("  \u2717 未找到 Google Chrome，跳过")
+        return False
+    src = os.path.expanduser("~/Library/Application Support/Google/Chrome")
+    dst_default = os.path.join(profile, "Default")
+    try:
+        os.makedirs(dst_default, exist_ok=True)
+        for fn in ("Cookies", "Cookies-wal", "Cookies-shm"):
+            sp = os.path.join(src, "Default", fn)
+            if os.path.exists(sp):
+                shutil.copy2(sp, os.path.join(dst_default, fn))
+        lsp = os.path.join(src, "Local State")
+        if os.path.exists(lsp):
+            shutil.copy2(lsp, os.path.join(profile, "Local State"))
+    except Exception as e:
+        print("  \u26a0\ufe0f 复制 Cookies 失败: %s" % e)
+    try:
+        logf = open("/tmp/chrome_debug.log", "a")
+        subprocess.Popen(
+            [chrome, "--user-data-dir=" + profile,
+             "--remote-debugging-port=%d" % port,
+             "--no-first-run", "--no-default-browser-check"],
+            stdout=logf, stderr=subprocess.STDOUT, start_new_session=True,
+        )
+    except Exception as e:
+        print("  \u2717 启动调试 Chrome 失败: %s" % e)
+        return False
+    for _ in range(int(timeout)):
+        _time.sleep(1)
+        try:
+            _url.urlopen(probe, timeout=2).read()
+            print("  \u2713 调试 Chrome 已就绪 (port %d)" % port)
+            return True
+        except Exception:
+            continue
+    print("  \u2717 调试 Chrome 启动超时")
+    return False
+
+
 def collect_all():
     print(f"[{datetime.now(SH_TZ).strftime('%H:%M:%S')}] WSJ 采集启动")
     t0 = time.time()
+
+    # 自愈：确保中文版采集所需的 CDP 调试 Chrome 在线（重启后必需）
+    ensure_cdp_chrome()
 
     # 加载去重库
     seen_urls = load_seen_urls()
