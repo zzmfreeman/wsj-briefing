@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSJ日报 — 2026年10月20日</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-header h1 span {
+            color: var(--text);
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+        .stat-pill strong {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* 饼图 */
+        .pie-chart {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient(#c41e3a 0deg 162.5806451612903deg #0066cc 162.5806451612903deg 220.64516129032256deg #00853e 220.64516129032256deg 261.2903225806451deg #333 261.2903225806451deg 307.7419354838709deg #8b572a 307.7419354838709deg 359.99999999999994deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .search-box {
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── 主布局 ── */
+        .dashboard-body {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 左侧筛选栏 */
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }
+        .filter-btn:hover {
+            background: var(--bg);
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .filter-btn.active .filter-count {
+            color: rgba(255,255,255,0.8);
+        }
+        .filter-count {
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+        .filter-btn.active .filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ── 卡片流 ── */
+        .card-stream {
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card.hidden {
+            display: none;
+        }
+
+        /* 卡片头部（可点击展开） */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #fafafa;
+        }
+        .card-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .card-titles {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .card-title-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
+        .card-section {
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card-time {
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {
+            padding: 0 16px 10px;
+        }
+
+        /* 导语 */
+        .card-dek {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }
+        .card-dek-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        /* 洞察 */
+        .card-insight {
+            padding: 8px 12px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-insight p {
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+        .card.expanded .card-detail {
+            max-height: 3000px;
+            padding: 0 16px 12px;
+        }
+
+        /* 图片 */
+        .card-hero {
+            margin: 0 0 10px;
+        }
+        .card-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets */
+        .card-bullets {
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+        .card-bullets li {
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .card-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .card-body-text {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* CTA */
+        .card-cta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* ── 页脚 ── */
+        .page-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .dashboard-body {
+                padding: 8px;
+            }
+            .card-stream {
+                padding: 0;
+            }
+            .search-box {
+                width: 140px;
+            }
+            .card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>62</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
+    </header>
+
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            <button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="🇨🇳 中文版">🇨🇳 中文版 <span class="filter-count">28</span></button><button class="filter-btn" data-filter="💻 Tech">💻 Tech <span class="filter-count">10</span></button><button class="filter-btn" data-filter="📈 Markets">📈 Markets <span class="filter-count">7</span></button><button class="filter-btn" data-filter="🌍 World">🌍 World <span class="filter-count">8</span></button><button class="filter-btn" data-filter="🏢 Business">🏢 Business <span class="filter-count">9</span></button>
+        </aside>
+        <div class="card-stream">
+            
+    <div class="card" data-section="🇨🇳 中文版" data-title="马斯克承诺向每名美国儿童赠送一股SpaceX股票">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">01</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">马斯克承诺向每名美国儿童赠送一股SpaceX股票</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">19:51</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-60141416?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">在Anthropic表示将5%的股份投入“公益基金”后，马斯克表示，他将向每名美国儿童赠送一股SpaceX股票。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查SpaceX公司章程是否允许此类分散化赠予，以及相关法律法规对此类行为的限制</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-60141416?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>埃隆·马斯克的净资产超过9000亿美元。 图片来源：Julia Demaree Nikhinson/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：马斯克表示明年将把自己持有的SpaceX股票向全美每个孩子各赠送一股</li><li>关键细节：马斯克承诺向每名美国儿童赠送一股SpaceX股票</li><li>影响：条件推断——若该承诺履行，可能引发关于未成年人持股及SpaceX股权流动性的法律与监管讨论</li></ul>
+        <a href="https://cn.wsj.com/articles/musk-vows-to-give-each-u-s-child-a-spacex-share-72bdff99" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="AI股震荡提醒人们：这次并无不同">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">02</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI股震荡提醒人们：这次并无不同</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:19</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-62390006?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">AI基础设施建设尚未证明它能够避开铁路和互联网等以往大型资本投资项目遇到的问题。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查后续数据中心投资及资本支出实际执行情况</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-62390006?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>相对于飙升的利润而言，诸如英伟达等AI股票的涨幅并不算大，因为投资者预计这种利润激增势头不会持久。 图片来源：David Paul Morris/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：通胀高于预期推高融资成本，威胁依赖债务融资的数据中心投资</li><li>关键细节：文章标题指出AI股震荡提醒投资者此次情况并无不同</li><li>影响：条件推断——若建设继续全速推进，可能面临资本支出愿景落空的风险</li></ul>
+        <a href="https://cn.wsj.com/articles/ai%E8%82%A1%E9%9C%87%E8%8D%A1%E6%8F%90%E9%86%92%E4%BA%BA%E4%BB%AC-%E8%BF%99%E6%AC%A1%E5%B9%B6%E6%97%A0%E4%B8%8D%E5%90%8C-ebbbb7c1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="特斯拉“飞天跑车”Roadster对全球汽车业竞争意味着什么？">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">03</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特斯拉“飞天跑车”Roadster对全球汽车业竞争意味着什么？</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">14:01</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-39162202?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">马斯克对Roadster跑车的最新愿景，与其说关乎冷气体火箭推进器，不如说更关乎中国。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查冷气体火箭推进器的测试数据、安全性及吸附系统的实际表现。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-39162202?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>来源：Tesla</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要描述新款特斯拉Roadster看上去像喷气式战斗机与兰博基尼的结合体，吸附系统让它能倒挂在离地69英尺的地方。</li><li>关键细节：摘要称最突出的功能是冷气体火箭推进器，能让这辆车跃过一排汽车，同时在空中完成一次桶滚动作。</li><li>影响：条件推断——如果此类技术实现商业化，可能影响高性能跑车的设计标准与竞争格局。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E7%89%B9%E6%96%AF%E6%8B%89-%E4%BC%9A%E9%A3%9E%E7%9A%84roadster-%E5%AF%B9%E5%85%A8%E7%90%83%E6%B1%BD%E8%BD%A6%E4%B8%9A%E7%AB%9E%E4%BA%89%E6%84%8F%E5%91%B3%E7%9D%80%E4%BB%80%E4%B9%88-e00048d1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="关于特斯拉“飞天跑车”Roadster的五大疑问">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">04</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">关于特斯拉“飞天跑车”Roadster的五大疑问</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:53</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-16494628?width=80&height=417" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">马斯克称特斯拉史上最狂野的车型将于2028年投产，但其关键细节仍不明朗，且一些功能可能无法合法上路使用。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查量产Roadster的实际飞行能力、合法使用地点及最终售价。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-16494628?width=700&height=417" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>特斯拉周四在得克萨斯州韦科附近召开的一场发布会上发布了其Roadster。 图片来源：Tesla/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新款Roadster在得克萨斯州SpaceX测试场地亮相，兑现了马斯克关于其具备飞行能力的承诺。</li><li>关键细节：文章标题提及特斯拉“飞天跑车”Roadster存在五大疑问。</li><li>影响：条件推断——如果量产版Roadster无法实现悬停和垂直加速，或合法使用范围受限，可能影响市场对其飞行功能的预期。</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0003986547" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="长鑫科技预计收入跃升">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">05</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">长鑫科技预计收入跃升</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">13:16</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-18631345?width=80&height=377" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">中国长鑫科技继续受益于AI带动的存储芯片供应紧张，该公司预计前九个月收入同比增至八倍以上。但周一股价仍大幅下跌。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查实际财务数据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-18631345?width=700&height=377" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>长鑫科技曾一度超越腾讯，成为中国市值最高的上市公司，但自7月上市以来，其市值已缩水超过10%。 图片来源：Cnsphoto/cnsphoto/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：长鑫科技预计2026年前九个月收入达人民币2,650亿至2,700亿元</li><li>关键细节：存储芯片供应紧张之际，长鑫科技预计收入将跃升逾八倍</li><li>影响：条件推断——若预期实现，公司财务状况可能显著改善</li></ul>
+        <a href="https://cn.wsj.com/articles/chinas-cxmt-expects-over-eightfold-revenue-jump-amid-memory-squeeze-4c52bff0" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="嘉信理财CEO对AI智能体交易持怀疑态度">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">06</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">嘉信理财CEO对AI智能体交易持怀疑态度</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:36</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-01289235?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">嘉信理财首席执行官沃斯特押注部分理财和投资需求离不开人工服务。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查AI智能体在金融领域的具体功能边界及客户实际使用场景</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-01289235?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>里克·沃斯特认为，由AI推动的大规模现金转移“极不可能发生”。 图片来源：Desiree Rios/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：沃斯特指出AI智能体为客户做的事有限，重大财务决策仍需联系理财顾问</li><li>关键细节：嘉信理财CEO里克·沃斯特对AI智能体在客户睡觉时交易股票表示怀疑</li><li>影响：条件推断——如果客户过度依赖AI伙伴，可能影响重大财务决策的独立性与安全性</li></ul>
+        <a href="https://cn.wsj.com/articles/ai%E6%99%BA%E8%83%BD%E4%BD%93%E5%9C%A8%E4%BD%A0%E7%9D%A1%E8%A7%89%E6%97%B6%E4%BA%A4%E6%98%93%E8%82%A1%E7%A5%A8-%E5%98%89%E4%BF%A1%E7%90%86%E8%B4%A2ceo%E6%8C%81%E6%80%80%E7%96%91%E6%80%81%E5%BA%A6-d631d3fd" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="普京提议美中俄三方峰会">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">07</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">普京提议美中俄三方峰会</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:35</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-28068513?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">俄罗斯领导人普京试图通过谈判，以有利于俄罗斯的方式结束这场持续四年的冲突。此次峰会将把乌克兰总统泽连斯基排除在外。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核实该计划是否实现及各方反应</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-28068513?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>俄罗斯总统普京 图片来源：Igor Ivanko/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据知情人士透露，普京提议下月与特朗普及习近平会晤商讨乌克兰问题，试图通过谈判以有利于俄罗斯的方式结束冲突</li><li>关键细节：普京提议举行美中俄三方峰会，共商乌克兰命运</li><li>影响：条件推断——若举行无泽连斯基参与的峰会，可能引起欧洲高度警觉</li></ul>
+        <a href="https://cn.wsj.com/articles/%E6%99%AE%E4%BA%AC%E6%8F%90%E8%AE%AE%E4%B8%BE%E8%A1%8C%E7%BE%8E%E4%B8%AD%E4%BF%84%E4%B8%89%E6%96%B9%E5%B3%B0%E4%BC%9A-%E5%85%B1%E5%95%86%E4%B9%8C%E5%85%8B%E5%85%B0%E5%91%BD%E8%BF%90-e12ccb3f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="泽连斯基如何决定冒险公然对抗特朗普">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">08</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">泽连斯基如何决定冒险公然对抗特朗普</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:22</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-59208985?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这位乌克兰领导人公开谴责白宫放宽对俄施压，进一步引发了美方的强烈不满。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查列车行程、在场人士说法、美国是否发出导弹发射预警及双方后续表态。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-59208985?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>尽管有激怒特朗普的风险，乌克兰总统泽连斯基还是决定公开批评特朗普的做法。  图片来源：Wojtek Radwanski/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称，据在场人士透露，泽连斯基与顾问在从基辅前往波兰的列车上收到俄罗斯导弹猛烈袭击基辅的消息，美国已连续第二天没有像往常一样发出导弹发射预警。</li><li>关键细节：标题称泽连斯基决定冒险公然对抗特朗普。</li><li>影响：条件推断——如果该报道被进一步证实，可能影响外界对泽连斯基与特朗普关系的判断。</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0003986711" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="伊朗被指为胡塞武装袭击沙特提供情报支持">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">09</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">伊朗被指为胡塞武装袭击沙特提供情报支持</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:43</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-00086854?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">伊朗的支持帮助胡塞武装对沙特及其也门盟友发动了迄今威力最大、战术最复杂的袭击。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查反胡塞联盟情报的具体证据及伊朗官方回应</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-00086854?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>在也门萨那举行的一场抗议活动中，胡塞武装的支持者们举着胡塞武装领导人阿卜杜勒-马利克·胡塞(Abdul-Malik al-Houthi)和已故伊朗最高领袖阿里·哈梅内伊的画像。 图片来源：Yahya Arhab/EPA/Shutterstock</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据透露，伊朗协助确定无人机和导弹袭击目标并提供训练指导</li><li>关键细节：伊朗被指为胡塞武装袭击沙特提供目标定位和情报支持</li><li>影响：条件推断——若指控属实，伊朗援助可能助推胡塞武装扩大在也门控制的领土范围</li></ul>
+        <a href="https://cn.wsj.com/articles/%E4%BC%8A%E6%9C%97%E4%B8%BA%E8%83%A1%E5%A1%9E%E6%AD%A6%E8%A3%85%E8%A2%AD%E5%87%BB%E6%B2%99%E7%89%B9%E6%8F%90%E4%BE%9B%E7%9B%AE%E6%A0%87%E5%AE%9A%E4%BD%8D%E5%92%8C%E6%83%85%E6%8A%A5%E6%94%AF%E6%8C%81-3321a97a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="胡塞武装袭击暴露出沙特的军事短板">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">10</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">胡塞武装袭击暴露出沙特的军事短板</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">12:46</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33528307?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">沙特虽然拥有先进武器，但也门武装组织已证明自己是一个韧性十足的对手。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查沙特后续如何弥补军事防御漏洞。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33528307?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>2023年，沙特军队在吉达附近的红海上守卫一艘军舰。 图片来源：Amr Nabil/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：分析人士指出，胡塞武装凭借本土制造的导弹和无人机，能有效抵消沙特的军事优势。</li><li>关键细节：胡塞武装袭击事件揭示了沙特在军事防御方面存在的不足。</li><li>影响：条件推断——若沙特无法解决这些短板，其在也门的战事可能面临更高风险。</li></ul>
+        <a href="https://cn.wsj.com/articles/saudi-arabias-military-limitations-are-being-exposed-by-houthi-attacks-f36bbd43" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="特朗普支持内塔尼亚胡竞选连任">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">11</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普支持内塔尼亚胡竞选连任</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">07:30</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-75098431?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">在距离以色列竞争激烈的全国大选只有数日之际，特朗普试图给予内塔尼亚胡期盼已久的助力。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查该社交媒体帖文的具体发布时间及后续选举进展</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-75098431?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>12月，以色列总理内塔尼亚胡与美国总统特朗普在海湖庄园。 图片来源：Alex Brandon/Associated Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：内塔尼亚胡正为政治生涯存亡而战，特朗普称其为伟大的战士型总理</li><li>关键细节：美国总统特朗普表态支持以色列总理内塔尼亚胡竞选连任</li><li>影响：条件推断——若特朗普助力生效，可能影响以色列大选结果及美以关系</li></ul>
+        <a href="https://cn.wsj.com/articles/trump-endorses-israels-netanyahu-for-re-election-15bd4f3c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="艾伯塔省脱离加拿大公投引发尖锐分歧">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">12</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">艾伯塔省脱离加拿大公投引发尖锐分歧</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">16:29</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-11939565?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">加拿大总理卡尼试图争取这个石油资源丰富的省份继续留在加拿大。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查后续游行安排及冲突各方的进一步回应</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-11939565?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>在5月份的一次集会上，支持艾伯塔省脱离加拿大的支持者举着横幅和旗帜。 图片来源：Henry Marken/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：拟挂满艾伯塔省旗的花车提议因涉及独立公投宣传被志愿者否决，随后支持者遭到大量骚扰和网络辱骂</li><li>关键细节：艾伯塔省脱离加拿大公投引发尖锐分歧</li><li>影响：条件推断——若此类地方性政治争议持续发酵，可能加剧社区内部对立并影响公共活动的正常组织</li></ul>
+        <a href="https://cn.wsj.com/articles/alberta-independence-vote-canada-7aefe9d6" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="特朗普幕僚聘请律师应对潜在国会调查">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">13</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普幕僚聘请律师应对潜在国会调查</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">13:40</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-45502343?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">为防范民主党重夺国会并启动调查，特朗普内阁官员与普通幕僚正提前构筑法律防线。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查中期选举结果、国会调查是否启动、涉事人员是否正式聘请律师及律所名称。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-45502343?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>众议院议员已向与本届政府有关的个人和实体发出函件，其中包括肯尼迪表演艺术中心管理层。 图片来源：Ken Cedeno/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：特朗普政府官员正联系律所寻求法律咨询；若民主党在中期选举赢得参众两院中的一院或两院，他们准备应对明年大量调查。</li><li>关键细节：特朗普幕僚正聘请律师，以应对国会潜在调查。</li><li>影响：条件推断——若相关选举结果使民主党获得发起调查的条件，特朗普幕僚可能面临更多国会调查与法律应对压力。</li></ul>
+        <a href="https://cn.wsj.com/articles/trump-administration-democrat-investigation-224ebe27" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="特朗普推进华盛顿高尔夫球场改造">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">14</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普推进华盛顿高尔夫球场改造</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:55</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-38818312?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美国总统特朗普表示，他对华盛顿特区一座公共高尔夫球场的改造将于11月中旬启动。在围绕该计划的法律争议持续之际，他仍在推进这项工程。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查改造工程的实际进展及法律争议后续</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-38818312?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>东波托马克高尔夫球场预计将关闭约15个月。 图片来源：Aaron Schwartz/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：东波托马克高尔夫球场将从11月15日起关闭约15个月</li><li>关键细节：特朗普继续推进华盛顿高尔夫球场改造计划</li><li>影响：条件推断——若改造启动，可能加剧围绕该计划的法律争议</li></ul>
+        <a href="https://cn.wsj.com/articles/trump-presses-ahead-with-plans-to-remake-washington-golf-course-9b36fb63" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="中国第三季度GDP增长4.5%，得益于出口拉动">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">15</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中国第三季度GDP增长4.5%，得益于出口拉动</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:55</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-11229774?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这一增速略高于第二季度的4.3%，也超过经济学家预期。中国政府近来推出力度温和的刺激措施，但消费者信心仍疲软，房地产困境犹存。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查官方GDP与出口数据，并关注后续修正及来源可靠性。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-11229774?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>上海郊外一个港口的集装箱。 图片来源：Go Nakamura/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：7月至9月GDP同比增长4.5%，增幅高于上季度4.3%。</li><li>关键细节：中国第三季度GDP增长4.5%，得益于出口拉动。</li><li>影响：条件推断——如果数据属实，出口可能在一定程度上支撑增长；国内放缓压力或仍存在，但材料未提供因果细节。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E4%B8%AD%E5%9B%BD%E7%AC%AC%E4%B8%89%E5%AD%A3%E5%BA%A6gdp%E5%A2%9E%E9%95%BF4-5-%E8%B6%85%E9%A2%84%E6%9C%9F-30e72182" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="Anthropic将把5%的股份划拨给新设的“公共利益”基金">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">16</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Anthropic将把5%的股份划拨给新设的“公共利益”基金</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:25</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-07390728?width=80&height=876" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该基金或可直接将资金发放给受AI引发的劳动力市场不稳定问题影响的人群。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查该公共利益基金的具体成立情况及后续资金流向</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-07390728?width=700&height=876" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Anthropic首席执行官达里奥·阿莫迪 图片来源：Carlos Barria/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：该基金可开展慈善捐赠或向特定人群发放资金，旨在应对AI引发的劳动力市场不稳定</li><li>关键细节：Anthropic计划将公司5%的股份划拨给一个新设的“公共利益基金”</li><li>影响：条件推断——若该举措实施，可能进一步缓解由AI快速发展带来的社会和经济动荡风险</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0003986615" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="Anthropic信托与IPO相关摘要">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">17</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Anthropic信托与IPO相关摘要</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">12:34</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-84606727?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这家AI公司对一个五人信托的运作细节讳莫如深。该信托不仅有权决定董事会人选，还能否决公司的各项重大举措。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查长期利益信托的规范文件及其对董事会构成的实际约束力。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-84606727?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Anthropic的联合创始人兼首席执行官达里奥·阿莫迪于9月抵达白宫参加会议。 图片来源：Aaron Schwartz/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称，一个运作不透明的信托有权左右公司董事会构成并阻止重大举措，且规范文件未披露。</li><li>关键细节：标题提出，需了解一个与Anthropic IPO相关的神秘信托。</li><li>影响：条件推断——如果该信托运作不透明且规范文件未披露，可能影响外界对Anthropic治理结构的判断。</li></ul>
+        <a href="https://cn.wsj.com/articles/anthropic-ipo-private-trust-0117cbf8" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="对冲基金亿万富豪奥弗德克的两场激烈交锋：对阵妻子和商业伙伴">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">18</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">对冲基金亿万富豪奥弗德克的两场激烈交锋：对阵妻子和商业伙伴</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">14:59</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-57668821/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">奥弗德克力图避免与妻子的离婚纠纷令他在与Two Sigma另一名联合创始人的争斗中处于不利地位。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查法庭最终判决结果及Two Sigma内部治理结构的后续变化。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-57668821/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：奥弗德克提出支付7.23亿美元以结束近24年婚姻，并面临与量化交易巨头Two Sigma控制权的争议。</li><li>关键细节：约翰·奥弗德克正应对与分居妻子的法庭争斗及与Two Sigma另一位联合创始人的对峙。</li><li>影响：条件推断——若和解条件被认定不公或控制权争夺升级，可能引发更激烈的法律后果及公司动荡。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E5%AF%B9%E5%86%B2%E5%9F%BA%E9%87%91%E4%BA%BF%E4%B8%87%E5%AF%8C%E8%B1%AA%E5%A5%A5%E5%BC%97%E5%BE%B7%E5%85%8B%E7%9A%84%E4%B8%A4%E5%9C%BA%E6%BF%80%E7%83%88%E4%BA%A4%E9%94%8B-%E5%AF%B9%E9%98%B5%E5%A6%BB%E5%AD%90%E5%92%8C%E5%95%86%E4%B8%9A%E4%BC%99%E4%BC%B4-9523e2cd" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="俄罗斯喷气无人机来袭，乌克兰火速构建防御网">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">19</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">俄罗斯喷气无人机来袭，乌克兰火速构建防御网</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:50</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-65160032/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">面对莫斯科量产的新型喷气武器，基辅防空体系陷入暂时无解困境。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-65160032/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“俄罗斯喷气无人机来袭，乌克兰火速构建防御网”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E4%BF%84%E7%BD%97%E6%96%AF%E5%96%B7%E6%B0%94%E6%97%A0%E4%BA%BA%E6%9C%BA%E6%9D%A5%E8%A2%AD-%E4%B9%8C%E5%85%8B%E5%85%B0%E7%81%AB%E9%80%9F%E6%9E%84%E5%BB%BA%E9%98%B2%E5%BE%A1%E7%BD%91-a39eb4eb" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="中国9月份房价跌幅略有收窄">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">20</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中国9月份房价跌幅略有收窄</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:14</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-521010?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">9月份中国70个大中城市的房价下跌0.14%，房价跌幅略有收窄，可能得益于中国政府为提振低迷的房地产行业而推出的支持措施。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查国家统计局原始数据、统计口径及支持措施的具体内容。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-521010?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片来源：QILAI SHEN/BLOOMBERG NEWS</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：《华尔街日报》根据国家统计局发布的数据计算，9月份中国70个大中城市房价下跌0.14%，前一个月跌幅为0.17%。</li><li>关键细节：中国9月份房价跌幅略有收窄</li><li>影响：条件推断——如果该跌幅收窄趋势持续，可能对房地产行业预期产生一定影响，但需更多数据验证。</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0003986705" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="华尔街录得6月以来最差单周表现">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">21</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">华尔街录得6月以来最差单周表现</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:27</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-68589123/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">从CoreWeave到Alphabet的多家公司遭抛售。纳指全周下跌4.5%。这一切的背后，是投资者担忧美国借贷成本上升可能令AI基础设施领域规模空前的投资放缓。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查该芯片制造商CEO的具体言论原文及通胀报告对债市的具体冲击细节。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-68589123/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：纳斯达克综合指数全周下跌4.5%。</li><li>关键细节：华尔街在刚刚过去的一周录得自6月以来的最差单周表现。</li><li>影响：条件推断——若AI投资者行为被持续视为赌博且中国半导体进展加剧跌势，可能进一步削弱市场信心并导致科技股抛售。</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0003986480" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="利雅得遇袭后华尔街高管审慎评估参会行程">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">22</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">利雅得遇袭后华尔街高管审慎评估参会行程</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:18</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-71441877?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">全球金融界精英对下周前往沙特参加一场备受期待的企业高管和投资者大会愈发谨慎。他们既要顾及自身安全，也担心得罪财力雄厚的东道主。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查两家公司是否作出正式决定及后续行程变动</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-71441877?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>去年在沙特阿拉伯举行的未来投资倡议大会期间的一次会议。 图片来源：Future Investment Initiative Media Center/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摩根大通和花旗集团高管正审慎评估原定赴未来投资倡议大会的行程，有些人已取消会面安排</li><li>关键细节：利雅得遭袭后，部分华尔街高管权衡是否参加“沙漠达沃斯”</li><li>影响：条件推断——若高管最终决定不参加，可能影响该大会的出席阵容及东道主声誉</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0003986575" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="福特欧洲复兴战：告别乏味车型，但新车得等到2028年">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">23</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">福特欧洲复兴战：告别乏味车型，但新车得等到2028年</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:11</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-61865031?width=80&height=477" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">来自中国车企的竞争令福特销量大跌，该公司将更加倚重自身赛车传统。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查福特官方公告、车型上市时间及销售区域。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-61865031?width=700&height=477" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>福特法国总裁圣地亚哥·赛恩斯在本月的巴黎车展上发表讲话。 图片来源：Tim Franco for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称福特新上任的欧洲业务负责人向经销商展示融入赛车元素的新车型，包括紧凑型电动汽车、两款混合动力跨界车和一款小型Bronco SUV设计方案。</li><li>关键细节：标题称福特欧洲复兴战与告别乏味车型，并称新车得等到2028年。</li><li>影响：条件推断——如果该计划推进，福特可能在本十年结束前于欧洲销售上述车型；实际上市与市场反应尚待核实。</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0003986788" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="法国骚乱后各派领导人相互指责">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">24</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">法国骚乱后各派领导人相互指责</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:12</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-10934169/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">周日，骚乱者继续在法国多地展开暴力活动，袭击市政厅、奢侈品店等，警方基本无力阻止。这场席卷全国的骚乱堪称多年来最严重之一。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查法国官方通报及独立媒体对骚乱范围、伤者与被拘留人数的报道。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-10934169/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称周末混乱中600多名警察和消防员受伤，2,000多人被拘留。</li><li>关键细节：标题称骚乱席卷法国后，各派领导人相互指责。</li><li>影响：条件推断——如果上述报道属实，可能加剧法国政界就骚乱责任的相互指责，并引发对治安应对的质疑。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E9%AA%9A%E4%B9%B1%E5%B8%AD%E5%8D%B7%E6%B3%95%E5%9B%BD%E5%90%8E-%E5%90%84%E6%B4%BE%E9%A2%86%E5%AF%BC%E4%BA%BA%E7%9B%B8%E4%BA%92%E6%8C%87%E8%B4%A3-009eacad" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="欧洲右翼为何与MAGA分道扬镳？">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">25</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">欧洲右翼为何与MAGA分道扬镳？</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:26</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-11504124?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">放眼欧洲各地，民族主义政党正接连赢得选举并在民调中领先。它们成功的秘诀之一，就是与特朗普及“让美国再次伟大”运动的盟友保持距离。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查德国选择党(AfD)后续是否继续减少与MAGA阵营公开互动，以及其国内议题重心变化。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-11504124?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>许多欧洲民族主义领导人已公开与特朗普在伊朗战争问题上决裂。 图片来源：Julia Demaree Nikhinson/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据摘要，德国选择党(Alternative for Germany，简称AfD)在最近两场地区选举中拔得头筹，其领导人已减少同MAGA阵营的公开互动。</li><li>关键细节：原文未提供更多可直接引用的事实。</li><li>影响：条件推断——如果摘要所述趋势持续，可能影响这些政党与特朗普及MAGA盟友的互动方式。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E6%AC%A7%E6%B4%B2%E5%8F%B3%E7%BF%BC%E4%B8%BA%E4%BD%95%E4%B8%8Emaga%E5%88%86%E9%81%93%E6%89%AC%E9%95%B3-3dfa2148" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="硅谷岗位被指要求应聘者连续三年全天候待命">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">26</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">硅谷岗位被指要求应聘者连续三年全天候待命</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">15:03</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-52781024/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">科技及其他行业老板愈发直言不讳：希望求职者长时间工作。在AI时代，奋斗文化正被推向新的高度，也愈发公开。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查Khosla Ventures官方招聘信息或相关回应，确认三年期限与全天候要求。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-52781024/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称Khosla Ventures创始人维诺德·科斯拉招聘幕僚长，要求上午8点到晚上8点现场办公并全天候待命，必要时晚上和周末也不例外，且保持三年。</li><li>关键细节：标题称有硅谷岗位要求应聘者连续三年全天候待命。</li><li>影响：条件推断——如果该招聘条件属实，可能给该岗位候选人带来高强度待命压力；影响可能限于该岗位及招聘方。</li></ul>
+        <a href="https://cn.wsj.com/articles/the-silicon-valley-job-that-demands-three-years-of-24-7-hustle-576d143b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="可口可乐如何撬动了百事对肯德基饮料机的掌控">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">27</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">可口可乐如何撬动了百事对肯德基饮料机的掌控</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:37</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-90420698?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">历经两天的秘密品鉴与战略评估，前百事旗下连锁巨头肯德基正式倒戈可口可乐。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查的事项：核实百事与肯德基新合同的签署情况、具体供货细节以及该事件对两家公司市场份额的实际影响。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-90420698?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>许多餐饮业人士将饮品视为提升利润的一种途径。 图片来源：Bing Guan/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：百胜餐饮旗下肯德基高管在得克萨斯州普莱诺品尝了可口可乐和百事公司的样品，目标是为美国3,000多家餐厅的现调饮料机选出一家供货公司。</li><li>关键细节：文章标题提及可口可乐撬动百事对肯德基饮料机的掌控。</li><li>影响：条件推断——如果百事公司与肯德基签订的10年合同到期且未能续约，可能导致其失去为美国数千家餐厅供应饮料的市场份额。</li></ul>
+        <a href="https://cn.wsj.com/articles/how-coke-loosened-pepsis-grip-on-kfcs-soda-fountains-01f92221" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="退休储蓄支取的“4%法则”靠谱吗？">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">28</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">退休储蓄支取的“4%法则”靠谱吗？</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">13:35</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-43537799?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">研究发现，当股市上涨且通胀温和时，“4%法则”的成功率为81.5%。但如果通胀率居高不下或市场疲软，成功率会急剧下降。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：未来需核查该策略在何种具体情况下会失效以及实施过程中最大的障碍。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-43537799?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片来源：Dan Page for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：作者与助理塔哈·阿布苏迈赫和安东·西伦检验该理念，即退休后首年提取投资组合4%，此后每年提取该金额外加抵消通胀部分。</li><li>关键细节：文章探讨退休储蓄支取阶段经久不衰且争议较大的“4%法则”。</li><li>影响：条件推断——如果遵循该策略，储蓄可能提取30年以上而仍有富余，但需明确其失效情况及实施障碍。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E9%80%80%E4%BC%91%E5%82%A8%E8%93%84%E6%94%AF%E5%8F%96%E7%9A%84-4-%E6%B3%95%E5%88%99-%E9%9D%A0%E8%B0%B1%E5%90%97-0e0e29fd" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="前OpenAI员工被控窃听，曾与沙特王室讨论工作">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">29</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">前OpenAI员工被控窃听，曾与沙特王室讨论工作</h3><span class="card-title-en">Former OpenAI Worker Accused of Bugging Discussed Jobs With Saudi Royal</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">01:17</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-09401884?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">在一份拘留申请中，检察官认为阿卜杜勒拉赫曼·阿尔福赞有潜逃风险，称其妻子和孩子已永久移居沙特阿拉伯。</p><p class="card-dek-en">In a detention filing, prosecutors argue Abdulrahman Alfozan is a flight risk, saying his wife and child moved permanently to Saudi Arabia.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查联邦法院后续出庭结果、检方文件及OpenAI或涉事方回应。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-09401884?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Signage at the OpenAI DevDay in San Francisco last month.  Minh Connors/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据检方称，35岁前OpenAI员工Alfozan被控窃听受限会议室，并据称曾与沙特王室成员联系讨论工作机会。</li><li>关键细节：前OpenAI员工被控窃听，并曾与沙特王室讨论工作。</li><li>影响：条件推断——如果法院采纳检方羁押主张，Alfozan可能继续被拘留；若案件推进，或引发对OpenAI会议室安全及前员工行为的关注。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/former-openai-worker-accused-of-bugging-discussed-jobs-with-saudi-royal-277c1c45" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Nvidia支持初创公司doubleAI推出降低算力成本模型">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">30</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Nvidia支持初创公司doubleAI推出降低算力成本模型</h3><span class="card-title-en">Nvidia-Backed Startup doubleAI Launches Model to Pare Cost of Compute</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">20:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-61982828?width=80&height=409" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">由Mobileye首席执行官阿蒙·沙舒瓦联合创立的公司表示，其成功将一名早期客户的算力成本削减了67%。</p><p class="card-dek-en">The company, co-founded by Mobileye CEO Amnon Shashua, says it slashed one early customer’s compute costs by 67%.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查的事项：Maxwell模型后续可用性及其对OpenAI等巨头实际账单的影响。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-61982828?width=700&height=409" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Members of the doubleAI team, with CEO Amnon Shashua seated at center. doubleAI</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：该公司推出的Maxwell模型声称将部分客户的计算成本降低了67%。</li><li>关键细节：Nvidia支持的初创公司doubleAI发布了旨在削减计算成本的模型。</li><li>影响：条件推断——如果该模型在大型AI实验室中广泛部署，可能通过提升硬件利用率实现显著的成本节约。</li></ul>
+        <a href="https://www.wsj.com/cio-journal/nvidia-backed-startup-doubleai-launches-model-to-pare-cost-of-compute-b780f215" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="DHS 下令从联邦民用 IT 系统移除 DeepSeek 技术">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">31</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">DHS 下令从联邦民用 IT 系统移除 DeepSeek 技术</h3><span class="card-title-en">DHS Orders DeepSeek Technology Removed From Federal Civilian IT Systems</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">22:44</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-26711157?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该命令还禁止未来购买该公司的产品和服务，其适用范围延伸至DeepSeek关联公司开发的产品，以及使用该公司技术实施构建的第三方产品。</p><p class="card-dek-en">The order, which also bars future purchases of the company’s products and services, extends to products developed by DeepSeek affiliates and third-party products built using the company’s implementations.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查 DHS 通知原文、适用机构范围、生效时间及例外条款。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-26711157?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>The restrictions extend to products developed by DeepSeek affiliates, as well as third-party products and services built using DeepSeek implementations. Dado Ruvic/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：美国国土安全部命令联邦民用机构从信息技术系统中移除中国 DeepSeek 开发的人工智能技术，并禁止未来购买其产品和服务。</li><li>关键细节：DHS 下令从联邦民用 IT 系统移除 DeepSeek 技术。</li><li>影响：条件推断——如果该命令执行，可能限制美国联邦民用机构使用或采购 DeepSeek 相关技术。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/dhs-orders-deepseek-technology-removed-from-federal-civilian-it-systems-060b6d3d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="阿联酋 AI 与数据初创公司扩张进入硅谷">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">32</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">阿联酋 AI 与数据初创公司扩张进入硅谷</h3><span class="card-title-en">U.A.E.-Based AI and Data Startup Expands Into Silicon Valley</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">22:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-02024506?width=80&height=525" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">6月完成6000万美元融资的CNTXT AI，已开发出以阿拉伯语优先的人工智能模型，并正在开展机器人训练工作。</p><p class="card-dek-en">CNTXT AI, which raised $60 million in June, has built Arabic-first AI models and is training robots.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查 CNTXT AI 硅谷办公室、招聘、融资与 committed revenues 是否属实，以及合作与部署进展。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-02024506?width=700&height=525" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Mohammad Abu Sheikh, chief executive and co-founder of CNTXT AI. CNTXT AI</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据该摘要，CNTXT AI 融资 $60 million 的 Series A，由 AI71 和 BlueFive Capital 共同领投，并正在加州 Milpitas 开设首个美国办公室。</li><li>关键细节：阿联酋的人工智能与数据初创公司扩张进入硅谷。</li><li>影响：条件推断——如果 CNTXT AI 按所述计划推进，可能便利美国与中东的 AI 合作，并扩大阿拉伯语 AI 模型应用；但影响取决于招聘与伙伴关系落地。</li></ul>
+        <a href="https://www.wsj.com/cio-journal/u-a-e-based-ai-and-data-startup-expands-into-silicon-valley-f6e54c1e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="The Weak Points in AI Bonds Are Becoming Clearer">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">33</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The Weak Points in AI Bonds Are Becoming Clearer</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">17:30</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-41296135?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">交易员们正在揭示他们认为人工智能相关债券发行中最大的陷阱所在。</p><p class="card-dek-en">Traders are revealing where they see the biggest pitfalls in debt issuance related to artificial intelligence.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-41296135?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>CoreWeave sells its computing power to AI companies and others. Jason Henry for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“The Weak Points in AI Bonds Are Becoming Clearer”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/finance/investing/the-weak-points-in-ai-bonds-are-becoming-clearer-12f09cc6" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="马斯克承诺向美国儿童赠送SpaceX股份">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">34</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">马斯克承诺向美国儿童赠送SpaceX股份</h3><span class="card-title-en">Musk Vows to Give Each U.S. Child a SpaceX Share</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">18:58</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-60141416?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">全球首富宣布了这一消息，此前Anthropic和其他知名亿万富翁也做出了类似承诺。</p><p class="card-dek-en">The world’s richest person made the announcement following similar pledges by Anthropic and other high-profile billionaires.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查该计划的具体实施细节、法律合规性及最终是否履行</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-60141416?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Elon Musk has a net worth of more than $900 billion. Julia Demaree Nikhinson/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：马斯克表示将在明年向美国每个儿童赠送其持有的SpaceX股票，并称这是众多此类举措中的第一次</li><li>关键细节：马斯克誓言向每位美国儿童赠送一份SpaceX股份</li><li>影响：条件推断——若该承诺兑现，可能引发公众对AI财富分配及科技巨头社会责任的关注</li></ul>
+        <a href="https://www.wsj.com/business/musk-vows-to-give-each-u-s-child-a-spacex-share-273bc71c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Jamie Dimon 呼吁商界领袖加强网络防御">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">35</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Jamie Dimon 呼吁商界领袖加强网络防御</h3><span class="card-title-en">Jamie Dimon Tells Leaders to Ramp Up Cyber Defenses</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">20:50</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-94282328?width=80&height=439" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外，由英伟达支持的初创公司推出了一种新型人工智能类别，旨在降低计算成本。</p><p class="card-dek-en">Plus, an Nvidia-backed startup’s new category of AI to cut compute costs.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查 Dimon 相关言论、Mythos 等 AI 模型影响及漏洞发现比例说法的依据。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-94282328?width=780&height=439" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>JPMorgan Chase CEO Jamie Dimon. WSJ Leadership Institute</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：Dimon 称网络安全是最大风险，并建议用最强人工智能（AI）模型寻找漏洞，称可发现其中 20%。</li><li>关键细节：Jamie Dimon 呼吁商界领袖加强网络防御。</li><li>影响：条件推断——如果企业采纳网络分段、身份访问管理等建议，可能降低部分网络风险；但实际效果取决于执行与威胁演变。</li></ul>
+        <a href="https://www.wsj.com/cio-journal/jamie-dimon-tells-leaders-to-ramp-up-cyber-defenses-04ac235f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Tech, Media & Telecom Roundup: Market Talk">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">36</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Tech, Media & Telecom Roundup: Market Talk</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">19:28</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-62208381?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">科技、媒体与电信综述：市场观察
+了解英特尔、诺基亚等更多科技、媒体和电信领域的最新市场观察。</p><p class="card-dek-en">Find insight on Intel, Nokia and more in the latest Market Talks covering Technology, Media and Telecom.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-62208381?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Tingshu Wang/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Tech, Media & Telecom Roundup: Market Talk”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/business/tech-media-telecom-roundup-market-talk-e8a9b95e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="微软因供电问题退出英国数据中心租赁交易">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">37</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">微软因供电问题退出英国数据中心租赁交易</h3><span class="card-title-en">Microsoft Pulls out of Nscale U.K. Data-Center Deal Over Power-Supply Issues</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">19:29</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-51506994?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">微软退出英国数据中心租赁交易的消息，对这家正筹备上市的人工智能基础设施公司而言是一次挫折。</p><p class="card-dek-en">The news is a setback for the AI infrastructure company as it prepares to go public.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：未来核查Nscale上市进程及后续计划</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-51506994?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Nscale's Loughton facility was expected to go live by the end of this year, but the company said that wouldn't be the case due to challenges with the power grid. Dado Ruvic/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：微软退出租赁50兆瓦设施及约23,000块英伟达GB300芯片的交易，该设施位于伦敦郊外Loughton</li><li>关键细节：微软因供电问题退出与Nscale的英国数据中心交易</li><li>影响：条件推断——若Nscale准备上市，此次交易取消可能构成其AI基础设施业务的挫折</li></ul>
+        <a href="https://www.wsj.com/tech/microsoft-pulls-out-of-nscale-u-k-data-center-deal-over-power-supply-issues-f804c434" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="科技股在周五抛售反弹">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">38</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">科技股在周五抛售反弹</h3><span class="card-title-en">Stock Market Today: Tech Stocks Rebound After Friday’s Selloff</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">16:35</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-925349/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">实时追踪股票、债券及市场动态，涵盖道琼斯工业平均指数、标普500指数和纳斯达克综合指数，以及原油价格走势。</p><p class="card-dek-en">Intel, CoreWeave make up some ground; European stocks, French bonds slump</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查后续交易日的具体涨跌幅及欧洲债券市场动态</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-925349/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：纳斯达克综合指数上涨超过1%，英特尔股价回升3.5%</li><li>关键细节：科技股在周五抛售之后出现反弹</li><li>影响：条件推断——如果市场情绪持续改善，可能进一步提振投资者信心</li></ul>
+        <a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-10-19-2026" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="71位经济学家对增长与收益率前景的看法">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">39</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">71位经济学家对增长与收益率前景的看法</h3><span class="card-title-en">See What 71 Economists Told Us About Where Growth and Yields Are Headed</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">23:44</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-12388706/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">《华尔街日报》调查的经济学家们现在认为，债券收益率将在更长时间内维持高位，经济增长将更加稳健，通胀最终将得到缓解。</p><p class="card-dek-en">Economists surveyed by The Wall Street Journal now see higher bond yields for longer, firmer growth and eventual relief on inflation.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查基准10年期收益率的具体走势及经济学家的预测细节。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-12388706/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：《华尔街日报》本月调查的经济学家认为，较高的债券收益率短期内不会消失。</li><li>关键细节：71位经济学家就经济增长和收益率的未来走向提供了观点。</li><li>影响：条件推断——如果收益率维持高位，可能继续给寻求新抵押贷款的个人、计划借贷的企业以及负债沉重的联邦政府带来压力。</li></ul>
+        <a href="https://www.wsj.com/finance/see-what-71-economists-told-us-about-where-growth-and-yields-are-headed-8977cb44" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Netflix股票或成黑马">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">40</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Netflix股票或成黑马</h3><span class="card-title-en">Netflix Stock Might be a Sleeper Hit</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">18:33</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-00759229/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外，科技股有望反弹。</p><p class="card-dek-en">Plus, tech stocks set to rebound.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查Netflix及其他公司的具体财务数据以确认市场反应</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-00759229/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：科技股经历低迷后，期货指向反弹，本周将发布Meta、Tesla和Netflix的企业财报</li><li>关键细节：Netflix股票可能成为潜在热门投资标的</li><li>影响：条件推断——若财报表现强劲，Netflix股价可能在市场反弹中受益</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/netflix-stock-might-be-a-sleeper-hit-fd4bd2b1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Putin’s Bid to End the War in Ukraine on Moscow’s Terms">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">41</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Putin’s Bid to End the War in Ukraine on Moscow’s Terms</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">18:02</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-23438384?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外，一个鲜为人知的私人信托机构正笼罩在Anthropic首次公开募股之上，法国领导人则在骚乱席卷全国后相互指责。</p><p class="card-dek-en">Plus, a little-known private trust is looming over Anthropic’s IPO, and French leaders are trading blame after rioting sweeps the nation.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-23438384?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Brendan Smialowski/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Putin’s Bid to End the War in Ukraine on Moscow’s Terms”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/articles/putins-bid-to-end-the-war-in-ukraine-on-moscows-terms-3e09dfec" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Jamie Dimon’s National-Security Pledge Finances $230 Billion in First Year">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">42</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Jamie Dimon’s National-Security Pledge Finances $230 Billion in First Year</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">18:01</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-88156249/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">摩根大通“安全与韧性倡议”正助力强化美国供应链及国防承包商。</p><p class="card-dek-en">JPMorgan’s “security and resiliency initiative” is helping bolster U.S. supply chains and defense contractors.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-88156249/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Photo: WSJ Leadership Institute</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Jamie Dimon’s National-Security Pledge Finances $230 Billion in First Year”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/finance/banking/jamie-dimons-national-security-pledge-finances-230-billion-in-first-year-c757faf2" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="西非：金矿开采的新“狂野西部”">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">43</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">西非：金矿开采的新“狂野西部”</h3><span class="card-title-en">The New Wild West of Gold Mining Is West Africa</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">03:18</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-60505602?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">矿业公司已投入数十亿美元开发新的金矿，以从该金属接近历史高位的价格中获利。</p><p class="card-dek-en">Mining companies have invested billions of dollars in new gold mines to cash in on near-record-high prices for the metal.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查西非金矿开采投资、金价接近纪录及公司活动的一手来源。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-60505602?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Dump trucks lined up at a mine in Ghana.  Francis Kokoroko/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称西非正出现现代淘金热，矿业公司近年涌入该地区，投资新金矿以利用接近纪录的金价。</li><li>关键细节：标题称金矿开采的新“狂野西部”是西非。</li><li>影响：条件推断——如果该报道属实，可能表明西非金矿开采活动升温，并可能吸引更多投资；但需核查。</li></ul>
+        <a href="https://www.wsj.com/world/africa/the-new-wild-west-of-gold-mining-is-west-africa-8b4886c4" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="印度年轻抗议者令莫迪陷入被动">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">44</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">印度年轻抗议者令莫迪陷入被动</h3><span class="card-title-en">Young Protesters Are Putting India’s Modi on the Defensive</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">02:33</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-81728759?width=80&height=853" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">纳伦德拉·莫迪政府素以对异见采取强硬手段著称，但近日其应对策略却遭到年轻抗议者的机智反击与公然蔑视。</p><p class="card-dek-en">Narendra Modi’s government has a reputation for being heavy-handed toward dissent, but its tactics in recent days have been met with a mix of wit and defiance by young protesters.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查阿比吉特·迪普克及其组织的实际影响力及莫迪政府的具体应对措施</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-81728759?width=1280&height=853" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Abhijeet Dipke at a rally demanding the resignation of India's chief election commissioner. Indranil Mukherjee/AFP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：蟑螂民众党青年运动创始人阿比吉特·迪普克公开挑战莫迪，称不惧被捕并邀请其抓捕</li><li>关键细节：年轻抗议者正在使印度总理莫迪处于防御地位</li><li>影响：条件推断——若此类公开挑战持续，可能进一步削弱莫迪政府的政治威信并引发更多社会动荡</li></ul>
+        <a href="https://www.wsj.com/world/india/young-protesters-are-putting-indias-modi-on-the-defensive-56108d4c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="以色列领先者回避可能助其胜选的阿拉伯选民">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">45</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">以色列领先者回避可能助其胜选的阿拉伯选民</h3><span class="card-title-en">Israel’s Front-Runners Shun Arab Voters Who Could Help Them Win Election</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">01:13</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-90067169?width=80&height=853" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">民调显示，以色列大选陷入僵局，除非获得约一百万阿拉伯选民的支持。然而，在两极分化的社会中，争取这部分选民的支持伴随着不利因素。</p><p class="card-dek-en">Opinion polls suggest the election is deadlocked, except for about a million Arab voters whose backing comes with drawbacks in a polarized society.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查选举日期、主要阵营是否确实未争取阿拉伯选民，以及相关报道的完整内容。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-90067169?width=1280&height=853" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Bedouins make up most of the Arab population of southern Israel.</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称，以色列两大政治阵营均未争取内盖夫沙漠中的潜在选民，尽管选前不到两周双方势均力敌。</li><li>关键细节：以色列领先者回避可能助其胜选的阿拉伯选民</li><li>影响：条件推断——如果该报道属实，可能影响选前对阿拉伯选民争取策略的讨论，但影响范围未定。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/israels-front-runners-shun-arab-voters-who-could-help-them-win-election-8f4cd158" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="法国骚乱：暴力因何而起、接下来会怎样">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">46</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">法国骚乱：暴力因何而起、接下来会怎样</h3><span class="card-title-en">Rioting in France: What’s Fueling the Violence and What Happens Next</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">00:46</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56230771/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">数周来，由学生主导的针对法国学校条件的抗议活动，近日升级为全国范围内的暴力抗议。</p><p class="card-dek-en">Weeks of student-led protests over conditions in French schools spiraled into violent protests across the country in recent days.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查法国官方通报、主流媒体现场报道及伤亡与逮捕数据。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56230771/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>The government mobilized thousands of police to counter protesters over the weekend.  Photo: Nathan Laine/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称周末法国各地骚乱中数百人受伤，超过2,000人被捕。</li><li>关键细节：标题称法国骚乱，并追问暴力诱因与后续发展。</li><li>影响：条件推断——如果骚乱持续或抗议升级，可能进一步影响法国公共秩序与安全，但需以可靠信息核实。</li></ul>
+        <a href="https://www.wsj.com/world/europe/rioting-in-france-whats-fueling-the-violence-and-what-happens-next-87f18199" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="沙特阿拉伯推迟“沙漠达沃斯”活动">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">47</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">沙特阿拉伯推迟“沙漠达沃斯”活动</h3><span class="card-title-en">Saudi Arabia Postpones ‘Davos in the Desert’ Event Slated for Next Week</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">22:37</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-96422694?width=80&height=470" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">沙特阿拉伯推迟了“沙漠达沃斯”活动。在伊朗支持的胡塞武装袭击沙特机场后，该会议将推迟至2027年举行。</p><p class="card-dek-en">The conference will be delayed until 2027, following attacks by the Iran-backed Houthis on the kingdom’s airports.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查沙特官方或主办方是否正式宣布推迟及新日期；核查袭击与会议推迟的关联。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-96422694?width=700&height=470" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Last year’s Future Investment Initiative conference in Riyadh, Saudi Arabia. Mohammed Benmansour/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：沙特阿拉伯决定推迟旗舰投资者会议；该会议原定 Oct. 26 在利雅得开始，组织者决定不线下举行，后称推迟至明年。</li><li>关键细节：沙特阿拉伯推迟原定下周举行的“沙漠达沃斯”活动。</li><li>影响：条件推断——如果该报道属实，会议推迟可能影响沙特吸引外国投资的活动安排，并可能被解读为安全局势对经济雄心的压力；实际影响尚不确定。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/saudi-arabia-decides-against-holding-in-person-investor-conference-d9f5e66b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="观点：Potomac Watch">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">48</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">观点：Potomac Watch</h3><span class="card-title-en">Opinion: Potomac Watch</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">02:35</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-946945?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美国总统通过仅对乌克兰施加压力来升级其结束俄乌冲突的策略。此外，法国骚乱背后的原因是什么？</p><p class="card-dek-en">The U.S. President escalates his strategy to end the Russia-Ukraine war by putting pressure only on Ukraine. Plus, what's behind the riots in France?</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查美国对乌施压策略的具体内容，以及法国骚乱背景的独立报道。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-946945?width=1280" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称，美国总统升级其结束俄乌战争的策略，方式是对乌克兰仅施压；并问法国骚乱背后原因。</li><li>关键细节：标题显示这是 Opinion 栏目下的 Potomac Watch。</li><li>影响：条件推断——如果该摘要所述策略属实，可能改变俄乌战争相关外交压力，但后果不确定。</li></ul>
+        <a href="https://www.wsj.com/podcasts/opinion-potomac-watch/donald-trump-moves-closer-to-an-alliance-with-russia/D69CA524-6C4C-411C-90C1-21500316A6C3" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Obama’s Dangerous Mideast Words">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">49</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Obama’s Dangerous Mideast Words</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">02:10</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-30362662/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">奥巴马对中东问题的危险言论。他对犹太历史的歪曲似乎是经过深思熟虑的——这加深了伤害。</p><p class="card-dek-en">His distortions of Jewish history appear carefully considered—which compounds the wound.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-30362662/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Elie Wiesel and President Barack Obama at the Buchenwald concentration camp  near Weimar, Germany, June 5, 2009. Agence France-Presse/Getty Image</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Obama’s Dangerous Mideast Words”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/obamas-dangerous-mideast-words-76a06ec9" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="America Abandons Ideals at Its Peril">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">50</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">America Abandons Ideals at Its Peril</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">02:08</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-17495081/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美国并非完美，但其善意曾一直不容置疑。如今，这一状况已发生改变。</p><p class="card-dek-en">The U.S. isn’t perfect, but it has always been hard to doubt its good intentions. Now that has changed.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-17495081/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>A naturalization ceremony in Mount Vernon, Va., July 4. Valerie Plesch/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“America Abandons Ideals at Its Peril”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/america-abandons-ideals-at-its-peril-0aed48e9" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Who Belongs on a Preventive Care Task Force?">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">51</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Who Belongs on a Preventive Care Task Force?</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">23:15</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-63744355/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">谁应加入预防保健工作组？
+读者就初级保健医生与专科医生在联邦卫生政策中的角色展开辩论。</p><p class="card-dek-en">Readers debate the role of primary-care physicians versus specialists in federal health policy.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-63744355/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Shane Dunlap/Associated Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Who Belongs on a Preventive Care Task Force?”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/who-belongs-on-a-preventive-care-task-force-e4322f8c" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="A Durable Trade Deal Needs Skin in the Game">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">52</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">A Durable Trade Deal Needs Skin in the Game</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">23:14</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-40233330/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">若贸易协议被废弃，双方工人、制造商和投资者都必须有所损失。</p><p class="card-dek-en">Workers, manufacturers and investors on both sides must have something to lose if the deal were abandoned.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-40233330/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>iStock</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“A Durable Trade Deal Needs Skin in the Game”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/a-durable-trade-deal-needs-skin-in-the-game-cf3b8076" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Alaska’s Senate Candidates and the Jones Act">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">53</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Alaska’s Senate Candidates and the Jones Act</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">23:13</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-38035632/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">阿拉斯加参议员候选人及《琼斯法案》：民主党人玛丽·佩尔托拉与共和党参议员丹·沙利文似乎都不愿与航运游说团体抗衡。</p><p class="card-dek-en">Neither Democrat Mary Peltola nor Republican Sen. Dan Sullivan appears willing to stand up to the shipping lobby.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-38035632/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Alaska Sen. Dan Sullivan and Senate candidate Mary Peltola participate in a debate in Anchorage, Alaska, Oct. 15. Kerry Tasker/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Alaska’s Senate Candidates and the Jones Act”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/alaskas-senate-candidates-and-the-jones-act-cd0a2f59" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="The Debate Over Execution">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">54</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">The Debate Over Execution</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">23:13</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-31970607/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">关于死刑执行方式的辩论
+关于注射死刑和枪决哪个更人道的争论，暴露了一个现代国家为了证明死刑的正当性不得不走多远。</p><p class="card-dek-en">Arguing whether lethal injection or firing squads are more humane exposes the lengths to which a modern nation must go to justify capital punishment.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-31970607/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Rick Bowmer/Associated Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“The Debate Over Execution”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/the-debate-over-execution-83256699" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="If Innovations in Higher Ed Are Working, Let’s Test Them">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">55</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">If Innovations in Higher Ed Are Working, Let’s Test Them</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">23:12</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-83971870/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">仅仅因为一所大学实施了富有创意的课程或模式，并不必然意味着其取得了成功。</p><p class="card-dek-en">Just because a college implements a creative program or model, that doesn’t necessarily imply success.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-83971870/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Daniel Jacobi II/The Daily Hampshire Gazette/Associated Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“If Innovations in Higher Ed Are Working, Let’s Test Them”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/if-innovations-in-higher-ed-are-working-lets-test-them-3595fcea" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="What to Know About the Obscure Trust Looming Over Anthropic’s IPO">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">56</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">What to Know About the Obscure Trust Looming Over Anthropic’s IPO</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">09:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-84606727?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这家人工智能公司极少披露关于五人信托机构的细节，该机构被授权塑造其董事会并阻止重大举措。</p><p class="card-dek-en">The AI company has shared few details on the dynamics of the five-person trust empowered to shape its board and block major moves.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-84606727?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Dario Amodei, co-founder and chief executive of Anthropic, arrives for a White House meeting in September. Aaron Schwartz/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“What to Know About the Obscure Trust Looming Over Anthropic’s IPO”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/anthropic-ipo-private-trust-188f41f7" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="Anthropic to Commit 5% of Its Shares to New ‘Public Benefit’ Fund">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">57</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Anthropic to Commit 5% of Its Shares to New ‘Public Benefit’ Fund</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">07:23</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-07390728?width=80&height=876" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该基金可将分配款项直接发放给受人工智能劳动力冲击影响的人群。</p><p class="card-dek-en">The fund could send distributions directly to populations affected by AI labor disruption.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-07390728?width=700&height=876" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Anthropic CEO Dario Amodei Carlos Barria/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Anthropic to Commit 5% of Its Shares to New ‘Public Benefit’ Fund”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/anthropic-to-commit-5-of-its-shares-to-new-public-benefit-fund-3332ef75" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="A Hedge-Fund Billionaire’s Two Bitter Wars—Against His Wife and His Business Partner">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">58</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">A Hedge-Fund Billionaire’s Two Bitter Wars—Against His Wife and His Business Partner</h3></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">09:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-57668821?width=80&height=853" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">对冲基金亿万富翁约翰·奥弗德克正试图避免因向妻子提出7.23亿美元离婚协议而引发的争执，影响他与Two Sigma联合创始人的商业纷争。</p><p class="card-dek-en">John Overdeck is trying to prevent a feud with his wife over his $723 million divorce settlement offer from costing him in a battle with his Two Sigma co-founder.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-57668821?width=1280&height=853" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>From left, Laura Overdeck, John Overdeck and David Siegel Rachel Mendelson/WSJ; Philip Montgomery for WSJ, Michael Nagle/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“A Hedge-Fund Billionaire’s Two Bitter Wars—Against His Wife and His Business Partner”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/finance/investing/two-sigma-overdeck-divorce-siegel-d66db008" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Oil Futures Pull Back as U.S. Waives Some Russia Sanctions">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">59</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Oil Futures Pull Back as U.S. Waives Some Russia Sanctions</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">15:42</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33954547?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">油价周一下跌，回吐了上周五的涨幅。交易员正在权衡美国决定豁免部分对俄罗斯新制裁与中东持续存在的供应风险。</p><p class="card-dek-en">Oil futures fell, pulling back from Friday’s gains after President Trump waived newly imposed sanctions on Russia, while persistent Middle East supply risks kept prices afloat.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33954547?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Trump signed an order Friday potentially easing limits on Russian energy trade. Ezra Acayan/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Oil Futures Pull Back as U.S. Waives Some Russia Sanctions”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/business/energy-oil/oil-prices-fall-as-traders-weigh-russia-sanctions-waiver-middle-east-risks-05053c4f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Saudi Arabia’s Military Limitations Are Being Exposed by Houthi Attacks">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">60</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Saudi Arabia’s Military Limitations Are Being Exposed by Houthi Attacks</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">10:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33528307?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">沙特阿拉伯拥有先进武器，但胡塞武装已证明其是一个顽强的对手，沙特的军事局限性正被胡塞武装的袭击所暴露。</p><p class="card-dek-en">The kingdom has advanced weaponry, but the Yemeni militant group has proved to be a resilient foe.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33528307?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Saudi forces guarding a military ship on the Red Sea near Jeddah in 2023. Amr Nabil/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Saudi Arabia’s Military Limitations Are Being Exposed by Houthi Attacks”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/saudi-arabias-military-limitations-are-being-exposed-by-houthi-attacks-40082655" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="Wall Street Elite Can’t Decide How to RSVP to the Prince’s Big Saudi Conference">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">61</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Wall Street Elite Can’t Decide How to RSVP to the Prince’s Big Saudi Conference</h3></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">07:01</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-71441877?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">胡塞武装近期的袭击行动令美国高管对下周前往沙特阿拉伯参加“未来投资倡议”大会的出行计划感到紧张。</p><p class="card-dek-en">Recent attacks by Houthi rebels are making U.S. executives nervous to travel to the Future Investment Initiative conference in Saudi Arabia next week.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-71441877?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>A session during the Future Investment Initiative conference in Saudi Arabia last year. Future Investment Initiative Media Center/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Wall Street Elite Can’t Decide How to RSVP to the Prince’s Big Saudi Conference”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/finance/some-wall-street-leaders-are-weighing-bailing-on-davos-in-the-desert-after-attacks-on-riyadh-f0be73b4" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Pepper…and Salt">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">62</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Pepper…and Salt</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">12:00</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-13495956?width=80&size=0.667" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">仅有标题或正文未通过来源校验，暂不推断。</p><p class="card-dek-en">Pepper…and Salt</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-13495956?width=800&size=0.667" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Pepper…and Salt”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/pepperand-salt-bf737204" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        Generated at 2026-10-20 04:04 HKT &middot; Source: Wall Street Journal
+    </footer>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {
+                    if (filter === 'all' || c.dataset.section === filter) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            };
+        });
+
+        // 搜索
+        function filterSearch(q) {
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
