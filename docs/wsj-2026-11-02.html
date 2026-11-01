@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSJ日报 — 2026年11月02日</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-header h1 span {
+            color: var(--text);
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+        .stat-pill strong {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* 饼图 */
+        .pie-chart {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient(#c41e3a 0deg 15.652173913043478deg #0066cc 15.652173913043478deg 125.21739130434784deg #00853e 125.21739130434784deg 156.5217391304348deg #333 156.5217391304348deg 203.47826086956525deg #8b572a 203.47826086956525deg 360.0deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .search-box {
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── 主布局 ── */
+        .dashboard-body {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 左侧筛选栏 */
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }
+        .filter-btn:hover {
+            background: var(--bg);
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .filter-btn.active .filter-count {
+            color: rgba(255,255,255,0.8);
+        }
+        .filter-count {
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+        .filter-btn.active .filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ── 卡片流 ── */
+        .card-stream {
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card.hidden {
+            display: none;
+        }
+
+        /* 卡片头部（可点击展开） */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #fafafa;
+        }
+        .card-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .card-titles {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .card-title-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
+        .card-section {
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card-time {
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {
+            padding: 0 16px 10px;
+        }
+
+        /* 导语 */
+        .card-dek {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }
+        .card-dek-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        /* 洞察 */
+        .card-insight {
+            padding: 8px 12px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-insight p {
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+        .card.expanded .card-detail {
+            max-height: 3000px;
+            padding: 0 16px 12px;
+        }
+
+        /* 图片 */
+        .card-hero {
+            margin: 0 0 10px;
+        }
+        .card-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets */
+        .card-bullets {
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+        .card-bullets li {
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .card-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .card-body-text {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* CTA */
+        .card-cta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* ── 页脚 ── */
+        .page-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .dashboard-body {
+                padding: 8px;
+            }
+            .card-stream {
+                padding: 0;
+            }
+            .search-box {
+                width: 140px;
+            }
+            .card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>23</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
+    </header>
+
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            <button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="🇨🇳 中文版">🇨🇳 中文版 <span class="filter-count">1</span></button><button class="filter-btn" data-filter="💻 Tech">💻 Tech <span class="filter-count">7</span></button><button class="filter-btn" data-filter="📈 Markets">📈 Markets <span class="filter-count">2</span></button><button class="filter-btn" data-filter="🌍 World">🌍 World <span class="filter-count">3</span></button><button class="filter-btn" data-filter="🏢 Business">🏢 Business <span class="filter-count">10</span></button>
+        </aside>
+        <div class="card-stream">
+            
+    <div class="card" data-section="🇨🇳 中文版" data-title="币安被盗案矛头指向朝鲜">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">01</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">币安被盗案矛头指向朝鲜</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:11</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-81143701?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">专家表示，朝鲜是这起63亿美元盗窃案的幕后黑手，这可能巩固了其作为全球头号加密货币窃贼的地位。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查链上活动证据的具体细节、币安官方确认情况及后续官方调查结果</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-81143701?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片来源：Dado Ruvic/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：网络安全研究人员与调查人员表示，链上活动表明名为TraderTraitor的朝鲜精锐黑客组织洗劫了币安，涉案金额高达63亿美元</li><li>关键细节：币安加密货币史上最大盗窃案的矛头指向朝鲜</li><li>影响：条件推断——如果指控属实，可能凸显朝鲜网络犯罪分子有能力绕过监控系统并掠夺巨额赃款，以支撑平壤方面日益扩张的核计划</li></ul>
+        <a href="https://cn.wsj.com/articles/%E5%B8%81%E5%AE%89%E5%8A%A0%E5%AF%86%E8%B4%A7%E5%B8%81%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%A4%A7%E7%9B%97%E7%AA%83%E6%A1%88%E7%9A%84%E7%9F%9B%E5%A4%B4%E6%8C%87%E5%90%91%E6%9C%9D%E9%B2%9C-ff695397" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="AI Spenders Get Spooked">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">02</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI Spenders Get Spooked</h3></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">23:55</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-71996299?width=80&height=520" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外，Anthropic展现出令人咋舌的40万亿美元市场机遇；我们试用了苹果首款触控屏MacBook；硅谷正应对五角大楼的弹药短缺问题，更多精彩内容。</p><p class="card-dek-en">Plus, Anthropic’s mind-boggling $40 trillion market opportunity, we tried Apple’s first touch-screen MacBook, Silicon Valley takes on the Pentagon’s explosives shortage and more.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查后续关于AI资本支出及市场反应的具体报道</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-71996299?width=780&height=520" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Jack Hall Media Assignments/Zuma Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：标题提及AI支出者感到恐慌</li><li>关键细节：原文未提供更多可直接引用的事实。</li><li>影响：条件推断——如果市场信心动摇，可能影响全球AI建设的融资进程</li></ul>
+        <a href="https://www.wsj.com/tech/ai/ai-spenders-get-spooked-80534757" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="投资者正对AI热潮风险进行对冲">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">03</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">投资者正对AI热潮风险进行对冲</h3><span class="card-title-en">Investors Are Hedging Against the Risks of the AI Boom</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">20:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-76627623?width=80&height=520" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">据原文，部分科技公司员工因AI热潮获利丰厚而辞职，目的不是退休，而是对公司股票进行对冲，反映出部分投资者对华尔街在人工智能上的数万亿美元押注感到紧张。</p><p class="card-dek-en">Plus, inside the final days of Darline Graham’s reluctant Senate run, and two owners claim to have the same legendary Porsche.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查对冲交易的具体规模、参与者及与AI相关股票表现变化的数据。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-76627623?width=780&height=520" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Jason Henry for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据原文，部分科技公司员工因AI热潮获利丰厚而辞职，目的不是退休，而是对公司股票进行对冲，反映出部分投资者对华尔街在人工智能上的数万亿美元押注感到紧张。</li><li>关键细节：投资者正针对AI热潮的风险进行对冲。</li><li>影响：条件推断——如果AI相关投资进一步受挫，投资者可能更多借助期权、信用违约掉期等工具寻求保护。</li></ul>
+        <a href="https://www.wsj.com/articles/investors-are-hedging-against-the-risks-of-the-ai-boom-603203d5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="AI赌注错综复杂网络是担忧科技股的理由">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">04</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI赌注错综复杂网络是担忧科技股的理由</h3><span class="card-title-en">The Tangled Web of AI Bets Is Reason to Fear Tech Stocks</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">18:30</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-46202084?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">英伟达、AMD和博通决定作为基石投资者参与Meta 250亿美元股票发行，涉及50亿美元资金</p><p class="card-dek-en">Vendor financing is back in a new form and it magnifies the AI trade on the way up—and down.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查芯片制造商在后续交易日的具体股价波动情况</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-46202084?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Major chip makers made a big investment in Meta—just before worries about the AI trade hit stocks hard. David Paul Morris/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：英伟达、AMD和博通决定作为基石投资者参与Meta 250亿美元股票发行，涉及50亿美元资金</li><li>关键细节：文章指出AI赌注的复杂网络构成担忧科技股的理由</li><li>影响：条件推断——若市场担忧加剧，可能继续冲击AI相关股票表现</li></ul>
+        <a href="https://www.wsj.com/tech/the-tangled-web-of-ai-bets-is-reason-to-fear-tech-stocks-905bde86" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="AI投资者争相为押注史上最大市场交易寻求保险对冲">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">05</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI投资者争相为押注史上最大市场交易寻求保险对冲</h3><span class="card-title-en">AI Investors Are Racing to Get Insurance on the Biggest Market Bet in History</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">08:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-76627623?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">随着数万亿美元押注人工智能交易，投资者、交易员甚至科技高管都在寻求高风险保护。</p><p class="card-dek-en">With trillions of dollars riding on the artificial-intelligence trade, investors, traders and even tech executives are hunting for high-stakes protection.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查华尔街押注的具体规模、反向操作的实际执行情况及报道全文</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-76627623?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>A data center at Intel headquarters in Santa Clara, Calif. The chip maker just had its worst month since March 2025. Jason Henry for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据原文称华尔街对人工智能下了数万亿美元的押注，该交易迄今被证明持续获利，部分投资者急切想做反向操作</li><li>关键细节：AI投资者正争相为史上最大的市场押注寻求保险式对冲</li><li>影响：条件推断——如果市场情绪逆转，此前因AI热潮上涨的科技巨头、公用事业和芯片股可能面临波动</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/ai-investors-are-racing-to-get-insurance-on-the-biggest-market-bet-in-history-a60e296f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="中文标题">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">06</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中文标题</h3><span class="card-title-en">The Shopping Bots Are Coming for Amazon</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">18:30</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-67257734?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美国营收最高的企业长期主导电子商务市场，但一个潜在的竞争对手正在崛起。</p><p class="card-dek-en">The biggest U.S. company by revenue has dominated e-commerce, but a potential rival is emerging.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查Meta AI代理对亚马逊实际市场份额的具体影响</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-67257734?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Jolly, the Muse avatar, is seen at a Meta conference earlier this year in Menlo Park, Calif. Jason Henry for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：Meta公司推出个人AI代理Muse，首月半在美加吸引超1000万人使用</li><li>关键细节：购物机器人正进入亚马逊市场</li><li>影响：条件推断——如果消费者转向Meta的AI代理，亚马逊作为首选购物平台的地位可能受到挑战</li></ul>
+        <a href="https://www.wsj.com/tech/the-shopping-bots-are-coming-for-amazon-701caa57" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="币安称遭遇最大规模加密黑客攻击后恢复提现">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">07</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">币安称遭遇最大规模加密黑客攻击后恢复提现</h3><span class="card-title-en">Binance Resumes Withdrawals After Suffering Biggest-Ever Crypto Hack</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">19:58</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-13634380?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该交易所表示，截至目前已追回被盗资产的大约95%。</p><p class="card-dek-en">The exchange says it has replaced roughly 95% of the stolen assets thus far.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核实被盗金额、攻击方式、提现恢复进度及监管方回应。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-13634380?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Andre M. Chang/ZUMA Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称币安周日在X发布声明，称已重新开放比特币、以太币及部分其他数字货币提现，并将分阶段开放更多提现；此前一周该交易所因安全检查暂停了客户提现。</li><li>关键细节：标题称币安（Binance）在遭遇最大规模加密黑客攻击后恢复提现。</li><li>影响：条件推断——如果属实，可能表明该交易所流动性承压后逐步恢复运作，但影响范围取决于后续损失规模与调查结果。</li></ul>
+        <a href="https://www.wsj.com/finance/currencies/binance-resumes-withdrawals-after-suffering-biggest-ever-crypto-hack-11d1900f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="投资者押注蓝潮利好医院股，但历史或非如此">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">08</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">投资者押注蓝潮利好医院股，但历史或非如此</h3><span class="card-title-en">Investors Are Betting a Blue Wave Will Help Hospitals. Don’t Count on It.</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">18:30</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56615519?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">医疗投资者最青睐的选举押注是医院运营商，媒体提醒回顾上次反对党赢得众议院并誓言推翻总统医疗议程时的情形。</p><p class="card-dek-en">Markets are anticipating a reversal of Trump’s Medicaid cuts. That may be easier said than done.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查医院运营商股价走势及选举后医疗政策实际变化。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56615519?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>HCA Healthcare and other hospital stocks have had a big run. Kristoffer Tripplaar/Sipa USA/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：医疗投资者最青睐的选举押注是医院运营商，媒体提醒回顾上次反对党赢得众议院并誓言推翻总统医疗议程时的情形。</li><li>关键细节：标题称投资者押注蓝潮将利好医院，但提醒不要指望这一点。</li><li>影响：条件推断——如果选举结果与投资者预期不符，医院运营商股票可能面临回调风险。</li></ul>
+        <a href="https://www.wsj.com/health/healthcare/investors-are-betting-a-blue-wave-will-help-hospitals-dont-count-on-it-411ab127" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="欧洲养老金契约松动引发恐慌与愤怒">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">09</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">欧洲养老金契约松动引发恐慌与愤怒</h3><span class="card-title-en">Panic and Anger Spread as Europe’s Great Pension Covenant Unravels</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">00:17</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-27376878?width=80&height=853" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">公共财政吃紧与人口快速老龄化正威胁这一契约，欧洲大陆民众对从摇篮到坟墓的福利国家前景感到恐惧和愤怒。</p><p class="card-dek-en">Governments in the region are straining to honor the entitlements of future pensioners, threatening a fragile generational contract.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：后续核查涉及哪些国家改革、退休年龄变化及官方政策文本。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-27376878?width=1280&height=853" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Worries about the sustainability of France’s welfare state have helped drive protests there in recent weeks. Uygar Ozel/ZUMA Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：公共财政吃紧与人口快速老龄化正威胁这一契约，欧洲大陆民众对从摇篮到坟墓的福利国家前景感到恐惧和愤怒。</li><li>关键细节：随着欧洲庞大养老金契约解体，恐慌与愤怒情绪蔓延。</li><li>影响：条件推断——如果养老金契约继续松动，可能加剧欧洲选民对福利国家未来的担忧与政治情绪。</li></ul>
+        <a href="https://www.wsj.com/world/europe/panic-and-anger-spread-as-europes-great-pension-covenant-unravels-69a94ed7" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="观点文章称GOP会发现繁荣比民粹主义更受欢迎">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">10</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">观点文章称GOP会发现繁荣比民粹主义更受欢迎</h3><span class="card-title-en">GOP Will Find Prosperity Is More Popular Than ‘Populism’</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">03:42</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-83449408/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该WSJ评论质疑共和党中期选举押注民粹主义与两极分化情绪，称迎合不会比拜登的学生贷款减免或液化天然气出口暂停更助选，并称特朗普团队任用卫生与公共服务部长小罗伯特·F·肯尼迪更多是推进其反对疫苗和农药的意识形态行动而非拉票</p><p class="card-dek-en">Their midterm strategy of appealing to polarizing furies looks an awful lot like Joe Biden’s approach.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查中期选举实际结果，以及评论中提到的肯尼迪相关立场与任命的后续报道</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-83449408/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Robert F. Kennedy Jr. speaks at a rally in Clive, Iowa, Oct. 28. Charlie Neibergall/Associated Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：该WSJ评论质疑共和党中期选举押注民粹主义与两极分化情绪，称迎合不会比拜登的学生贷款减免或液化天然气出口暂停更助选，并称特朗普团队任用卫生与公共服务部长小罗伯特·F·肯尼迪更多是推进其反对疫苗和农药的意识形态行动而非拉票</li><li>关键细节：该评论标题称GOP将发现繁荣比民粹主义更受欢迎</li><li>影响：条件推断——如果评论判断成立，共和党依赖民粹主义策略可能难以在中期选举中获益，但选举结果文中未给出</li></ul>
+        <a href="https://www.wsj.com/opinion/gop-will-find-prosperity-is-more-popular-than-populism-49010b99" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="关于鲍勃·琼斯大学税务豁免地位的法律争议">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">11</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">关于鲍勃·琼斯大学税务豁免地位的法律争议</h3><span class="card-title-en">Reagan Was Right, and Trump Is Wrong, About Bob Jones</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">03:41</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-88863360/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">国会从未授权国税局撤销因种族歧视而丧失免税资格的学校的免税地位。</p><p class="card-dek-en">Congress never authorized the IRS to withdraw tax exemptions from schools that discriminate by race.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查最高法院最终对Bob Jones University税务豁免地位的裁决结果。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-88863360/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Bob Jones, Jr., and his son, Bob Jones III, outside the Supreme Court in Washington, 1982. Bettmann Archive</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：鲍勃·琼斯大学（Bob Jones University）曾因宗教原因拒绝接收黑人，后虽屈服于法律压力但禁止跨种族约会。美国国税局（IRS）裁定这些行为违反了反种族歧视的“基本公共政策”，故该校不符合教育机构的免税资格。</li><li>关键细节：在最高法院，司法部反对IRS，认为只有国会拥有立法权，而非法院或行政部门。司法部律师W. Bradford Reynolds和Chuck Cooper指出，内部收入法典中没有授权IRS拒绝种族隔离学校的免税。</li><li>影响：条件推断——如果法院采纳司法部的观点，可能意味着对联邦层面通过税法处理种族隔离学校问题的权限存在不同解读。</li></ul>
+        <a href="https://www.wsj.com/opinion/reagan-was-right-and-trump-is-wrong-about-bob-jones-bc838f58" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="乔治亚州展示政策创新以应对奥巴马医疗法案成本问题">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">12</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">乔治亚州展示政策创新以应对奥巴马医疗法案成本问题</h3><span class="card-title-en">Georgia Makes ObamaCare Less Irrational</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">03:41</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-53383814/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">《平价医疗法案》提供两种主要补贴：降低月度保费的保费税收抵免，以及用于支付自付额、共付额和自付费用的成本分摊补贴。</p><p class="card-dek-en">The federal premium tax credit has created bizarre price distortions. The state found a fix.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查乔治亚州政策创新对整体《平价医疗法案》市场的影响，以及对纳税人的财政负担是否能得到有效减轻</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-53383814/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Wayne Partlow/Associated Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：《平价医疗法案》提供两种主要补贴：降低月度保费的保费税收抵免，以及用于支付自付额、共付额和自付费用的成本分摊补贴。</li><li>关键细节：2027年开放注册开始时，参保人面临保费和自付额上涨。</li><li>影响：条件推断——如果乔治亚州的政策创新得以实施，可能有助于缓解《平价医疗法案》市场中由于结构性缺陷导致的成本上升和价格扭曲。</li></ul>
+        <a href="https://www.wsj.com/opinion/georgia-makes-obamacare-less-irrational-150f4d08" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="巴西对博索纳罗的禁令属司法决定">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">13</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">巴西对博索纳罗的禁令属司法决定</h3><span class="card-title-en">Brazil’s Order Against Bolsonaro Was Appropriate</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">03:28</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-79102011/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">无人应质疑巴西民主。</p><p class="card-dek-en">No one should question Brazilian democracy.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查博索纳罗洗钱与腐败案的最新进展及法院判决依据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-79102011/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Flavio Bolsonaro in Rio de Janeiro, Sept. 25. Mauro Pimentel/Agence France-Presse/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：没收护照令由最高法院法官莫赖斯作出，而非卢拉政府</li><li>关键细节：巴西对前总统候选人博索纳罗的禁令是适当的</li><li>影响：条件推断——若该司法独立性属实，可能缓解外界对政治报复的担忧</li></ul>
+        <a href="https://www.wsj.com/opinion/brazils-order-against-bolsonaro-was-appropriate-1ebec324" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="华尔街日报评论：本周得失盘点">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">14</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">华尔街日报评论：本周得失盘点</h3><span class="card-title-en">WSJ Opinion: Hits and Misses of the Week</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">00:43</time>
+        <img class="card-thumb" src="http://opinion-images.wsj.net/im-26977392?width=80&height=720" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">社论报道节目汇总Kim Strassel、Allysia Finley和Dan Henninger的本周最佳与最差内容。</p><p class="card-dek-en">Journal Editorial Report: The week’s best and worst from Kim Strassel, Allysia Finley and Dan Henninger.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查该期节目实际讨论的话题及评论员具体观点。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="http://opinion-images.wsj.net/im-26977392?width=1280&height=720" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：社论报道节目汇总Kim Strassel、Allysia Finley和Dan Henninger的本周最佳与最差内容。</li><li>关键细节：《华尔街日报》评论栏目盘点本周的得失。</li><li>影响：条件推断——如果观众关注该评论节目，可能了解评论员对本周新闻事件的评价观点。</li></ul>
+        <a href="https://www.wsj.com/video/series/journal-editorial-report/wsj-opinion-hits-and-misses-of-the-week/BB3944C2-4832-49A5-AFB9-E0AE80DEC9BD" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="WSJ观点：民主党拥抱左翼">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">15</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">WSJ观点：民主党拥抱左翼</h3><span class="card-title-en">WSJ Opinion: Democrats Embrace the Left</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">00:34</time>
+        <img class="card-thumb" src="http://opinion-images.wsj.net/im-44595475?width=80&height=720" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">编辑报道称社会主义正突然成为该党的常态</p><p class="card-dek-en">Journal Editorial Report: Suddenly, socialism is becoming the party's norm.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查民主党政纲实际变化及该评论的论据来源</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="http://opinion-images.wsj.net/im-44595475?width=1280&height=720" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：编辑报道称社会主义正突然成为该党的常态</li><li>关键细节：《华尔街日报》评论称民主党拥抱左翼</li><li>影响：条件推断——如果属实，可能影响美国民主党政纲走向，但仅为评论观点</li></ul>
+        <a href="https://www.wsj.com/video/series/journal-editorial-report/wsj-opinion-democrats-embrace-the-left/D144FA73-813B-4656-97E5-2AE428320D87" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="1894中期选举或预示2026">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">16</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">1894中期选举或预示2026</h3><span class="card-title-en">The 1894 Midterm Might Have Foretold 2026</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">00:34</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-34362424/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">政治两党可能围绕扩大联邦权力达成共识，而这恰恰是美国所不需要的。</p><p class="card-dek-en">The political parties could unite around increasing federal power, the opposite of what America needs.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查1894年具体政策对当代2026年选举的类比有效性及数据来源。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-34362424/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Journal Editorial Report: Paul Gigot interviews Wall Street Journal columnist Karl Rove.  Photo: CJ Gunther/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要指出1894年选举导致政党重组，技术颠覆与移民焦虑加剧了党派分裂。</li><li>关键细节：标题提及1894年中期选举可能预示2026年局势。</li><li>影响：条件推断——如果历史模式重演，当前政治极化与技术经济冲击可能导致类似2026年的联邦权力扩张与联盟重组。</li></ul>
+        <a href="https://www.wsj.com/opinion/the-1894-midterm-might-have-foretold-2026-a1b9fac7" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="马查多据称重返委内瑞拉">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">17</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">马查多据称重返委内瑞拉</h3><span class="card-title-en">María Corina Machado Brings New Hope to Venezuela</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">00:33</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-21163245/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">反对派领导人马查多在流亡数月后重返委内瑞拉。据悉，该国可能于7月举行选举。</p><p class="card-dek-en">The opposition leader returns after months in exile. Elections are possible in July.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核实其是否确已回国、特朗普政府是否推进新选举及相关时间线。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-21163245/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Journal Editorial Report: The week’s best and worst from Kim Strassel, Allysia Finley and Dan Henninger.  Photo: Eddie Seal/Bloomberg News/475th Separate Assault Regiment CODE 9.2/AP/Patrick McDermott</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称流亡10个月后，反对派领导人María Corina Machado于10月25日经四天行程抵达Barquisimeto，是8月以来第八次尝试。</li><li>关键细节：标题称María Corina Machado为委内瑞拉带来新希望。</li><li>影响：条件推断——如果其现身能推动华盛顿安排选举，委内瑞拉局势可能出现变数；摘要称这可能改变拖延局面。</li></ul>
+        <a href="https://www.wsj.com/opinion/maria-corina-machado-brings-new-hope-to-venezuela-df850227" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Kalshi体育博彩争议：多州诉讼持续获胜">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">18</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Kalshi体育博彩争议：多州诉讼持续获胜</h3><span class="card-title-en">A Sports Bet by Any Other Name Is Still a Bet</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">00:32</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-31784401/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">据摘要，Kalshi近90%的投注与体育相关，数十个州起诉其是无执照体育博彩公司，且各州持续胜诉；其CEO Tarek Mansour主张应由商品期货交易委员会监管。</p><p class="card-dek-en">The CFTC has neither the competency nor statutory authority to regulate gambling.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查各州诉讼进展及CFTC监管权归属的后续裁决。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-31784401/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Dado Ruvic/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据摘要，Kalshi近90%的投注与体育相关，数十个州起诉其是无执照体育博彩公司，且各州持续胜诉；其CEO Tarek Mansour主张应由商品期货交易委员会监管。</li><li>关键细节：标题指出体育博彩换个名字仍然是博彩。</li><li>影响：条件推断——如果各州继续胜诉，Kalshi可能面临监管归属争议加剧。</li></ul>
+        <a href="https://www.wsj.com/opinion/a-sports-bet-by-any-other-name-is-still-a-bet-c75ad5ff" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="政治逃避时代中的“责任”探讨">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">19</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">政治逃避时代中的“责任”探讨</h3><span class="card-title-en">‘Responsibility’ in an Age of Political Evasion</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">00:31</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-12615844/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">乔治·W·布什总统在2001年9月11日恐怖袭击后发表的全国讲话或数周后对国会的演讲中，未对袭击承担责任，并指责恐怖分子。</p><p class="card-dek-en">The system today provides strong incentives not to accept responsibility for anything bad.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查William Galston关于“领导人过去习惯承担责任”的观点是否被完全遗漏了上述案例。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-12615844/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>President George W. Bush addresses the nation from the Oval Office, Sept. 11, 2001. Tim Sloan/Agence France-Presse/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：乔治·W·布什总统在2001年9月11日恐怖袭击后发表的全国讲话或数周后对国会的演讲中，未对袭击承担责任，并指责恐怖分子。</li><li>关键细节：弗兰克林·D·罗斯福总统在1941年12月8日对国会发表讲话时，未对珍珠港突袭事件承担责任，并指责日本。</li><li>影响：条件推断——如果将罗斯福和布什的案例与2023年10月7日哈马斯袭击前以色列情报、军事和政治的失败进行类比，则可能表明领导层在面对重大危机时存在不承担责任的倾向。</li></ul>
+        <a href="https://www.wsj.com/opinion/responsibility-in-an-age-of-political-evasion-eb23e642" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="韩国芯片出口加速增长 逼近1万亿美元年度出口目标">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">20</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">韩国芯片出口加速增长 逼近1万亿美元年度出口目标</h3><span class="card-title-en">South Korea’s Chip-Led Exports Accelerate, Bringing $1 Trln Annual Target Closer</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">08:35</time>
+        
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">摘要称韩国10月半导体驱动的出口增长超预期，三星电子和SK Hynix为全球两大存储芯片制造商，AI基础设施投资推动芯片需求</p><p class="card-dek-en">South Korea’s Chip-Led Exports Accelerate, Bringing $1 Trln Annual Target Closer</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查韩国官方10月出口数据及1万亿美元年度目标的进展</p></div>
+      </div>
+      <div class="card-detail">
+        
+        <ul class="card-bullets"><li>核心事实：摘要称韩国10月半导体驱动的出口增长超预期，三星电子和SK Hynix为全球两大存储芯片制造商，AI基础设施投资推动芯片需求</li><li>关键细节：韩国以芯片为主导的出口加速增长，使1万亿美元年度出口目标更接近实现</li><li>影响：条件推断——如果AI需求持续，韩国可能更接近其1万亿美元年度出口目标</li></ul>
+        <a href="https://www.wsj.com/world/asia/south-koreas-chip-led-exports-accelerate-bringing-1-trln-annual-target-closer-5180b539" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="帝国CEO时代：Anthropic上市文件披露创始人投票权">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">21</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">帝国CEO时代：Anthropic上市文件披露创始人投票权</h3><span class="card-title-en">We’re Living in the Age of the Imperial CEO</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">08:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-06559516?width=80&height=853" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">AI巨头Anthropic公开提交文件，或成迄今最大IPO；招股书披露七位创始人获得投票权，潜在投资者影响力受限。</p><p class="card-dek-en">Anthropic joins other hot tech companies in going public with a share structure that keeps founders in control.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查Anthropic IPO后续进展及监管对创始人超级投票权结构的态度。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-06559516?width=1280&height=853" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Meta’s Mark Zuckerberg, Anthropic’s Dario Amodei and SpaceX’s Elon Musk. Emil Lendof/WSJ, iStock, Getty Images, Reuters, AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：AI巨头Anthropic公开提交文件，或成迄今最大IPO；招股书披露七位创始人获得投票权，潜在投资者影响力受限。</li><li>关键细节：文章称当下是帝国CEO（Imperial CEO）时代。</li><li>影响：条件推断——如果此类股权结构普及，可能引发对投资者投票权受限的担忧。</li></ul>
+        <a href="https://www.wsj.com/tech/ai/anthropic-ipo-dual-class-stock-founder-control-4c43a56d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="中文标题">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">22</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中文标题</h3><span class="card-title-en">What I Learned in ‘Dalifornia,’ China’s Laid-Back Capital of Doing Nothing</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">10:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-03375628?width=80&height=1024" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">摄影者Gilles Sabrié为WSJ拍摄，描述大理群山环绕、湖泊如耳形海且气候温和</p><p class="card-dek-en">A trend among China’s youth of fleeing the rat race and doing the bare minimum has prompted concern in Beijing. But most young Chinese do want to work.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查的事项</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-03375628?width=1280&height=1024" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>A bookstore and cafe in Dali.</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摄影者Gilles Sabrié为WSJ拍摄，描述大理群山环绕、湖泊如耳形海且气候温和</li><li>关键细节：文章标题提及‘Dalifornia’及中国大理被称为无所事事之都</li><li>影响：条件推断——如果该描述成立，可能影响外界对当地生活节奏的认知</li></ul>
+        <a href="https://www.wsj.com/world/china/what-i-learned-in-dalifornia-chinas-laid-back-capital-of-doing-nothing-2fd1266d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="俄罗斯影子舰队使用网和轮胎自制无人机防护">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">23</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">俄罗斯影子舰队使用网和轮胎自制无人机防护</h3><span class="card-title-en">Russia’s Shadow Fleet Turns to Nets and Rubber Tires for Makeshift Drone Armor</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">07:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-06877397?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">石油出口为莫斯科的战争努力提供资金，乌克兰正试图对其造成沉重打击。</p><p class="card-dek-en">Oil exports help pay for Moscow’s war effort and Ukraine is trying to hit them hard.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查该防护策略在后续冲突中的实际效能及成本效益。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-06877397?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>A tanker with protective netting in the Bosporus. Yoruk Isik</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：自八月以来，俄罗斯油轮在黑海及博斯普鲁斯海峡频繁展示此类反无人机装置以抵御乌克兰的无人机袭击。</li><li>关键细节：俄罗斯影子舰队利用网、金属笼和橡胶轮胎等简易材料为油轮加装无人机防护装甲。</li><li>影响：条件推断——若此类简易改装能有效降低损失，可能延长关键能源出口的生命周期，从而维持克里姆林宫的经济命脉。</li></ul>
+        <a href="https://www.wsj.com/world/russias-shadow-fleet-turns-to-nets-and-rubber-tires-for-makeshift-drone-armor-95e817a1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        Generated at 2026-11-02 04:02 HKT &middot; Source: Wall Street Journal
+    </footer>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {
+                    if (filter === 'all' || c.dataset.section === filter) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            };
+        });
+
+        // 搜索
+        function filterSearch(q) {
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
