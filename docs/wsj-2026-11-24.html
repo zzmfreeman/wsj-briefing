@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSJ日报 — 2026年11月24日</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a1a;
+            --text-sec: #666;
+            --text-light: #999;
+            --accent: #c41e3a;
+            --border: #e0e0e0;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --insight-bg: #f0f4ff;
+            --insight-border: #4a7ab5;
+            --dek-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 顶部统计栏 ── */
+        .dashboard-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-header h1 span {
+            color: var(--text);
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+        .stat-pill strong {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* 饼图 */
+        .pie-chart {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: conic-gradient(#c41e3a 0deg 183.27272727272725deg #0066cc 183.27272727272725deg 209.45454545454544deg #00853e 209.45454545454544deg 255.27272727272725deg #333 255.27272727272725deg 294.5454545454545deg #8b572a 294.5454545454545deg 359.99999999999994deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .search-box {
+            margin-left: auto;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── 主布局 ── */
+        .dashboard-body {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 左侧筛选栏 */
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            align-self: flex-start;
+            padding: 14px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-sec);
+            transition: all 0.15s;
+        }
+        .filter-btn:hover {
+            background: var(--bg);
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .filter-btn.active .filter-count {
+            color: rgba(255,255,255,0.8);
+        }
+        .filter-count {
+            font-size: 11px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+        .filter-btn.active .filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ── 卡片流 ── */
+        .card-stream {
+            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card.hidden {
+            display: none;
+        }
+
+        /* 卡片头部（可点击展开） */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #fafafa;
+        }
+        .card-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--border);
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .card-titles {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .card-title-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
+        .card-section {
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card-time {
+            font-size: 11px;
+            color: var(--text-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 首页可见区域：导语 + 洞察 */
+        .card-preview {
+            padding: 0 16px 10px;
+        }
+
+        /* 导语 */
+        .card-dek {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.55;
+            padding: 8px 12px;
+            background: var(--dek-bg);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 8px;
+        }
+        .card-dek-en {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-sec);
+            line-height: 1.5;
+            padding: 4px 12px 4px 15px;
+            border-left: 3px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        /* 洞察 */
+        .card-insight {
+            padding: 8px 12px;
+            background: var(--insight-bg);
+            border-left: 3px solid var(--insight-border);
+            border-radius: 0 4px 4px 0;
+        }
+        .insight-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--insight-border);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-insight p {
+            font-size: 13px;
+            color: #2a2a2a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 展开区域：图片 + bullets + 链接 */
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+        .card.expanded .card-detail {
+            max-height: 3000px;
+            padding: 0 16px 12px;
+        }
+
+        /* 图片 */
+        .card-hero {
+            margin: 0 0 10px;
+        }
+        .card-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* 字段标注 */
+        .field-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        /* 首页缩略图 */
+        .card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 图片说明 */
+        .card-hero figcaption {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 4px 0 0;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets */
+        .card-bullets {
+            list-style: none;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+        .card-bullets li {
+            position: relative;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .card-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .card-body-text {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* CTA */
+        .card-cta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* ── 页脚 ── */
+        .page-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .dashboard-body {
+                padding: 8px;
+            }
+            .card-stream {
+                padding: 0;
+            }
+            .search-box {
+                width: 140px;
+            }
+            .card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>WSJ <span>日报</span></h1>
+        <div class="stat-pill"><strong>55</strong> 篇文章</div>
+        <div class="pie-chart"></div>
+        <input class="search-box" type="text" placeholder="搜索标题..." oninput="filterSearch(this.value)">
+    </header>
+
+    <div class="dashboard-body">
+        <aside class="sidebar">
+            <h3>板块筛选</h3>
+            <button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="🇨🇳 中文版">🇨🇳 中文版 <span class="filter-count">28</span></button><button class="filter-btn" data-filter="💻 Tech">💻 Tech <span class="filter-count">4</span></button><button class="filter-btn" data-filter="📈 Markets">📈 Markets <span class="filter-count">7</span></button><button class="filter-btn" data-filter="🌍 World">🌍 World <span class="filter-count">6</span></button><button class="filter-btn" data-filter="🏢 Business">🏢 Business <span class="filter-count">10</span></button>
+        </aside>
+        <div class="card-stream">
+            
+    <div class="card" data-section="🇨🇳 中文版" data-title="英伟达董事会恢复黄仁勋CEO职务">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">01</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">英伟达董事会恢复黄仁勋CEO职务</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">22:19</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-93996429?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该公司表示，其董事会已“听取了美国政府高层的意见。”英伟达股价开盘时飙升30%。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查美国官员关于黄仁勋对象与中国情报部门合作的具体证据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-93996429?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>黄仁勋 图片来源：Lisi Niesner/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：黄仁勋在被曝有婚外情并辞职11天后回归</li><li>关键细节：英伟达董事会恢复了黄仁勋的CEO职务</li><li>影响：条件推断——若黄仁勋与情报部门关联属实，可能影响公司声誉及合规性</li></ul>
+        <a href="https://cn.wsj.com/articles/nvidia-board-reinstates-jensen-huang-as-ceo-525b6629" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="摧毁克里米亚大桥的导弹背后：一名俄罗斯流亡者">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">02</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">摧毁克里米亚大桥的导弹背后：一名俄罗斯流亡者</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">18:36</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-33905064/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">米哈伊尔·科科里奇是Destinus的首席执行官，该公司生产了摧毁克里米亚大桥行动中使用的Ruta巡航导弹，而科科里奇本人对普京深恶痛绝。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-33905064/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>米哈伊尔·科科里奇于2012年离开俄罗斯，并在2022年俄罗斯入侵乌克兰后放弃了俄罗斯国籍。 图片来源：Claudia Paparelli for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“摧毁克里米亚大桥的导弹背后：一名俄罗斯流亡者”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0004087059" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="黄仁勋握手交易风险与丑闻焦点辨析">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">03</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">黄仁勋握手交易风险与丑闻焦点辨析</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:56</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-98714864/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这位被迫离职的首席执行官曾以不签合同的交易为傲，如今这些交易却显露风险信号。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查握手交易的具体内容、涉嫌间谍活动的指控来源与证据，以及黄仁勋任职状况的官方信息</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-98714864/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称围绕黄仁勋的丑闻中最令人担忧的并非婚外情内容，并提及涉嫌中国间谍活动、黯然辞职后再重返英伟达担任CEO的想法等说法</li><li>关键细节：标题称黄仁勋在英伟达做成的握手交易暗藏风险</li><li>影响：条件推断——如果相关指控属实，可能影响投资者对英伟达的信心；但材料未证实任何指控成立</li></ul>
+        <a href="https://cn.wsj.com/articles/nvidia-jensen-huang-deals-b68f3e8f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="AI热潮挤压其他经济领域">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">04</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI热潮挤压其他经济领域</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:27</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-70689391/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">劳动力、设备、能源和投资纷纷涌向AI建设，留给其他行业的资源所剩无几。一场市场抛售凸显了其中的风险。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查AI对整体经济的具体影响数据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-70689391/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Anthropic IPO后股价剧烈震荡，叠加英伟达问题凸显依赖AI风险</li><li>关键细节：AI建设热潮吸纳大量资源，挤压其他经济领域</li><li>影响：条件推断——若AI持续挤压其他领域，可能引发市场波动及经济增长风险</li></ul>
+        <a href="https://cn.wsj.com/articles/the-ai-build-out-is-sucking-up-resources-and-crowding-out-the-rest-of-the-economy-75e41a63" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="AI泡沫是否已经破裂？">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">05</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI泡沫是否已经破裂？</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:19</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-18367316?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">最近几周席卷股市的AI相关股票抛售潮，与互联网泡沫破裂时的情景惊人地相似。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查2026年相关科技股实际市场表现及文中引用的股价对比数据的真实性。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-18367316?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>投资者仍然关注人工智能的盈利能力。 图片来源：Spencer Platt/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：近期AI股票抛售潮与互联网泡沫时期相似，并对比了科技巨头在2000年和2026年的股价跌幅。</li><li>关键细节：文章标题质疑人工智能领域是否存在泡沫以及该泡沫是否已经破裂。</li><li>影响：条件推断——如果历史重演迹象属实，可能暗示当前AI投资存在风险，但需验证数据准确性。</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0004086404" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="亚洲多地监管机构加大力度平息AI引发的市场动荡">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">06</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">亚洲多地监管机构加大力度平息AI引发的市场动荡</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">13:44</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-09596516?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">韩国官员正筹备设立一只市场稳定基金，韩国综合指数本月迄今已累计下跌近18%。台湾证交所加权指数则创下1990年以来最差单周表现。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：后续核查各监管机构具体措施内容及其对AI相关股票走势的实际影响。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-09596516?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>韩国综合指数这一基准股指本月迄今已累计下跌近18%。 图片来源：Kim Hong-Ji/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：中国、韩国和台湾的监管部门及市场运营机构已推出紧急措施，以遏制全球AI相关股票大跌引发的动荡；亚洲市场周一仍波动，但有好转迹象。</li><li>关键细节：亚洲多地监管机构加大力度平息AI引发的市场动荡</li><li>影响：条件推断——如果这些紧急措施有效，可能缓解对AI投资热潮消退的担忧。</li></ul>
+        <a href="https://cn.wsj.com/articles/asian-regulators-step-up-efforts-to-calm-ai-driven-market-turmoil-d40e0933" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="2026年科技礼物选购指南">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">07</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">2026年科技礼物选购指南</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">13:28</time>
+        <img class="card-thumb" src="https://m.wsj.net/video-atmo/20261118/6ad76b29-cde0-4730-abb0-a25e451cf12f/1/f6b8c9b6-01d4-4669-a4a5-db49ec1695d9_1920x1080.jpg?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">《华尔街日报》个人科技专栏作家盘点了本年度她亲测后最喜爱的数码产品，这些好物涵盖了各个价位。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步可核查清单具体产品名单、作者测试方法，以及所称不收取报酬的声明是否有披露依据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://m.wsj.net/video-atmo/20261118/6ad76b29-cde0-4730-abb0-a25e451cf12f/1/f6b8c9b6-01d4-4669-a4a5-db49ec1695d9_1920x1080.jpg?width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：作者称测试过很多产品，清单包含可借助人工智能(AI)记录备忘录的智能戒指、帮人按按钮的迷你机器人，以及苹果公司(Apple)和亚马逊(Amazon)等品牌的最佳新品，并称不收取这些公司报酬</li><li>关键细节：一篇标题为2026年科技礼物选购指南的文章</li><li>影响：条件推断——如果读者参考该清单选购礼物，可能获得作者自称经过高标准筛选的科技产品选项，但实际效果取决于个人需求</li></ul>
+        <a href="https://cn.wsj.com/articles/tech-gift-guide-holiday-2026-8254aeb5" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="卢特尼克在特朗普政府中地位稳固">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">08</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">卢特尼克在特朗普政府中地位稳固</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:52</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-88359758?width=80&height=459" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">尽管出现英伟达丑闻，且卢特尼克的华尔街公司受到审视，但这位商务部长仍比对手们在特朗普政府班底中留得更久。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：后续需核查威尔斯离职是否正式确认、卢特尼克是否公开谈及政策权限变化</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-88359758?width=700&height=459" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>美国商务部长霍华德·卢特尼克上周访问菲律宾期间。 图片来源：Carlos Barria/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据摘要，特朗普宣布白宫办公厅主任苏西·威尔斯即将离职，商务部长霍华德·卢特尼克随后称“我哪儿也不去”，并据知情人士称他此前受威尔斯约束</li><li>关键细节：标题称卢特尼克在特朗普政府中屹立不倒</li><li>影响：条件推断——如果威尔斯离职属实，卢特尼克在公开谈论政策方面可能不再需要事先向她通气，但这仅是摘要所述人士的说法</li></ul>
+        <a href="https://cn.wsj.com/articles/%E5%8D%A2%E7%89%B9%E5%B0%BC%E5%85%8B%E5%A6%82%E4%BD%95%E5%9C%A8%E7%89%B9%E6%9C%97%E6%99%AE%E6%94%BF%E5%BA%9C%E4%B8%AD%E5%B1%B9%E7%AB%8B%E4%B8%8D%E5%80%92-ed8ac555" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="金正恩欢迎新外国使节">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">09</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">金正恩欢迎新外国使节</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">19:02</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-71850067?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">金正恩首次亲自接受外国大使递交国书，传递出一个信号：他无需借助美国总统特朗普，也能展现政治家形象。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查金正恩与特朗普后续是否进行对话及具体时间点。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-71850067?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>朝鲜领导人金正恩周日在平壤向俄罗斯、瑞典、越南及其他国家的使节发表讲话。 图片来源：KCNA/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：金正恩尚未准备好与特朗普对话，正急于展示自身地位</li><li>关键细节：金正恩亲自欢迎“对我们友好”的新外国使节</li><li>影响：条件推断——若朝鲜持续通过外交礼仪展示独立性，可能影响未来美朝互动节奏。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E9%87%91%E6%AD%A3%E6%81%A9%E4%BA%B2%E8%87%AA%E6%AC%A2%E8%BF%8E-%E5%AF%B9%E6%88%91%E4%BB%AC%E5%8F%8B%E5%A5%BD-%E7%9A%84%E6%96%B0%E5%A4%96%E5%9B%BD%E4%BD%BF%E8%8A%82-2013403a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="特朗普曾试图联系金正恩但无回应">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">10</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普曾试图联系金正恩但无回应</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:14</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-02982449/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">金正恩掌控的核武库日益强大，而华盛顿距离拆除朝鲜核武库的目标却越来越远。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查后续是否有新的官方声明或接触迹象</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-02982449/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>2019年2月，金正恩在越南与美国总统特朗普会晤前，从车上挥手致意。 图片来源：LINH PHAM/GETTY IMAGES</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：美国总统特朗普去年曾试图通过电话和沟通渠道联系朝鲜领导人金正恩，但无人回电</li><li>关键细节：据知情人士透露，特朗普随后写了一封信，但问题在于如何把信送到金正恩手中</li><li>影响：条件推断——若朝鲜持续拒绝沟通，可能影响地区外交局势走向</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0004086492" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="荷兰法院临时禁止比亚迪钛7 SUV在欧盟销售，股价下跌">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">11</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">荷兰法院临时禁止比亚迪钛7 SUV在欧盟销售，股价下跌</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">16:26</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-46785500?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">比亚迪上周五在声明中表示，该公司强烈不同意法院判决，并将提起上诉。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查荷兰法院裁定的正式文书、禁令范围与有效期，以及比亚迪是否上诉</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-46785500?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片来源：GREG BAKER/AGENCE FRANCE-PRESSE/GETTY IMAGES</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：荷兰一家法院临时禁止比亚迪一款大型SUV在欧盟销售，裁定其侵犯捷豹路虎卫士外观设计；该公司股票周一收盘下跌1.84%，报61.20港元</li><li>关键细节：比亚迪股价下跌，此前荷兰法院禁止其钛7 SUV车型在欧盟销售</li><li>影响：条件推断——如果禁令持续，比亚迪该车型在欧盟的销售可能继续受阻，公司股价或承压</li></ul>
+        <a href="https://cn.wsj.com/articles/%E6%AF%94%E4%BA%9A%E8%BF%AA%E8%82%A1%E4%BB%B7%E4%B8%8B%E8%B7%8C-%E6%AD%A4%E5%89%8D%E8%8D%B7%E5%85%B0%E6%B3%95%E9%99%A2%E7%A6%81%E6%AD%A2%E5%85%B6%E9%92%9B7-suv%E8%BD%A6%E5%9E%8B%E5%9C%A8%E6%AC%A7%E7%9B%9F%E9%94%80%E5%94%AE-9013d8c9" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="特朗普拟办晚宴回馈模因币持有者">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">12</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普拟办晚宴回馈模因币持有者</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">07:51</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-01911250?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">特朗普去年获得了6.35亿美元的模因币版税收入。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查晚宴实际举办情况及后续影响</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-01911250?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>晚宴将在弗吉尼亚州斯特林的特朗普高尔夫俱乐部举行。 图片来源：Elizabeth Frantz/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：特朗普将举办晚宴，出席者包括凯文·奥利里等名人</li><li>关键细节：特朗普设专属晚宴回馈持币大户</li><li>影响：条件推断——若该活动如期举行，可能引发市场关注或波动</li></ul>
+        <a href="https://cn.wsj.com/articles/trump-rewards-top-owners-of-his-declining-coin-with-exclusive-dinner-8f2dc2ba" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="黄仁勋夫妇巨额财富构成一览">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">13</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">黄仁勋夫妇巨额财富构成一览</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">12:28</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-73215617?width=80&height=468" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">两人控制着8.7亿股英伟达股票，其中包括通过信托及其他实体控制的股份，价值超过1,090亿美元。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查英伟达官方公告与权威媒体报道，确认黄仁勋家庭财务状况及相关背景信息的真实性。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-73215617?width=700&height=468" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>9月份，黄仁勋和妻子洛丽·黄在华盛顿特区。 图片来源：Carolyn Kaster/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要提及黄仁勋与妻子洛丽·黄在创办英伟达时已有两个年幼孩子，且银行存款仅够维持六个月生活</li><li>关键细节：文章标题为黄仁勋夫妇巨额财富构成一览</li><li>影响：条件推断——如果该财富背景信息属实，可能有助于理解其资产规模，但仅为基于文本的条件式推断。</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0004086623" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="Anthropic承诺巨额支出但华尔街预期评级低">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">14</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Anthropic承诺巨额支出但华尔街预期评级低</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">12:19</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-41873370/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">在经历了动荡的IPO之后，Anthropic的信用评级将影响其资本计划以及AI行业的未来。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查Anthropic后续在债券市场的实际表现及其债务评级的最终结果。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-41873370/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：Anthropic上周筹资逾1,000亿美元，市值约为1.18万亿美元</li><li>关键细节：Anthropic承诺支出9,000亿美元，但华尔街预计其债务将被评为垃圾级</li><li>影响：条件推断——如果该公司未来数年实际支出接近承诺的9,000亿美元，可能面临巨大的偿债压力，导致债券市场表现不及预期。</li></ul>
+        <a href="https://cn.wsj.com/articles/anthropic-committed-to-spend-900-billion-wall-street-expects-its-debt-to-be-junk-a2cb5392" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="Anthropic上市交易遇波折，各方开始相互指责">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">15</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Anthropic上市交易遇波折，各方开始相互指责</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:02</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56927365?width=80&height=520" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">上周五，Anthropic股价盘中一度下跌15%，跌至仅比IPO发行价高5美分的水平。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查Anthropic股价后续走势、市值变化以及监管或相关各方对下跌原因的进一步说明</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56927365?width=780&height=520" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Anthropic在纽约为其首次公开募股投放的广告。 图片来源：Shuran Huang for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据材料，Anthropic这宗史上规模最大的IPO上市第二天遇挫，市值缩水约1,090亿美元；上周五股价盘中一度下跌15%，收盘下跌8.5%，报88.91美元，仍较发行价高出7%，投资者等各方开始相互指责</li><li>关键细节：Anthropic上市交易遇波折，各方开始相互指责</li><li>影响：条件推断——如果相关不利因素叠加持续，Anthropic股价可能继续承压，市场对其IPO的信心可能进一步受影响</li></ul>
+        <a href="https://cn.wsj.com/articles/WP-WSJS-0004086385" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="阿联酋开始实施引渡，全球逃犯需另寻藏身之处">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">16</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">阿联酋开始实施引渡，全球逃犯需另寻藏身之处</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:57</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-64905095/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">该国近期的一系列高调逮捕和引渡行动释放出信号：对于那些曾在此堂而皇之生活的全球罪犯而言，风向已经变了。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查阿联酋引渡政策的具体执行范围及对迪拜金融监管的实际影响</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-64905095/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：迪拜长期因宽松监管成为逃犯庇护地，如今犯罪头目处境正在发生变化</li><li>关键细节：阿联酋已开始实施引渡措施</li><li>影响：条件推断——若引渡政策持续收紧，全球逃犯可能面临更严峻的生存压力，需另寻藏身之处</li></ul>
+        <a href="https://cn.wsj.com/articles/fugitive-criminals-need-a-new-hideout-since-the-u-a-e-started-extraditing-them-2fc433a3" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="阿联酋冒险穿越霍尔木兹海峡接力运油">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">17</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">阿联酋冒险穿越霍尔木兹海峡接力运油</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:25</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-56826029?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这项得到美军协助、事关重大的接力运输行动，对于打破伊朗对霍尔木兹海峡的控制至关重要。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查该公司船舶和船员受损情况的具体报道，以及霍尔木兹海峡通行状况的后续发展</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-56826029?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>一艘油轮停靠在阿联酋富查伊拉港。 图片来源：Amr Alfiky/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称阿布扎比国家石油公司（埃德诺克）扩充油轮船队，在美军协助抵御伊朗导弹和无人机袭击的掩护下维持原油运输</li><li>关键细节：标题称阿联酋在霍尔木兹海峡接力运油</li><li>影响：条件推断——如果该行动持续，可能影响霍尔木兹海峡的石油运输格局，但影响程度无法从文本确定</li></ul>
+        <a href="https://cn.wsj.com/articles/the-u-a-e-is-shuttling-oil-past-iran-in-risky-hormuz-operation-646cb513" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="乌克兰在利比亚港口击沉俄罗斯军舰">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">18</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">乌克兰在利比亚港口击沉俄罗斯军舰</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:01</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-91665742?width=80&height=439" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">一艘俄罗斯军舰周日在利比亚一处港口倾覆，此前一艘货船周六在波罗的海遇袭。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查袭击具体责任方及船只受损真实情况</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-91665742?width=700&height=439" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>一张卫星照片显示，周日，一艘俄罗斯军舰在利比亚港口城市班加西倾覆。 图片来源：Vantor/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：卫星图像显示“水星”号(Merkury)护卫舰在班加西冒出浓烟并局部沉没</li><li>关键细节：报道称乌克兰在利比亚港口击沉俄罗斯军舰</li><li>影响：条件推断——若属实，可能表明无人机袭击范围已超出传统战场</li></ul>
+        <a href="https://cn.wsj.com/articles/russian-ships-struck-in-attacks-far-from-ukraine-as-wars-fallout-spreads-11aeef34" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="乌克兰防务产业或触发展上限">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">19</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">乌克兰防务产业或触发展上限</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">10:24</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-82408696/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">面对俄罗斯的轰炸以及资金需求，基辅正艰难地进一步壮大重获新生的防务产业。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查防务产业实际产能数据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-82408696/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>在乌克兰一处地点未公开的Ark Robotics工厂内，一名工程师将零部件焊接到一辆无人地面车辆上。</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据行业人士和防务分析师称，自俄罗斯入侵以来重获新生的乌克兰防务产业，很可能已经触及发展上限</li><li>关键细节：乌克兰急盼破局，防止蓬勃发展的防务产业陷入停滞</li><li>影响：条件推断——若该趋势属实，可能影响乌克兰持续打击能力</li></ul>
+        <a href="https://cn.wsj.com/articles/ukraine-is-racing-to-keep-its-booming-defense-industry-from-stalling-6fde1bf7" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="联合国气候谈判因化石燃料分歧破裂">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">20</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">联合国气候谈判因化石燃料分歧破裂</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">07:24</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-70747678/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">欧洲和一些国家拒绝接受一份决议草案，该草案未提及各经济体有必要摆脱对化石燃料的依赖。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查谈判是否重启及最终协议是否提及逐步摆脱化石燃料</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-70747678/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：谈判在土耳其安塔利亚举行，欧洲等国拒绝接受未呼吁逐步摆脱化石燃料的协议</li><li>关键细节：联合国气候谈判因化石燃料分歧破裂</li><li>影响：条件推断——如果分歧持续，可能难以就应对全球变暖达成新的全球共识</li></ul>
+        <a href="https://cn.wsj.com/articles/u-n-climate-talks-collapse-over-fossil-fuel-rift-8b868e5b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="俄惩教所被指系统性性虐待乌克兰战俘">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">21</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">俄惩教所被指系统性性虐待乌克兰战俘</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:25</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-04125027/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">乌克兰男性战俘在帕基诺监狱的遭遇是俄罗斯将性虐待系统化的缩影。一名看守说，“你们现在是我们的乌克兰婊子了。”</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步核查是否有独立机构或第三方证实帕基诺惩教所的相关指控。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-04125027/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：奥列克西·扎尔克诺夫等人抵达莫斯科以东约150英里的帕基诺村的第七惩教所后，据称被剥光衣服并被迫触摸彼此生殖器。</li><li>关键细节：报道称在俄罗斯战俘营中，性虐待据称已成为系统的一部分。</li><li>影响：条件推断——如果指控属实，可能加剧对俄方对待战俘的国际关注与追责呼声。</li></ul>
+        <a href="https://cn.wsj.com/articles/the-russian-pow-camp-where-sex-abuse-became-part-of-the-system-9531f37d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="美国拟禁中国汽车，梅赛德斯-奔驰为何险遭“池鱼之殃”？">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">22</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">美国拟禁中国汽车，梅赛德斯-奔驰为何险遭“池鱼之殃”？</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">09:37</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-60706704?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">由于中国实体持有梅赛德斯-奔驰部分股权，这家德国汽车制造商在美国的业务布局面临威胁。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查美国国会相关法案的实际进展、中国实体持股比例的准确数据及公司官方回应</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-60706704?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>梅赛德斯-奔驰在美国约有10,000名员工。 图片来源：Eric Thayer/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：中国实体持有梅赛德斯-奔驰近20%股份</li><li>关键细节：美国计划禁止中国汽车进入市场</li><li>影响：条件推断——如果美国国会通过相关法案，梅赛德斯-奔驰可能因持股结构遭受连带冲击，甚至被迫退出美国市场</li></ul>
+        <a href="https://cn.wsj.com/articles/how-mercedes-benz-nearly-became-collateral-damage-in-a-chinese-car-ban-63e6c927" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="七张图表解析油价新常态">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">23</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">七张图表解析油价新常态</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">11:30</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-54796021/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">相互制衡的力量正导致油价既难大涨也难大跌。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查霍尔木兹海峡实际通航状况及后续油价波动是否如文中预测般形成常态。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-54796021/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：布伦特原油期货价格一度逼近战争爆发以来的最高水平，此后有所回落但仍远高于每桶73美元的水平。</li><li>关键细节：文章标题为《七张图表解析油价新常态》。</li><li>影响：条件推断——若霍尔木兹海峡无法恢复战前状态，则未来油价可能常态化维持在每桶85至95美元区间。</li></ul>
+        <a href="https://cn.wsj.com/articles/%E4%B8%83%E5%BC%A0%E5%9B%BE%E8%A1%A8%E8%A7%A3%E6%9E%90%E6%B2%B9%E4%BB%B7%E6%96%B0%E5%B8%B8%E6%80%81-7c525648" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="想让Anthropic一直“怪”下去的阿莫迪兄妹">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">24</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">想让Anthropic一直“怪”下去的阿莫迪兄妹</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">13:12</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-37778811/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这对兄妹上周四完成了史上规模最大的IPO，但第二天市场却遭遇暴跌。对于这家本身就非同寻常的公司来说，这无疑是又一次不同寻常的事件。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查该IPO的实际融资额、估值口径及“规模最大”的统计依据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-37778811/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称丹妮拉·阿莫迪两年后完成了有史以来规模最大的IPO，这家AI公司如今市值约1.18万亿美元，由她与哥哥达里奥·阿莫迪及五位朋友共同创办</li><li>关键细节：标题聚焦阿莫迪兄妹与Anthropic</li><li>影响：条件推断——如果摘要所述IPO规模与市值属实，Anthropic可能成为AI行业市值最高的公司之一</li></ul>
+        <a href="https://cn.wsj.com/articles/%E6%83%B3%E8%AE%A9anthropic%E4%B8%80%E7%9B%B4-%E6%80%AA-%E4%B8%8B%E5%8E%BB%E7%9A%84%E9%98%BF%E8%8E%AB%E8%BF%AA%E5%85%84%E5%A6%B9-6eb9957b" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="肯·格里芬想把牛津大学和麻省理工带到迈阿密，结果给另一所大学捐了30亿美元">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">25</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">肯·格里芬想把牛津大学和麻省理工带到迈阿密，结果给另一所大学捐了30亿美元</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">13:52</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-19881531/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">Citadel创始人给卡内基梅隆大学的这笔捐赠将成为高等教育领域规模最大的个人单笔捐赠，反映出高等教育界经历的巨大变革，也反映出迈阿密的转型。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查受捐大学名称、捐款条款及与迈阿密建校计划的关联</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-19881531/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：据摘要，肯·格里芬曾与牛津大学、剑桥大学、麻省理工学院和范德堡大学接洽，希望在南佛罗里达建顶尖理工科大学</li><li>关键细节：肯·格里芬给另一所大学捐了30亿美元</li><li>影响：条件推断——如果格里芬的捐资落地，可能影响南佛罗里达高等教育格局，但受捐学校未在提供文本中说明</li></ul>
+        <a href="https://cn.wsj.com/articles/ken-griffin-citadel-miami-carnegie-mellon-4a6a9c90" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="拒绝放慢脚步：婴儿潮一代正在重新定义老年生活">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">26</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">拒绝放慢脚步：婴儿潮一代正在重新定义老年生活</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">14:29</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-53330246/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">与前代相比，美国的婴儿潮一代更富有，也更具冒险精神，他们正在尽情享受生活：“我这种人绝不会像我父母那样退休。”</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：后续核查该系列报道的完整正文及具体论据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-53330246/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：本文是《华尔街日报》如何度过老年系列报道的一部分</li><li>关键细节：报道称婴儿潮一代正在重新定义老年生活</li><li>影响：条件推断——如果婴儿潮一代持续改变老年阶段的面貌，可能影响社会对老年生活的认知</li></ul>
+        <a href="https://cn.wsj.com/articles/baby-boomers-aging-add2b197" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="詹姆斯·邦德手腕空空，引发腕表业争夺战">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">27</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">詹姆斯·邦德手腕空空，引发腕表业争夺战</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">07:41</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-34867808?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">007佩戴欧米茄腕表已有30年，但在此次重磅亮相中，却不见该品牌的踪影。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查邦德最终佩戴的腕表品牌及积家与帕丁森合作细节</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-34867808?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>英国演员罗伯特·帕丁森将在亚马逊米高梅影业出品的电影中饰演下一任詹姆斯·邦德。 图片来源：Felix Ursell/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称自1995年《黄金眼》上映以来邦德佩戴欧米茄海马系列腕表；Instagram帖子中新任007罗伯特·帕丁森未戴表，积家于9月签下帕丁森担任品牌大使，引发换表猜测</li><li>关键细节：标题称詹姆斯·邦德手腕空空，引发腕表业争夺战</li><li>影响：条件推断——如果邦德真的更换腕表品牌，可能影响两大奢侈腕表品牌的市场关注，但这仅为报道中的猜测</li></ul>
+        <a href="https://cn.wsj.com/articles/james-bonds-bare-wrist-sets-off-watch-industry-war-9636f3fb" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🇨🇳 中文版" data-title="银行服务中断风险与摩根大通软件漏洞">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">28</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">银行服务中断风险与摩根大通软件漏洞</h3></div>
+        <span class="card-section" style="background:#c41e3a">🇨🇳 中文版</span>
+        <time class="card-time">08:43</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-02033177?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">刚过去的一周给美国人提了个醒：银行也会像电网一样出现服务中断。对此，理财顾问给了一些建议。</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：关注摩根大通后续关于漏洞修复和服务恢复的官方说明</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-02033177?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>图片来源：Timothy Mulcare for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摩根大通(JPMorgan Chase)因软件漏洞导致客户付款、提款等日常操作遇到困难，提示银行可能像电网一样出现服务中断</li><li>关键细节：普通人需为银行服务中断做好准备</li><li>影响：条件推断——如果发生类似故障，客户日常金融操作可能受阻，提前准备有助于应对</li></ul>
+        <a href="https://cn.wsj.com/articles/bank-outage-tips-3f2b125f" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="黄仁勋再度颠覆AI前景">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">29</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">黄仁勋再度颠覆AI前景</h3><span class="card-title-en">Jensen Huang Upends AI Outlook Once Again</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">00:09</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-77891911?width=80&height=520" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">黄仁勋再度颠覆AI前景。此外，OpenAI科学家提出对前沿模型开发设定共同限制。</p><p class="card-dek-en">Plus, OpenAI scientist proposes common limits on frontier model development.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查美国政府输入的具体性质、黄仁勋回归后的实际管理举措以及OpenAI提出的AI监管框架是否会被行业采纳。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-77891911?width=780&height=520" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Michael Nagle/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：OpenAI首席科学家雅各布·帕乔基呼吁建立评估前沿模型及红队安全测试的共同规范。</li><li>关键细节：英伟达董事会在收到美国政府高层意见后，认为黄仁勋回归不会构成国家安全风险。</li><li>影响：条件推断——若黄仁勋回归被证实无风险且市场反应积极，可能重塑AI行业对领导层稳定性的预期并提振相关资产价值。</li></ul>
+        <a href="https://www.wsj.com/cio-journal/jensen-huang-upends-ai-outlook-once-again-b2bdb17d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="肯·陈呼吁制定AI使命宣言">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">30</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">肯·陈呼吁制定AI使命宣言</h3><span class="card-title-en">Why Ken Chenault Is Calling for an AI ‘Manifesto’</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">18:57</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-17169415?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">肯·陈（Ken Chenault）呼吁制定人工智能“宣言”。</p><p class="card-dek-en">Why Ken Chenault Is Calling for an AI ‘Manifesto’</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查AI“宣言”的具体内容、各方响应及后续是否出台实质性监管框架。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-17169415?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Michael Rea got the idea for Rx Savings Solutions while working as a pharmacist at Walgreens. Chase Castor for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：他提出需解决AI面临的十大挑战，并认为政府与企业应加强合作以应对监管与对齐问题。</li><li>关键细节：美国运通前CEO肯·陈主张为人工智能制定类似“宣言”的指引，强调其应致力于改善人类生活。</li><li>影响：条件推断——若采纳该倡议，可能推动政企在AI治理上形成共识，但具体监管措施及实施路径仍存不确定性。</li></ul>
+        <a href="https://www.wsj.com/articles/why-ken-chenault-is-calling-for-an-ai-manifesto-7eab1b51" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="黄仁勋回归与AI隐忧">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">31</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">黄仁勋回归与AI隐忧</h3><span class="card-title-en">Jensen Is Back. But AI’s Problems Haven’t Gone Away.</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">02:32</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-78298356?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">英伟达首席执行官的回归在多个层面上都是坏消息，而且并不能消除整个AI生态系统乃至该公司本身所面临的严峻挑战。</p><p class="card-dek-en">The Nvidia CEO’s return is bad on multiple levels, and doesn’t remove serious challenges facing the AI ecosystem in general or the company in particular.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查Nvidia针对前CEO与中国间谍关联的调查进展及实际影响。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-78298356?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Angela Weiss/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称Nvidia NVDA股价上涨32.15%，为标普500指数提供支撑。</li><li>关键细节：标题提及Jensen Huang回归，但指出AI的问题并未消失。</li><li>影响：条件推断——如果市场持续依赖Nvidia表现，可能掩盖对AI泡沫及公司调查的担忧。</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/jensen-is-back-but-ais-problems-havent-gone-away-7551770e" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="AI建设热潮吸走资源挤压经济其他领域">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">32</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI建设热潮吸走资源挤压经济其他领域</h3><span class="card-title-en">The AI Build-Out Is Sucking Up Resources and Crowding Out the Rest of the Economy</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">10:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-73188330/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">人工智能建设热潮正将劳动力、设备、能源和投资大量吸纳，导致其他行业资源匮乏。市场抛售现象凸显了由此引发的风险。</p><p class="card-dek-en">Workers, equipment, energy and investment funneled into the AI build-out leave little left for other industries. A market selloff shows the risks.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查Anthropic上市及周五抛售、Nvidia问题的后续报道与数据</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-73188330/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称AI建设成为美国经济增长的主要力量，但同时把经济其他领域挤到一旁</li><li>关键细节：标题称AI建设热潮正在吸走资源并挤压经济其他领域</li><li>影响：条件推断——如果经济高度依赖AI增长，相关公司波动可能放大整体市场风险</li></ul>
+        <a href="https://www.wsj.com/tech/ai/the-ai-build-out-is-sucking-up-resources-and-crowding-out-the-rest-of-the-economy-13143007" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="💻 Tech" data-title="特朗普曾请万斯协助说服英伟达让黄仁勋回归">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">33</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">特朗普曾请万斯协助说服英伟达让黄仁勋回归</h3><span class="card-title-en">Trump Asked Vance to Help Persuade Nvidia to Bring Back Jensen Huang</span></div>
+        <span class="card-section" style="background:#0066cc">💻 Tech</span>
+        <time class="card-time">03:46</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-75358264?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">副总统周末开展工作，协助劝说这家芯片制造商的董事会恢复其前首席执行官的职务。</p><p class="card-dek-en">The vice president worked over the weekend to help coax the chip maker’s board to reinstate its former CEO.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查后续报道中万斯是否采取行动、涉事背景及官方回应</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-75358264?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>President Trump said he had spoken to the board ‘directly and indirectly’ about reinstating Jensen Huang.  Ken Cedeno/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据一名美国官员称，特朗普告诉万斯，他未看到黄仁勋做错事或构成安全风险的证据，并请副总统过问此事</li><li>关键细节：标题称特朗普曾请万斯协助说服英伟达让黄仁勋回归</li><li>影响：条件推断——如果属实，可能反映白宫高层对英伟达及其领导人态度的动向，但具体政策影响尚不明确</li></ul>
+        <a href="https://www.wsj.com/politics/policy/nvidia-ceo-trump-vance-jensen-huang-bdec91c3" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="英伟达股价因黄仁勋回归CEO职位预期而飙升">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">34</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">英伟达股价因黄仁勋回归CEO职位预期而飙升</h3><span class="card-title-en">Stock Market Today: Nvidia Stock Surges as Investors Cheer Jensen Huang's Return as CEO</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">17:52</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-925351/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">股票、债券及市场动态实时更新，涵盖道琼斯工业平均指数、标普500指数和纳斯达克综合指数。</p><p class="card-dek-en">Nasdaq rebounds 7% after Friday’s bloodbath</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查的事项：核实黄仁勋复职的具体法律程序、特朗普言论的完整背景以及后续股价波动的实际驱动因素</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-925351/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：2026年11月23日，被罢免仅11天的黄仁勋重返英伟达，股价一度飙升36%</li><li>关键细节：投资者庆祝黄仁勋回归CEO职位推动英伟达股价飙升</li><li>影响：条件推断——若市场持续受AI交易情绪推动，可能进一步推高芯片巨头市值及纳斯达克指数表现</li></ul>
+        <a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-11-23-2026" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="中文标题">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">35</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">中文标题</h3><span class="card-title-en">Pouncing on Anthropic Won’t Make You Rich</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">19:28</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-35242255/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">中文标题
+此外，科技板块浴火重生。</p><p class="card-dek-en">Plus, tech rises from the ashes.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查Anthropic后续股价表现及市场反应。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-35242255/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：股市预计将恢复周五部分跌幅，Anthropic股价受关注，投资者仍受抛售影响。</li><li>关键细节：文章指出盲目收购Anthropic无法让人致富。</li><li>影响：条件推断——如果市场持续波动，投资者可能面临进一步的不确定性风险。</li></ul>
+        <a href="https://www.wsj.com/finance/stocks/pouncing-on-anthropic-wont-make-you-rich-4d500a06" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Disney押注流媒体业务扩张">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">36</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Disney押注流媒体业务扩张</h3><span class="card-title-en">Disney Bets Big on Streaming. Just Don’t Ask What It Costs.</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">18:30</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-99127714?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">迪士尼通过增加内容、体育节目以及可能推出的免费层级，旨在将流媒体业务打造为新的增长引擎。</p><p class="card-dek-en">More content, sports and maybe a free tier aim to make streaming a growth engine.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查Disney后续财报或官方公告以确认相关计划细节</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-99127714?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Disney+ posted a better-than-expected quarterly operating profit.  Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称Disney计划把Disney+从家庭看《Toy Story》后取消的服务，变为长期保留的服务，将加入体育内容及TikTok创作者短视频，并考虑推出免费广告支持档位</li><li>关键细节：标题称Disney大力押注流媒体业务</li><li>影响：条件推断——如果该策略推进，可能影响Disney+的订阅留存与成本结构</li></ul>
+        <a href="https://www.wsj.com/finance/disney-bets-big-on-streaming-just-dont-ask-what-it-costs-4b33553a" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="大规模人口外流加剧古巴经济危机">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">37</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">大规模人口外流加剧古巴经济危机</h3><span class="card-title-en">The Mass Exodus Making Cuba’s Economic Crisis Even Worse</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">02:03</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-98073848/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">观看视频，了解该国经济困境和燃料短缺为何可能掩盖着一个更大的问题，而这一问题关系到古巴能否实现经济转机。</p><p class="card-dek-en">Watch to learn why the country’s economic woes and fuel shortages could be masking an even bigger issue for its chances of a turnaround.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查人口流失的具体统计来源及制裁细节</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-98073848/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Photo: Daniel Vergara</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：研究人员估计，五年内人口损失可能达到四分之一</li><li>关键细节：大规模人口外流正使古巴的经济危机进一步恶化</li><li>影响：条件推断——若人口持续快速萎缩，将对古巴的现在和未来产生巨大影响</li></ul>
+        <a href="https://www.wsj.com/world/americas/the-mass-exodus-making-cubas-economic-crisis-even-worse-6fed25bd" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="晨间风险报告：阿联酋开始引渡，逃犯寻找新藏身地">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">38</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">晨间风险报告：阿联酋开始引渡，逃犯寻找新藏身地</h3><span class="card-title-en">The Morning Risk Report: Fugitives Seek New Hideouts as UAE Begins Extraditing</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">20:36</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-19055689?width=80&height=467" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此外：花旗集团在英国一家子公司漏计了350亿美元资产；特朗普表示，他将对在美国境外建设数据中心的公司进行处罚。</p><p class="card-dek-en">Plus: Citi undercounted $35 billion in assets in a U.K. subsidiary and Trump says he will penalize companies that build data centers outside the U.S.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查阿联酋所签引渡条约的具体名单与执行情况，以及花旗资本低估事件的监管回应</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-19055689?width=700&height=467" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Citigroup CEO Jane Fraser Michael Nagle/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据摘要，阿联酋近期签署多项引渡条约，涉嫌爱尔兰犯罪头目Daniel Kinahan于8月被引渡回都柏林；另据摘要，花旗因交易处理失误低估一家英国子公司规模350亿美元</li><li>关键细节：报道称阿联酋开始引渡，逃犯正寻找新的藏身之处</li><li>影响：条件推断——如果引渡合作持续，可能改变逃犯将阿联酋作为藏身地的格局，但实际效果取决于条约执行情况</li></ul>
+        <a href="https://www.wsj.com/risk-compliance-journal/fugitive-criminals-are-looking-for-new-hideouts-since-the-uae-started-extraditing-94e98eb1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="朝鲜领导人金正恩会见新使节">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">39</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">朝鲜领导人金正恩会见新使节</h3><span class="card-title-en">North Korea’s Kim Jong Un Welcomes New Envoys ‘Friendly Toward Us’</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">17:26</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-71850067?width=80&height=466" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">朝鲜领导人金正恩急于表明，他是一位不需要通过与美国首脑会晤来证明自身地位的全球政治家。</p><p class="card-dek-en">The leader is eager to show that he is a global statesman who doesn’t need a summit with the U.S. to prove his status.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查其是否准备与特朗普对话及后续外交动作</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-71850067?width=700&height=466" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>North Korean leader Kim Jong Un gave a speech to envoys from Russia, Sweden and Vietnam and other countries in Pyongyang on Sunday. KCNA/AFP/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：金正恩周日接收了10位外国大使的国书</li><li>关键细节：金正恩欢迎‘对我们友好’的新使节</li><li>影响：条件推断——若其意图展示无需峰会即可确立地位，可能影响与特朗普的互动预期</li></ul>
+        <a href="https://www.wsj.com/world/asia/north-koreas-kim-jong-un-welcomes-new-envoys-friendly-toward-us-8102b4aa" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Nvidia的教训：危机前先定规则">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">40</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Nvidia的教训：危机前先定规则</h3><span class="card-title-en">Nvidia’s Lesson: Set Rules Before a Crisis</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">02:34</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-25460208/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">发展迅速的公司应提前设定好约束机制，以免董事会因恐慌而过早罢免创始人。</p><p class="card-dek-en">Fast-moving companies should lock in guardrails so panicked boards don’t oust founders prematurely.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查Nvidia官方公告及权威媒体是否证实辞职与复职日期</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-25460208/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Jensen Huang in Taipei, May 19, 2025.  i-hwa cheng/Agence France-Presse/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称Elon Musk于11月14日发推称黄仁勋在Nvidia的许多供应链交易是握手协议而非书面合同</li><li>关键细节：摘要称Jensen Huang于11月12日辞职，董事会于11月23日一致恢复其职务</li><li>影响：条件推断——如果该人事变动属实，可能影响Nvidia供应链相关安排，但真实性未经验证</li></ul>
+        <a href="https://www.wsj.com/opinion/nvidias-lesson-set-rules-before-a-crisis-d4ccc369" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="马尔科·卢比奥被称是失败外交政策的'人质'">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">41</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">马尔科·卢比奥被称是失败外交政策的'人质'</h3><span class="card-title-en">Marco Rubio Is Hostage to a Failing Foreign Policy</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">02:33</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-30146553/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">他还能保持多久“致力于美国利益的严肃人物”这一声誉？</p><p class="card-dek-en">How long can he keep his reputation as a serious person committed to American interests?</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：下一步需核查该民调的具体来源、样本与时间，以及全文对'外交政策使美国蒙羞、削弱'等论断的具体论据。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-30146553/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Marco Rubio in Washington, Nov. 20. Aaron Schwartz/Bloomberg News</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称中期选举失利后的一项民调显示，卢比奥在共和党选民中领先于2028年总统提名竞争。</li><li>关键细节：标题称马尔科·卢比奥（Marco Rubio）是失败外交政策的'人质'。</li><li>影响：条件推断——如果卢比奥继续担任美国外交政策的代表人物，他可能面临既为该政策站台又试图与之保持距离的两难处境，但这属于原文观点性推断，并非已发生的事实。</li></ul>
+        <a href="https://www.wsj.com/opinion/marco-rubio-is-hostage-to-a-failing-foreign-policy-d4ddaeca" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Understanding Sinclair’s Law and Racial Progress">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">42</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Understanding Sinclair’s Law and Racial Progress</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">01:35</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-97169991/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">我认为他察觉到了某种现象，但我也认为实际情况比这更为严重。</p><p class="card-dek-en">I believe he was onto something, but I also believe the phenomenon is worse than that.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需重新校验正文后再判断。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-97169991/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Senator-elect Scott Colom in Tougaloo, Miss., Nov. 11. Lauren Witte/Clarion Ledger/USA TODAY NETWORK/Reuters</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：新闻标题为“Understanding Sinclair’s Law and Racial Progress”。</li><li>关键细节：正文级事实未通过来源校验，仅保留标题。</li><li>影响：证据不足，暂不推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/understanding-sinclairs-law-and-racial-progress-d6ab52cd" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="骨科医生称Medicare报销下降或加剧手术供应危机">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">43</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">骨科医生称Medicare报销下降或加剧手术供应危机</h3><span class="card-title-en">Let Me Keep Operating, Don’t Make Me Pay</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">01:34</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-09214421/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">一名骨科医生表示，由于无法自掏腰包承担为患者提供治疗的额外费用，其处境艰难。</p><p class="card-dek-en">I can’t pay out of pocket for the privilege of treating patients.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查Medicare Part B报销新规的官方金额及该医生所述数字是否属实。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-09214421/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：一位自称在芝加哥郊区执业29年的骨科医生称，经通胀调整后报销下降超过60%，Medicare Part B新规下髋或膝关节置换报销将不足$1,000，扣除成本后净得约$500，并称已暂停自己薪水以支付员工。</li><li>关键细节：标题为“让我继续执业，别让我付钱”，涉及医生执业与付费议题。</li><li>影响：条件推断——如果报销继续下降，可能进一步影响复杂关节置换手术的可及性，但此为有界推断，实际影响未经验证。</li></ul>
+        <a href="https://www.wsj.com/opinion/let-me-keep-operating-dont-make-me-pay-285d7b98" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="AI无法替代医生">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">44</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">AI无法替代医生</h3><span class="card-title-en">Artificial Intelligence Can’t Replace a Doctor</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">01:33</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-36485176/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">真正的关注和清晰的路线图，才是最终为患者带来缓解的关键。</p><p class="card-dek-en">That genuine attention and clear roadmap are what ultimately bring patients relief.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查文中提及的Katherine Bindley的具体诊疗经历及30年手术实践中的相关数据。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-36485176/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Cai Yang/Zuma Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：作者指出，患者需要的不是算法或网络外外科医生，而是基本的临床判断力。</li><li>关键细节：人工智能不能取代医生</li><li>影响：条件推断——如果过度依赖算法而忽视人类医生的常识性临床判断，可能导致误诊并延误对复杂病症的识别。</li></ul>
+        <a href="https://www.wsj.com/opinion/artificial-intelligence-cant-replace-a-doctor-ba5192c4" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="不应私有化航空运输，而应推进现代化">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">45</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">不应私有化航空运输，而应推进现代化</h3><span class="card-title-en">Don’t Privatize Air Transportation. Modernize</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">01:32</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-20330919/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">我国空中交通管制面临的问题源于几十年前的基础设施。</p><p class="card-dek-en">Our country’s problem with air-traffic control is decades-old infrastructure.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查私有化空管系统的实际运行记录，以及该社论原文内容</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-20330919/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>The air traffic control tower at Ronald Reagan Washington National Airport in Arlington, Va., Nov. 14. Emily Curiel/EPA/Shutterstock</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：针对《华尔街日报》社论回应称，不应把私有化的随意言论当作航空系统升级的严肃方案，也不应忽视私有化系统的实际记录；认为空管问题源于数十年老旧基础设施，联邦航空管理局（FAA）对空域和空管人员的管理是黄金标准</li><li>关键细节：主张不应私有化航空运输，而应推进现代化</li><li>影响：条件推断——如果按此观点，私有化可能不是空管升级的合适方案，现代化或更可取</li></ul>
+        <a href="https://www.wsj.com/opinion/dont-privatize-air-transportation-modernize-5cbbe619" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="读者称政府从Anthropic成功中获税收意外之财">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">46</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">读者称政府从Anthropic成功中获税收意外之财</h3><span class="card-title-en">Government Gets a Tax Windfall From Anthropic</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">01:31</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-11671424/?size=1.5&width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">美国企业在税收负担中占据较大份额。</p><p class="card-dek-en">U.S. companies take a large share of the burden.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查Anthropic实际估值来源、来信所引税收比例的依据，以及该信是否代表报社立场</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-11671424/?size=1.5&width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Guerin Charles/Abaca/ZUMA Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：读者来信假设若Anthropic估值达1.8万亿美元，美国政府通过税收起约拥有每家美企三分之一权益，即获利约9000亿美元</li><li>关键细节：标题提及政府从Anthropic获得税收意外之财</li><li>影响：条件推断——如果该估算成立，Anthropic的成功可能使各级政府获得大额税收，但这仅为来信作者的个人观点</li></ul>
+        <a href="https://www.wsj.com/opinion/government-gets-a-tax-windfall-from-anthropic-790b0571" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="投资者乐见“芯片之王”回归">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">47</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">投资者乐见“芯片之王”回归</h3><span class="card-title-en">Investors Cheer Return of the Chip King</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">00:21</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-33905691?width=80&size=1.501" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">黄仁勋重返英伟达首席执行官职位。</p><p class="card-dek-en">Jensen Huang is back as CEO of Nvidia.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查黄仁勋回归的具体背景、时间及美国一些最伟大的发明者公开支持的原始报道。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-33905691?width=1280&size=1.501" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Nvidia CEO Jensen Huang at a press conference in Tokyo in July.  Philip Fong/Agence France-Presse/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称英伟达（Nvidia）CEO兼联合创始人黄仁勋重新掌舵，散户投资者实现了让其回归的愿望，股东明确表示最信任他领导技术竞争；摘要还称他并非模范丈夫，其判断失误可能对美国安全造成后果，且美国一些最伟大的发明者公开支持他。</li><li>关键细节：标题称投资者乐见“芯片之王”回归。</li><li>影响：条件推断——如果黄仁勋继续领导英伟达，可能影响公司在技术竞争中的走向，但此为条件式推断。</li></ul>
+        <a href="https://www.wsj.com/opinion/investors-cheer-return-of-the-chip-king-fc092103" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="黄仁勋夫妇财富解析：英伟达危机下的巨额身家">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">48</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">黄仁勋夫妇财富解析：英伟达危机下的巨额身家</h3><span class="card-title-en">Jensen and Lori Huang Have Amassed a Vast Fortune. We Break Down Their Wealth.</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">10:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-73215617?width=80&height=468" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">英伟达创始人及其妻子通过信托及其他实体，共控制着8.7亿股英伟达股票。</p><p class="card-dek-en">The Nvidia founder and his wife have control over 870 million Nvidia shares, including through trusts and other entities.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查Jensen Huang辞职与回归CEO的具体时间线、持股数据及股价变动是否经官方渠道证实。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-73215617?width=700&height=468" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Jensen Huang and his wife, Lori Huang, in Washington, D.C., in September.  Carolyn Kaster/AP</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称黄氏夫妇仍持有8.7亿股，上周价值超过1090亿美元；Jensen因婚外情曝光辞任后，公司进入危机模式，股价下滑，夫妇财富缩水数十亿美元。</li><li>关键细节：标题称Jensen和Lori Huang已积累巨额财富，文章对其财富进行拆解。</li><li>影响：条件推断——如果Jensen Huang回归CEO的消息被证实，可能影响英伟达股价及夫妇财富的进一步波动。</li></ul>
+        <a href="https://www.wsj.com/finance/investing/jensen-and-lori-huang-have-amassed-a-vast-fortune-we-break-down-their-wealth-3d2287b1" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="Anthropic承诺支出9000亿美元，华尔街预期其债务为垃圾级">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">49</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Anthropic承诺支出9000亿美元，华尔街预期其债务为垃圾级</h3><span class="card-title-en">Anthropic Committed to Spend $900 Billion. Wall Street Expects Its Debt to Be Junk.</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">11:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-41873370/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">经历动荡的首次公开募股（IPO）之后，这家初创公司的信用评级将影响其资本计划以及人工智能行业的未来。</p><p class="card-dek-en">After a turbulent IPO, the startup’s credit rating will affect its capital plans and the future of the AI industry.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：核查其债券实际发行与评级结果，以及9000亿美元承诺支出的官方披露</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-41873370/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Anthropic made history with its initial price offering, raising $81 billion. WSJ’s Kate Clark breaks down the artificial-intelligence giant’s first day of trading.  Photo: Shuran Huang for WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称这家AI公司上周融资超过1000亿美元，估值约1.18万亿美元，超过沃尔玛或摩根大通</li><li>关键细节：标题称Anthropic承诺未来数年支出9000亿美元用于AI算力，华尔街预期其债务将被视为垃圾级</li><li>影响：条件推断——如果Anthropic未来数年需为AI算力支付巨额支出，其债券市场表现可能面临不确定性</li></ul>
+        <a href="https://www.wsj.com/finance/investing/anthropic-committed-to-spend-900-billion-wall-street-expects-its-debt-to-be-junk-5514d55d" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="📈 Markets" data-title="篮球成就了“魔术师”约翰逊的名声，马克·沃尔特助其成为亿万富翁">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">50</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">篮球成就了“魔术师”约翰逊的名声，马克·沃尔特助其成为亿万富翁</h3><span class="card-title-en">Basketball Made Magic Johnson Famous. Mark Walter Made Him a Billionaire.</span></div>
+        <span class="card-section" style="background:#00853e">📈 Markets</span>
+        <time class="card-time">10:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-59320334?width=80&height=853" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">这位中西部投资人邀请这位洛杉矶体育明星收购一家盈利的保险公司，而该公司目前正与一项联邦调查有关联。</p><p class="card-dek-en">The Midwest investor invited the L.A. sports celebrity to buy a moneymaking insurance company that is now linked to a federal probe.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查联邦当局对未披露内部关联交易的调查进展。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-59320334?width=1280&height=853" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Earvin 'Magic' Johnson and Mark Walter Emil Lendof/WSJ, AP, Zuma Press</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：据《华尔街日报》分析，截至2025年，约翰逊作为EquiTrust大股东，已从其公司向由沃尔特控制或与其有关联的企业投资123亿美元。</li><li>关键细节：篮球成就了“魔术师”约翰逊的名声，马克·沃尔特助其成为亿万富翁。</li><li>影响：条件推断——如果联邦当局确认相关交易未披露内部关联属实，涉事交易可能面临审查后果。</li></ul>
+        <a href="https://www.wsj.com/business/media/magic-johnson-mark-walter-federal-probe-a219fc08" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="乌克兰无人机袭击利比亚港口俄罗斯船只">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">51</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">乌克兰无人机袭击利比亚港口俄罗斯船只</h3><span class="card-title-en">Ukraine Sinks Russian Warship, Hits Cargo Vessels Far From Warzone</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">07:09</time>
+        <img class="card-thumb" src="https://m.wsj.net/video-atmo/20261123/6fa4297e-daa7-4b2f-9f6c-a2adb4b119ab/1/e14b7fd1-afe1-4ff0-98cc-28f97dccee5d_1920x1080.jpg?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">此次袭击是乌克兰无人机对俄罗斯船只发动的一系列攻击的最新事件，这些打击已远远超出战场范围。</p><p class="card-dek-en">The attacks are the latest in a series of Ukrainian drone strikes on Russian vessels that have spread far beyond the battlefield.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查梅尔库里号所属级别及事件后续影响</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://m.wsj.net/video-atmo/20261123/6fa4297e-daa7-4b2f-9f6c-a2adb4b119ab/1/e14b7fd1-afe1-4ff0-98cc-28f97dccee5d_1920x1080.jpg?width=700" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>VOLODYMYR ZELENSKY/UKRAINE SBU VIA STORYFUL</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：乌克兰海无人机在利比亚港口周日击沉梅尔库里号护卫舰，此前波罗的海货船遭袭</li><li>关键细节：乌克兰击沉一艘俄罗斯军舰并击中远离战区的货船</li><li>影响：条件推断——若此类远程打击持续，可能加剧俄罗斯海上资产损失风险</li></ul>
+        <a href="https://www.wsj.com/world/europe/russian-ships-struck-in-attacks-far-from-ukraine-as-wars-fallout-spreads-a51964cb" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="俄罗斯流亡者与克里米亚大桥导弹袭击">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">52</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">俄罗斯流亡者与克里米亚大桥导弹袭击</h3><span class="card-title-en">The Russian Exile Behind the Missiles That Helped Destroy the Crimea Bridge</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">11:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-96149421/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">米哈伊尔·科科里奇是Destinus公司的首席执行官，该公司生产了用于此次袭击的“鲁塔”巡航导弹。科科里奇以痛恨普京而闻名。</p><p class="card-dek-en">Mikhail Kokorich is the Putin-hating CEO of Destinus, the company that produced the Ruta cruise missile used in the attack.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查该流亡者的具体身份及其在袭击中的实际角色。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-96149421/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Mikhail Kokorich left Russia in 2012 and renounced his citizenship after the invasion of Ukraine in 2022. CLAUDIA PAPARELLI FOR WSJ</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：摘要称Ruta巡航导弹及无人机和导弹袭击导致大桥上部承重结构受损并沉入海底。</li><li>关键细节：标题提及一名俄罗斯流亡者与摧毁克里米亚大桥的导弹有关。</li><li>影响：条件推断——如果该流亡者确实参与策划，可能表明针对关键基础设施的非对称攻击策略正在演变。</li></ul>
+        <a href="https://www.wsj.com/world/the-russian-exile-behind-the-missiles-that-helped-destroy-the-crimea-bridge-39adfa66" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🌍 World" data-title="阿联酋引渡政策转变令逃犯面临风险">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">53</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">阿联酋引渡政策转变令逃犯面临风险</h3><span class="card-title-en">Fugitive Criminals Need a New Hideout Since the U.A.E. Started Extraditing Them</span></div>
+        <span class="card-section" style="background:#333">🌍 World</span>
+        <time class="card-time">09:00</time>
+        <img class="card-thumb" src="https://images.wsj.net/im-64905095?width=80&height=1280" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">阿联酋近期发生的高调逮捕事件，标志着当地执法环境的转变。这一动态变化令那些长期隐匿于公众视野之下的犯罪嫌疑人面临新的风险与压力，反映出该国在打击犯罪及引渡合作政策上的新动向。</p><p class="card-dek-en">High-profile arrests in the emirate signal a shifting landscape for suspected criminals living in plain sight.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查其他在阿联酋的知名逃犯是否已采取迁移行动或受到进一步法律约束。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://images.wsj.net/im-64905095?width=1280&height=1280" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Dubai has established itself as a welcoming global business hub. Benjamin Cremel/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：迪拜因监管宽松曾为逃犯提供庇护，现签署多项引渡条约并引渡爱尔兰黑帮头目丹尼尔·基纳汉</li><li>关键细节：阿联酋开始引渡逃犯，迫使罪犯寻找新藏身处</li><li>影响：条件推断——若阿联酋继续加强引渡合作，长期隐匿于该国的国际逃犯可能面临被遣返及刑事追责的风险。</li></ul>
+        <a href="https://www.wsj.com/world/middle-east/fugitive-criminals-need-a-new-hideout-since-the-u-a-e-started-extraditing-them-7d26ff20" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="Pepper…and Salt">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">54</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">Pepper…and Salt</h3></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">13:00</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-17860761?width=80&size=0.667" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">文章标题为Pepper…and Salt</p><p class="card-dek-en">Pepper…and Salt</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查WSJ订阅服务的具体条款及版权归属</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-17860761?width=800&size=0.667" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>
+        <ul class="card-bullets"><li>核心事实：文章标题为Pepper…and Salt</li><li>关键细节：原文未提供更多可直接引用的事实。</li><li>影响：条件推断——若该版权声明属实，可能暗示内容受Dow Jones & Company, Inc.保护至2026年</li></ul>
+        <a href="https://www.wsj.com/opinion/pepperand-salt-831ed781" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" data-section="🏢 Business" data-title="芝加哥一年内流失多位市财政总监">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-num">55</span>
+        <div class="card-titles"><span class="field-label">标题</span><h3 class="card-title">芝加哥一年内流失多位市财政总监</h3><span class="card-title-en">Chicago Can’t Keep a Chief Financial Officer</span></div>
+        <span class="card-section" style="background:#8b572a">🏢 Business</span>
+        <time class="card-time">06:16</time>
+        <img class="card-thumb" src="https://opinion-images.wsj.net/im-78703706/social?width=80" loading="lazy">
+      </div>
+      <div class="card-preview">
+        <span class="field-label">导语</span><p class="card-dek">又有一位市财政总监辞职，原因是市长在财政烂摊子问题上不够坦诚。</p><p class="card-dek-en">Another one resigns, as the mayor isn’t honest about the fiscal mess.</p>
+        <div class="card-insight"><span class="insight-label">洞察</span><p>后续观察：需核查芝加哥市政厅后续财政总监任命及Gabrysch完整声明原文。</p></div>
+      </div>
+      <div class="card-detail">
+        <figure class="card-hero"><img src="https://opinion-images.wsj.net/im-78703706/social" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"><figcaption>Journal Editorial Report: Will $50B fix what’s broken in the air-traffic system?  Photo: Emily Curiel/EPA/Shutterstock/Kevin Dietsch/Getty Images</figcaption></figure>
+        <ul class="card-bullets"><li>核心事实：芝加哥市长Brandon Johnson任内一年内失去三名市财政总监；本月CFO Ashlee Gabrysch上任仅三个月即辞职，称不愿损害对纳税人的信义义务。</li><li>关键细节：芝加哥难以留住首席财政官。</li><li>影响：条件推断——如果财政总监频繁离职，可能引发投资者和评级机构对芝加哥市财政信息可靠性的担忧。</li></ul>
+        <a href="https://www.wsj.com/opinion/chicago-cant-keep-a-cfo-mayor-brandon-johnson-913dd920" target="_blank" class="card-cta">阅读原文 &rarr;</a>
+      </div>
+    </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        Generated at 2026-11-24 04:03 HKT &middot; Source: Wall Street Journal
+    </footer>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // 板块筛选
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.card').forEach(c => {
+                    if (filter === 'all' || c.dataset.section === filter) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            };
+        });
+
+        // 搜索
+        function filterSearch(q) {
+            q = q.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            document.querySelectorAll('.card').forEach(c => {
+                const title = c.dataset.title.toLowerCase();
+                const sectionMatch = (activeFilter === 'all' || c.dataset.section === activeFilter);
+                const titleMatch = (!q || title.indexOf(q) !== -1);
+                if (sectionMatch && titleMatch) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
